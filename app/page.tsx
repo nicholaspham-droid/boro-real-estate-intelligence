@@ -7,35 +7,38 @@ type Area = {
   name: string;
   borough: string;
   score: number;
-  growth: number;
-  confidence: "High" | "Medium" | "Low";
-  price: string;
+  lots: number;
+  farGap: number;
+  altered: number;
+  transit: number;
+  resilience: number;
   drivers: string[];
-  risk: number;
   cells: number[];
 };
 
 const AREAS: Area[] = [
-  { rank: 1, name: "Ridgewood", borough: "Queens", score: 88, growth: 24.6, confidence: "High", price: "$1.02M", drivers: ["Transit", "Supply"], risk: 24, cells: [72, 84, 91, 68, 82, 76, 87, 63] },
-  { rank: 2, name: "Crown Heights", borough: "Brooklyn", score: 84, growth: 22.1, confidence: "High", price: "$1.18M", drivers: ["Demand", "Rent growth"], risk: 31, cells: [67, 82, 76, 88, 71, 81, 65, 74] },
-  { rank: 3, name: "Mott Haven", borough: "Bronx", score: 82, growth: 21.4, confidence: "Medium", price: "$685K", drivers: ["Pipeline", "Transit"], risk: 39, cells: [61, 78, 83, 69, 72, 85, 58, 77] },
-  { rank: 4, name: "Sunset Park", borough: "Brooklyn", score: 79, growth: 19.8, confidence: "High", price: "$1.10M", drivers: ["Jobs", "Scarcity"], risk: 28, cells: [74, 71, 80, 62, 77, 68, 83, 59] },
-  { rank: 5, name: "Astoria", borough: "Queens", score: 77, growth: 18.5, confidence: "High", price: "$1.24M", drivers: ["Liquidity", "Transit"], risk: 26, cells: [66, 75, 70, 79, 63, 73, 81, 60] },
-  { rank: 6, name: "Washington Heights", borough: "Manhattan", score: 74, growth: 17.2, confidence: "Medium", price: "$720K", drivers: ["Value gap", "Demand"], risk: 34, cells: [58, 72, 77, 61, 69, 75, 55, 70] },
-  { rank: 7, name: "Jamaica", borough: "Queens", score: 72, growth: 16.8, confidence: "Medium", price: "$735K", drivers: ["Transit", "Zoning"], risk: 43, cells: [55, 69, 74, 64, 71, 66, 76, 52] },
-  { rank: 8, name: "Flatbush", borough: "Brooklyn", score: 69, growth: 15.1, confidence: "High", price: "$985K", drivers: ["Rent growth", "Liquidity"], risk: 32, cells: [62, 67, 70, 58, 65, 73, 54, 68] },
-  { rank: 9, name: "East Harlem", borough: "Manhattan", score: 67, growth: 14.2, confidence: "Medium", price: "$795K", drivers: ["Value gap", "Pipeline"], risk: 46, cells: [49, 65, 71, 56, 63, 68, 51, 59] },
-  { rank: 10, name: "St. George", borough: "Staten Island", score: 64, growth: 13.5, confidence: "Low", price: "$610K", drivers: ["Value gap", "Supply"], risk: 41, cells: [48, 61, 67, 52, 58, 64, 44, 60] },
-  { rank: 11, name: "Bedford Park", borough: "Bronx", score: 61, growth: 12.7, confidence: "Medium", price: "$540K", drivers: ["Affordability", "Transit"], risk: 45, cells: [43, 58, 64, 49, 55, 61, 47, 57] },
-  { rank: 12, name: "Elmhurst", borough: "Queens", score: 58, growth: 11.9, confidence: "Medium", price: "$690K", drivers: ["Demand", "Affordability"], risk: 38, cells: [46, 55, 60, 51, 57, 62, 48, 53] },
+  { rank: 1, name: "Highbridge / Concourse", borough: "Bronx", score: 97, lots: 3323, farGap: 1.76, altered: 6.2, transit: 99.9, resilience: 98.4, drivers: ["Capacity", "Alterations"], cells: [83, 94, 88, 97, 91, 86, 95, 79] },
+  { rank: 2, name: "Fordham / University Hts.", borough: "Bronx", score: 89, lots: 3243, farGap: 1.52, altered: 5.0, transit: 99.6, resilience: 99.5, drivers: ["Capacity", "Transit"], cells: [78, 89, 84, 92, 87, 81, 90, 75] },
+  { rank: 3, name: "Upper East Side", borough: "Manhattan", score: 79, lots: 5474, farGap: 1.56, altered: 1.9, transit: 99.6, resilience: 97.6, drivers: ["Capacity", "Transit"], cells: [70, 81, 76, 84, 79, 73, 82, 67] },
+  { rank: 4, name: "Belmont / East Tremont", borough: "Bronx", score: 79, lots: 4100, farGap: 1.14, altered: 4.2, transit: 99.6, resilience: 99.8, drivers: ["Alterations", "Resilience"], cells: [72, 80, 77, 85, 74, 82, 69, 78] },
+  { rank: 5, name: "East Harlem", borough: "Manhattan", score: 78, lots: 3062, farGap: 1.90, altered: 0.8, transit: 99.5, resilience: 71.3, drivers: ["Capacity", "Flood flag"], cells: [68, 79, 75, 83, 71, 80, 65, 76] },
+  { rank: 6, name: "Morrisania / Crotona", borough: "Bronx", score: 77, lots: 3655, farGap: 1.24, altered: 3.6, transit: 92.0, resilience: 100, drivers: ["Alterations", "Resilience"], cells: [66, 78, 73, 81, 76, 69, 79, 64] },
+  { rank: 7, name: "Murray Hill / Kips Bay", borough: "Manhattan", score: 76, lots: 2789, farGap: 1.45, altered: 1.7, transit: 98.8, resilience: 96.2, drivers: ["Capacity", "Transit"], cells: [67, 76, 72, 80, 74, 78, 63, 75] },
+  { rank: 8, name: "Chelsea / Clinton", borough: "Manhattan", score: 75, lots: 3407, farGap: 1.35, altered: 2.2, transit: 99.5, resilience: 89.9, drivers: ["Capacity", "Transit"], cells: [64, 75, 70, 79, 73, 77, 61, 72] },
+  { rank: 9, name: "Kingsbridge / Bedford", borough: "Bronx", score: 74, lots: 3588, farGap: 1.00, altered: 3.5, transit: 99.8, resilience: 99.2, drivers: ["Alterations", "Transit"], cells: [65, 74, 71, 78, 68, 76, 62, 73] },
+  { rank: 10, name: "Upper West Side", borough: "Manhattan", score: 71, lots: 4419, farGap: 1.30, altered: 0.7, transit: 99.8, resilience: 99.5, drivers: ["Capacity", "Resilience"], cells: [61, 71, 68, 75, 70, 65, 73, 59] },
+  { rank: 11, name: "Hunts Point / Longwood", borough: "Bronx", score: 70, lots: 2979, farGap: .90, altered: 2.9, transit: 99.5, resilience: 96.4, drivers: ["Alterations", "Transit"], cells: [60, 70, 66, 74, 69, 63, 72, 57] },
+  { rank: 12, name: "Mott Haven / Melrose", borough: "Bronx", score: 69, lots: 3984, farGap: .79, altered: 3.4, transit: 99.8, resilience: 93.5, drivers: ["Alterations", "Transit"], cells: [58, 69, 65, 73, 67, 62, 71, 56] },
+  { rank: 13, name: "Downtown / Fort Greene", borough: "Brooklyn", score: 69, lots: 8107, farGap: .45, altered: 5.1, transit: 99.8, resilience: 99.0, drivers: ["Alterations", "Resilience"], cells: [61, 68, 64, 72, 66, 70, 57, 67] },
+  { rank: 14, name: "Bedford-Stuyvesant", borough: "Brooklyn", score: 67, lots: 16805, farGap: .60, altered: 3.3, transit: 99.9, resilience: 100, drivers: ["Alterations", "Resilience"], cells: [57, 67, 63, 71, 65, 60, 69, 54] },
+  { rank: 15, name: "Brownsville", borough: "Brooklyn", score: 66, lots: 8070, farGap: 1.04, altered: .8, transit: 100, resilience: 100, drivers: ["Capacity", "Resilience"], cells: [56, 66, 62, 70, 64, 59, 68, 53] },
 ];
 
 const BOROUGHS = ["All boroughs", "Manhattan", "Brooklyn", "Queens", "Bronx", "Staten Island"];
 
 export default function Home() {
   const [borough, setBorough] = useState("All boroughs");
-  const [horizon, setHorizon] = useState(5);
-  const [layer, setLayer] = useState<"score" | "growth" | "risk">("score");
+  const [layer, setLayer] = useState<"score" | "capacity" | "resilience">("score");
   const [selected, setSelected] = useState(AREAS[0]);
   const [query, setQuery] = useState("");
   const [showGaps, setShowGaps] = useState(false);
@@ -45,8 +48,7 @@ export default function Home() {
       .filter((a) => `${a.name} ${a.borough}`.toLowerCase().includes(query.toLowerCase()));
   }, [borough, query]);
 
-  const adjustedGrowth = (growth: number) => growth * (horizon / 5);
-  const intensity = (a: Area) => layer === "score" ? a.score : layer === "growth" ? Math.min(96, adjustedGrowth(a.growth) * 3.2) : 100 - a.risk;
+  const intensity = (a: Area) => layer === "score" ? a.score : layer === "capacity" ? Math.min(100, a.farGap * 52) : a.resilience;
 
   return (
     <main>
@@ -55,39 +57,38 @@ export default function Home() {
         <nav aria-label="Primary navigation">
           <a className="active" href="#outlook">Outlook</a>
           <a href="#rankings">Rankings</a>
+          <a href="#sources">Sources</a>
           <a href="#methodology">Methodology</a>
         </nav>
-        <button className="data-status" onClick={() => setShowGaps(true)}><i /> Data coverage: 76%</button>
+        <button className="data-status" onClick={() => setShowGaps(true)}><i /> PLUTO 26v1 · 858,602 lots</button>
       </header>
 
       <section className="hero" id="top">
         <div>
-          <p className="eyebrow">NYC PROPERTY INTELLIGENCE · MODEL 0.9</p>
-          <h1>Where value<br />moves <em>next.</em></h1>
-          <p className="lede">A forward-looking score for New York neighborhoods, built from sales momentum, assessed values, transit access, development pressure, and climate exposure.</p>
+          <p className="eyebrow">NYC PUBLIC-RECORD INTELLIGENCE · PLUTO 26V1</p>
+          <h1>Where the city<br />can grow <em>next.</em></h1>
+          <p className="lede">A value-potential signal built from the official tax-lot record: unused residential floor-area capacity, transit-zone status, recent alterations and mapped flood exposure.</p>
         </div>
         <div className="headline-stat">
           <span>Top signal</span>
-          <strong>Ridgewood</strong>
-          <div><b>88</b><small>/100</small></div>
-          <p>Projected {horizon}-year value change <b>+{adjustedGrowth(24.6).toFixed(1)}%</b></p>
+          <strong>Bronx CD 4</strong>
+          <div><b>97</b><small>/100</small></div>
+          <p>Observed lots <b>3,323</b> · average unused residential FAR <b>1.76</b></p>
         </div>
       </section>
 
       <section className="controls" id="outlook" aria-label="Map controls">
-        <label className="search"><span>⌕</span><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search neighborhood" aria-label="Search neighborhood" /></label>
+        <label className="search"><span>⌕</span><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search community district" aria-label="Search community district" /></label>
         <label><span>Borough</span><select value={borough} onChange={(e) => setBorough(e.target.value)}>{BOROUGHS.map((b) => <option key={b}>{b}</option>)}</select></label>
-        <div className="segmented" aria-label="Forecast horizon">
-          <span>Horizon</span>{[3, 5, 10].map((n) => <button key={n} className={horizon === n ? "selected" : ""} onClick={() => setHorizon(n)}>{n}Y</button>)}
-        </div>
+        <div className="segmented"><span>Release</span><button className="selected">26V1</button><button disabled>Quarterly</button></div>
         <div className="segmented layer" aria-label="Map layer">
-          <span>Layer</span>{(["score", "growth", "risk"] as const).map((v) => <button key={v} className={layer === v ? "selected" : ""} onClick={() => setLayer(v)}>{v === "score" ? "Outlook" : v === "growth" ? "Growth" : "Resilience"}</button>)}
+          <span>Layer</span>{(["score", "capacity", "resilience"] as const).map((v) => <button key={v} className={layer === v ? "selected" : ""} onClick={() => setLayer(v)}>{v === "score" ? "Potential" : v === "capacity" ? "FAR gap" : "Resilience"}</button>)}
         </div>
       </section>
 
       <section className="map-shell">
         <div className="map-head">
-          <div><p className="eyebrow">NEIGHBORHOOD SIGNAL MAP</p><h2>{layer === "score" ? "Composite outlook score" : layer === "growth" ? `Projected ${horizon}-year growth` : "Climate resilience"}</h2></div>
+          <div><p className="eyebrow">COMMUNITY-DISTRICT SIGNAL MAP</p><h2>{layer === "score" ? "Public-record potential score" : layer === "capacity" ? "Unused residential FAR" : "Lots without PLUTO flood flag"}</h2></div>
           <div className="legend"><span>Lower</span>{[28,42,56,70,84,96].map(n => <i key={n} style={{ background: `hsl(${160 - n * .85} 78% ${20 + n * .48}%)` }} />)}<span>Higher</span></div>
         </div>
         <div className="map-area">
@@ -101,42 +102,54 @@ export default function Home() {
           </div>
           <article className="map-card">
             <button aria-label="Close detail" onClick={() => setSelected(AREAS[0])}>×</button>
-            <p>#{selected.rank} FORECAST RANK</p><h3>{selected.name}</h3><span>{selected.borough}</span>
-            <div className="score-row"><strong>{selected.score}</strong><small>/100<br />OUTLOOK</small><b>+{adjustedGrowth(selected.growth).toFixed(1)}%</b></div>
+            <p>#{selected.rank} PLUTO SIGNAL RANK</p><h3>{selected.name}</h3><span>{selected.borough}</span>
+            <div className="score-row"><strong>{selected.score}</strong><small>/100<br />POTENTIAL</small><b>{selected.farGap.toFixed(2)} FAR</b></div>
             <div className="meter"><i style={{ width: `${selected.score}%` }} /></div>
-            <dl><div><dt>Median recorded sale</dt><dd>{selected.price}</dd></div><div><dt>Model confidence</dt><dd className={`conf ${selected.confidence.toLowerCase()}`}>● {selected.confidence}</dd></div></dl>
+            <dl><div><dt>PLUTO lots observed</dt><dd>{selected.lots.toLocaleString()}</dd></div><div><dt>Altered since 2020</dt><dd>{selected.altered.toFixed(1)}%</dd></div><div><dt>Greater transit zone</dt><dd>{selected.transit.toFixed(1)}%</dd></div></dl>
             <div className="tags">{selected.drivers.map(d => <span key={d}>{d}</span>)}</div>
           </article>
         </div>
       </section>
 
       <section className="rankings" id="rankings">
-        <div className="section-title"><div><p className="eyebrow">BOROCAST INDEX</p><h2>Highest upside,<br />risk-adjusted.</h2></div><p>Ranked by projected appreciation, market depth, development catalysts and downside exposure. Select a row to locate it on the map.</p></div>
-        <div className="table-wrap"><table><thead><tr><th>Rank</th><th>Neighborhood</th><th>Outlook</th><th>{horizon}Y projection</th><th>Confidence</th><th>Primary signals</th></tr></thead><tbody>
-          {areas.map(a => <tr key={a.name} onClick={() => setSelected(a)} className={selected.name === a.name ? "row-active" : ""}><td><b>{String(a.rank).padStart(2,"0")}</b></td><td><strong>{a.name}</strong><small>{a.borough}</small></td><td><div className="table-score"><b>{a.score}</b><i><span style={{ width: `${a.score}%` }} /></i></div></td><td className="positive">+{adjustedGrowth(a.growth).toFixed(1)}%</td><td><span className={`conf ${a.confidence.toLowerCase()}`}>● {a.confidence}</span></td><td>{a.drivers.map(d => <span className="tag" key={d}>{d}</span>)}</td></tr>)}
+        <div className="section-title"><div><p className="eyebrow">PLUTO-DERIVED INDEX</p><h2>Development potential,<br />made inspectable.</h2></div><p>Community districts ranked only on fields available in PLUTO 26v1. This is a land-use potential score—not a price forecast or appraisal. Select a row to locate it on the map.</p></div>
+        <div className="table-wrap"><table><thead><tr><th>Rank</th><th>Community district</th><th>Potential</th><th>Avg. FAR gap</th><th>Recent alterations</th><th>Primary signals</th></tr></thead><tbody>
+          {areas.map(a => <tr key={a.name} onClick={() => setSelected(a)} className={selected.name === a.name ? "row-active" : ""}><td><b>{String(a.rank).padStart(2,"0")}</b></td><td><strong>{a.name}</strong><small>{a.borough} · {a.lots.toLocaleString()} lots</small></td><td><div className="table-score"><b>{a.score}</b><i><span style={{ width: `${a.score}%` }} /></i></div></td><td className="positive">{a.farGap.toFixed(2)}</td><td>{a.altered.toFixed(1)}%</td><td>{a.drivers.map(d => <span className="tag" key={d}>{d}</span>)}</td></tr>)}
         </tbody></table>{areas.length === 0 && <p className="empty">No neighborhoods match this view.</p>}</div>
       </section>
 
       <section className="method" id="methodology">
         <div><p className="eyebrow">HOW TO READ THIS</p><h2>A signal, not<br />an appraisal.</h2></div>
         <div className="method-grid">
-          <article><b>01</b><h3>Market momentum</h3><p>Recorded sale-price and turnover trends, normalized within property type.</p><span>35% weight</span></article>
-          <article><b>02</b><h3>Place catalysts</h3><p>Transit access, permitted construction, zoning capacity and job proximity.</p><span>30% weight</span></article>
-          <article><b>03</b><h3>Value & resilience</h3><p>Entry-price gap, liquidity, flood exposure and model data completeness.</p><span>35% weight</span></article>
+          <article><b>01</b><h3>Development capacity</h3><p>Average positive gap between allowable residential FAR and currently built FAR.</p><span>35% weight</span></article>
+          <article><b>02</b><h3>Transit & alteration</h3><p>Share of lots in the Greater Transit Zone and share with YearAlter1 of 2020 or later.</p><span>50% combined</span></article>
+          <article><b>03</b><h3>Flood resilience</h3><p>Share of lots without the PLUTO 2015 preliminary flood-map indicator.</p><span>15% weight</span></article>
         </div>
-        <div className="source-note"><p><strong>Public-source foundation</strong> · NYC DOF Rolling Sales and assessment rolls · DCP PLUTO / MapPLUTO · NYC Open Data transit, permits and flood layers</p><button onClick={() => setShowGaps(true)}>Review data gaps →</button></div>
+        <div className="source-note"><p><strong>Audited source</strong> · NYC DCP PLUTO dataset 64uk-42ks · Version 26v1 · quarterly · 858,602 tax lots · BBL complete · coordinates 99.8%</p><button onClick={() => setShowGaps(true)}>Review audit →</button></div>
       </section>
 
-      <footer><a className="brand" href="#top"><span>BORO</span>CAST</a><p>Research prototype · Scores are directional and not investment advice.</p><span>Snapshot: FY2026 / CY2025 source releases</span></footer>
+      <section className="sources" id="sources">
+        <div className="section-title"><div><p className="eyebrow">OFFICIAL DATA DIRECTORY</p><h2>Government feeds<br />we can actually join.</h2></div><p>PLUTO is the spine. BBL joins are direct; geographic joins use official coordinates or district identifiers. Feeds are listed here before they are allowed into the score.</p></div>
+        <div className="source-grid">
+          <a href="https://data.cityofnewyork.us/resource/64uk-42ks.json" target="_blank" rel="noreferrer"><b>Core</b><h3>PLUTO 26v1</h3><p>Tax-lot, building, zoning, assessment and district attributes.</p><span>Quarterly · direct BBL · 858,602 rows ↗</span></a>
+          <a href="https://data.cityofnewyork.us/City-Government/NYC-Citywide-Rolling-Calendar-Sales/usep-8jbt" target="_blank" rel="noreferrer"><b>Next</b><h3>Rolling Sales</h3><p>Recorded transfers and prices; $0/non-market transactions require filtering.</p><span>Monthly · borough/block/lot join ↗</span></a>
+          <a href="https://data.cityofnewyork.us/Housing-Development/DOB-Permit-Issuance/ipu4-2q9a" target="_blank" rel="noreferrer"><b>Next</b><h3>DOB permits</h3><p>Issued construction permits with BBL and daily refresh.</p><span>Daily · direct BBL ↗</span></a>
+          <a href="https://data.cityofnewyork.us/City-Government/Zoning-Application-Portal-ZAP-BBL/2iga-a6mk" target="_blank" rel="noreferrer"><b>Next</b><h3>ZAP applications</h3><p>Lots attached to active and historical land-use applications.</p><span>Monthly · validated BBL ↗</span></a>
+          <a href="https://data.cityofnewyork.us/Environment/NYC-Building-Energy-and-Water-Data-Disclosure-/5zyy-y8am" target="_blank" rel="noreferrer"><b>Candidate</b><h3>Energy disclosure</h3><p>Benchmarking for covered buildings, not the full property universe.</p><span>Annual · BBL available ↗</span></a>
+          <a href="https://data.ny.gov/Transportation/MTA-Subway-Entrances-and-Exits-2024/i9wp-a4ja" target="_blank" rel="noreferrer"><b>Candidate</b><h3>MTA entrances</h3><p>Official station entrances for walking-distance calculations.</p><span>Static 2024 · spatial join ↗</span></a>
+        </div>
+      </section>
 
-      {showGaps && <div className="modal-backdrop" onClick={() => setShowGaps(false)}><section className="modal" onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="gaps-title"><button className="modal-close" onClick={() => setShowGaps(false)}>×</button><p className="eyebrow">MODEL TRANSPARENCY</p><h2 id="gaps-title">Known data gaps</h2><p className="modal-intro">These gaps reduce precision. The model applies a confidence penalty instead of pretending the inputs are complete.</p><ul>
-        <li><b>Non-market transfers</b><span>Rolling Sales includes $0 and related-party transfers. They must be filtered before training.</span></li>
-        <li><b>Condition & renovations</b><span>Public lot records do not reliably capture interior condition, recent renovations or concessions.</span></li>
-        <li><b>Condo/co-op joins</b><span>Unit sales and lot-level building attributes do not always align cleanly.</span></li>
-        <li><b>Private rental data</b><span>Asking rents, effective rents and vacancies are incomplete without licensed market feeds.</span></li>
-        <li><b>Timing mismatch</b><span>Assessments, PLUTO, permits, flood maps and sales refresh on different schedules.</span></li>
-        <li><b>Future shocks</b><span>Interest rates, insurance repricing, tax changes and project cancellations are scenarios—not observable facts.</span></li>
-      </ul><div className="modal-callout"><b>Current release</b><span>Neighborhood-level directional ranking</span><b>Not yet appropriate for</b><span>Parcel valuation, underwriting or automated purchase decisions</span></div></section></div>}
+      <footer><a className="brand" href="#top"><span>BORO</span>CAST</a><p>Public-record research prototype · This is not an appraisal or investment advice.</p><span>Snapshot: PLUTO 26v1 · accessed Aug 7, 2026</span></footer>
+
+      {showGaps && <div className="modal-backdrop" onClick={() => setShowGaps(false)}><section className="modal" onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="gaps-title"><button className="modal-close" onClick={() => setShowGaps(false)}>×</button><p className="eyebrow">PLUTO 26V1 AUDIT</p><h2 id="gaps-title">Coverage is high.<br />Meaning is bounded.</h2><p className="modal-intro">The feed is broad and joinable. The bigger gaps are conceptual: PLUTO describes tax lots and zoning, not transaction intent or future market value.</p><ul>
+        <li><b>BBL</b><span>858,602 of 858,602 rows populated — 100% field coverage.</span></li>
+        <li><b>Coordinates</b><span>857,103 rows populated — approximately 99.8% coverage.</span></li>
+        <li><b>Year built</b><span>818,364 rows have a nonzero value — approximately 95.3%.</span></li>
+        <li><b>Building area</b><span>817,099 rows have a nonzero value — approximately 95.2%; vacant lots can legitimately be zero.</span></li>
+        <li><b>Lot-map mismatch</b><span>2,341 records are not standard one-to-one PLUTO/tax-map matches; source systems refresh on different cycles.</span></li>
+        <li><b>What PLUTO lacks</b><span>Interior condition, rents, concessions, financing, buyer intent, insurance cost and a market-sale price series.</span></li>
+      </ul><div className="modal-callout"><b>Current release</b><span>Community-district land-use potential derived from PLUTO only</span><b>Next controlled joins</b><span>Rolling Sales, DOB permits and ZAP—each with its own refresh and quality test</span><b>Not appropriate for</b><span>Parcel valuation, underwriting or automated purchase decisions</span></div></section></div>}
     </main>
   );
 }
