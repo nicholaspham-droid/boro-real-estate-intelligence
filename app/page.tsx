@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { GooglePropertyMap } from "./GooglePropertyMap";
-import { EDGE_COMPONENTS, METROS, NATIONAL_FEEDS } from "./metroData";
+import { COMPETENCY_FACTORS, EDGE_COMPONENTS, METROS, NATIONAL_FEEDS } from "./metroData";
 
 type Area = {
   cd: number;
@@ -45,6 +45,13 @@ function edgeRead(area: Area) {
   if (area.altered >= 3 && area.resilience >= 99) return { type: "Momentum edge", action: "Trace alteration clusters and sales activity" };
   if (area.resilience < 90) return { type: "Capacity / risk split", action: "Price flood and insurance exposure before review" };
   return { type: "Watch signal", action: "Add sales and permit evidence before escalation" };
+}
+
+function competencyGrade(score: number) {
+  if (score >= 85) return "A";
+  if (score >= 70) return "B";
+  if (score >= 55) return "C";
+  return "D";
 }
 
 export default function Home() {
@@ -141,13 +148,15 @@ export default function Home() {
             </div>
             <ol className="metro-list">
               {METROS.filter((metro) => metro.cohort === metroCohort).map((metro, index) => <li key={metro.name}>
-                <b>{String(index + 1).padStart(2, "0")}</b><div><strong>{metro.short}</strong><span>{metro.name}</span></div><div className="metro-stat"><strong>{metro.population.toLocaleString()}</strong><span className={metro.growth < 0 ? "down" : ""}>{metro.growth > 0 ? "+" : ""}{metro.growth.toFixed(2)}% YoY</span></div>
+                <b>{String(index + 1).padStart(2, "0")}</b><div><strong>{metro.short}</strong><span>{metro.name}</span></div><div className="metro-stat"><strong>{metro.population.toLocaleString()}</strong><span className={metro.growth < 0 ? "down" : ""}>{metro.growth > 0 ? "+" : ""}{metro.growth.toFixed(2)}% YoY</span></div><div className="competency-score"><strong>{metro.competency}% <i>{competencyGrade(metro.competency)}</i></strong><span><i style={{ width: `${metro.competency}%` }} /></span><small>±{metro.evidenceBand} pts</small></div>
               </li>)}
             </ol>
+            <div className="competency-legend"><strong>Data competency</strong><span>A 85+ · B 70–84 · C 55–69 · D hold</span><small>Evidence band estimates potential Edge Score movement from missing or weak inputs. It is not yet a statistical confidence interval.</small></div>
           </div>
           <div className="coverage-panel">
             <p className="eyebrow">ACQUISITION STACK</p><h3>Comparable first.<br />Granular second.</h3>
             <div className="feed-list">{NATIONAL_FEEDS.map(feed => <div key={feed.label}><span className={`feed-status ${feed.status === "ready" ? "ready" : "needed"}`}>{feed.status}</span><div><strong>{feed.label}</strong><small>{feed.source} · {feed.role}</small></div></div>)}</div>
+            <details className="competency-method"><summary>How competency is scored</summary>{COMPETENCY_FACTORS.map(factor => <div key={factor.label}><span>{factor.label}</span><b>{factor.weight}%</b></div>)}</details>
             <div className="gap-callout"><b>Known gap</b><p>There is no national PLUTO equivalent. Assessment, parcel geometry, zoning and arms-length sales differ in licensing, geography, identifiers and refresh cadence. Every local adapter will publish its own coverage grade.</p></div>
           </div>
         </div>

@@ -5,29 +5,41 @@ export type Metro = {
   growth: number;
   cohort: "largest" | "fastest";
   localStatus: "live" | "source inventory" | "cataloging";
+  competency: number;
+  evidenceBand: number;
 };
 
 export const METROS: Metro[] = [
-  { name: "New York–Newark–Jersey City, NY–NJ", short: "New York", population: 20112448, growth: 0.16, cohort: "largest", localStatus: "live" },
-  { name: "Los Angeles–Long Beach–Anaheim, CA", short: "Los Angeles", population: 12844441, growth: -0.48, cohort: "largest", localStatus: "source inventory" },
-  { name: "Chicago–Naperville–Elgin, IL–IN", short: "Chicago", population: 9434123, growth: 0.24, cohort: "largest", localStatus: "source inventory" },
-  { name: "Dallas–Fort Worth–Arlington, TX", short: "Dallas–Fort Worth", population: 8477157, growth: 1.48, cohort: "largest", localStatus: "source inventory" },
-  { name: "Houston–Pasadena–The Woodlands, TX", short: "Houston", population: 7904627, growth: 1.63, cohort: "largest", localStatus: "source inventory" },
-  { name: "Atlanta–Sandy Springs–Roswell, GA", short: "Atlanta", population: 6482182, growth: 0.96, cohort: "largest", localStatus: "source inventory" },
-  { name: "Washington–Arlington–Alexandria, DC–VA–MD–WV", short: "Washington", population: 6465724, growth: 0.78, cohort: "largest", localStatus: "source inventory" },
-  { name: "Miami–Fort Lauderdale–West Palm Beach, FL", short: "Miami", population: 6391072, growth: -0.14, cohort: "largest", localStatus: "source inventory" },
-  { name: "Philadelphia–Camden–Wilmington, PA–NJ–DE–MD", short: "Philadelphia", population: 6329118, growth: 0.25, cohort: "largest", localStatus: "source inventory" },
-  { name: "Phoenix–Mesa–Chandler, AZ", short: "Phoenix", population: 5228938, growth: 1.14, cohort: "largest", localStatus: "source inventory" },
-  { name: "Ocala, FL", short: "Ocala", population: 442660, growth: 3.43, cohort: "fastest", localStatus: "cataloging" },
-  { name: "Myrtle Beach–Conway–North Myrtle Beach, SC", short: "Myrtle Beach", population: 427551, growth: 3.20, cohort: "fastest", localStatus: "cataloging" },
-  { name: "Spartanburg, SC", short: "Spartanburg", population: 407656, growth: 2.75, cohort: "fastest", localStatus: "cataloging" },
-  { name: "Lakeland–Winter Haven, FL", short: "Lakeland", population: 874790, growth: 2.74, cohort: "fastest", localStatus: "cataloging" },
-  { name: "Punta Gorda, FL", short: "Punta Gorda", population: 217212, growth: 2.72, cohort: "fastest", localStatus: "cataloging" },
-  { name: "Huntsville, AL", short: "Huntsville", population: 556444, growth: 2.64, cohort: "fastest", localStatus: "cataloging" },
-  { name: "Wilmington, NC", short: "Wilmington", population: 492772, growth: 2.58, cohort: "fastest", localStatus: "cataloging" },
-  { name: "St. George, UT", short: "St. George", population: 213670, growth: 2.51, cohort: "fastest", localStatus: "cataloging" },
-  { name: "Fayetteville–Springdale–Rogers, AR", short: "Northwest Arkansas", population: 622177, growth: 2.43, cohort: "fastest", localStatus: "cataloging" },
-  { name: "Raleigh–Cary, NC", short: "Raleigh", population: 1595720, growth: 2.36, cohort: "fastest", localStatus: "cataloging" },
+  { name: "New York–Newark–Jersey City, NY–NJ", short: "New York", population: 20112448, growth: 0.16, cohort: "largest", localStatus: "live", competency: 88, evidenceBand: 6 },
+  { name: "Los Angeles–Long Beach–Anaheim, CA", short: "Los Angeles", population: 12844441, growth: -0.48, cohort: "largest", localStatus: "source inventory", competency: 78, evidenceBand: 10 },
+  { name: "Chicago–Naperville–Elgin, IL–IN", short: "Chicago", population: 9434123, growth: 0.24, cohort: "largest", localStatus: "source inventory", competency: 90, evidenceBand: 6 },
+  { name: "Dallas–Fort Worth–Arlington, TX", short: "Dallas–Fort Worth", population: 8477157, growth: 1.48, cohort: "largest", localStatus: "source inventory", competency: 72, evidenceBand: 12 },
+  { name: "Houston–Pasadena–The Woodlands, TX", short: "Houston", population: 7904627, growth: 1.63, cohort: "largest", localStatus: "source inventory", competency: 70, evidenceBand: 12 },
+  { name: "Atlanta–Sandy Springs–Roswell, GA", short: "Atlanta", population: 6482182, growth: 0.96, cohort: "largest", localStatus: "source inventory", competency: 73, evidenceBand: 12 },
+  { name: "Washington–Arlington–Alexandria, DC–VA–MD–WV", short: "Washington", population: 6465724, growth: 0.78, cohort: "largest", localStatus: "source inventory", competency: 77, evidenceBand: 10 },
+  { name: "Miami–Fort Lauderdale–West Palm Beach, FL", short: "Miami", population: 6391072, growth: -0.14, cohort: "largest", localStatus: "source inventory", competency: 76, evidenceBand: 10 },
+  { name: "Philadelphia–Camden–Wilmington, PA–NJ–DE–MD", short: "Philadelphia", population: 6329118, growth: 0.25, cohort: "largest", localStatus: "source inventory", competency: 89, evidenceBand: 6 },
+  { name: "Phoenix–Mesa–Chandler, AZ", short: "Phoenix", population: 5228938, growth: 1.14, cohort: "largest", localStatus: "source inventory", competency: 68, evidenceBand: 15 },
+  { name: "Ocala, FL", short: "Ocala", population: 442660, growth: 3.43, cohort: "fastest", localStatus: "cataloging", competency: 78, evidenceBand: 10 },
+  { name: "Myrtle Beach–Conway–North Myrtle Beach, SC", short: "Myrtle Beach", population: 427551, growth: 3.20, cohort: "fastest", localStatus: "cataloging", competency: 70, evidenceBand: 12 },
+  { name: "Spartanburg, SC", short: "Spartanburg", population: 407656, growth: 2.75, cohort: "fastest", localStatus: "cataloging", competency: 66, evidenceBand: 15 },
+  { name: "Lakeland–Winter Haven, FL", short: "Lakeland", population: 874790, growth: 2.74, cohort: "fastest", localStatus: "cataloging", competency: 78, evidenceBand: 10 },
+  { name: "Punta Gorda, FL", short: "Punta Gorda", population: 217212, growth: 2.72, cohort: "fastest", localStatus: "cataloging", competency: 80, evidenceBand: 10 },
+  { name: "Huntsville, AL", short: "Huntsville", population: 556444, growth: 2.64, cohort: "fastest", localStatus: "cataloging", competency: 67, evidenceBand: 15 },
+  { name: "Wilmington, NC", short: "Wilmington", population: 492772, growth: 2.58, cohort: "fastest", localStatus: "cataloging", competency: 84, evidenceBand: 8 },
+  { name: "St. George, UT", short: "St. George", population: 213670, growth: 2.51, cohort: "fastest", localStatus: "cataloging", competency: 83, evidenceBand: 8 },
+  { name: "Fayetteville–Springdale–Rogers, AR", short: "Northwest Arkansas", population: 622177, growth: 2.43, cohort: "fastest", localStatus: "cataloging", competency: 74, evidenceBand: 12 },
+  { name: "Raleigh–Cary, NC", short: "Raleigh", population: 1595720, growth: 2.36, cohort: "fastest", localStatus: "cataloging", competency: 86, evidenceBand: 8 },
+];
+
+export const COMPETENCY_FACTORS = [
+  { label: "National comparable feeds", weight: 35 },
+  { label: "Parcel geometry + stable ID", weight: 15 },
+  { label: "Assessment + building attributes", weight: 15 },
+  { label: "Verified arms-length sales", weight: 15 },
+  { label: "Zoning + land-use capacity", weight: 8 },
+  { label: "Permits + development pipeline", weight: 7 },
+  { label: "Freshness, terms + join quality", weight: 5 },
 ];
 
 export const NATIONAL_FEEDS = [
