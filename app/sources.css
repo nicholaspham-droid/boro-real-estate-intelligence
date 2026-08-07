@@ -124,3 +124,139 @@
 .map-tooltip { display: grid; gap: 4px; color: #06142e; }
 .map-tooltip b { font-size: 13px; }
 .map-tooltip span { color: #687585; font-size: 10px; }
+
+/* The original abstract-map river masks are not used by Google Maps. */
+.map-area::before,
+.map-area::after {
+  display: none;
+}
+
+.map-card {
+  left: 22px;
+  bottom: 22px;
+  width: 244px;
+  padding: 18px;
+}
+
+.map-card h3 { font-size: 24px; }
+.map-card .score-row { margin-top: 15px; }
+.map-card .score-row > strong { font-size: 46px; }
+.map-card dl { margin: 14px 0 12px; padding-top: 10px; }
+.map-card dl div { margin: 6px 0; }
+
+@media (max-width: 600px) {
+  .map-card {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    width: auto;
+    padding: 16px;
+  }
+}
+
+.edge-pill {
+  display: inline-block;
+  border: 1px solid #aeb7aa;
+  background: #eef5dc;
+  padding: 6px 8px;
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  white-space: nowrap;
+}
+
+.next-test { max-width: 260px; color: #687585; font-size: 11px; line-height: 1.4; }
+
+.national,
+.edge {
+  padding: 82px 7vw 90px;
+}
+
+.national { background: #081a37; color: white; }
+.national .section-title > p { color: #98a8bd; }
+.national .eyebrow { color: #8fa1b8; }
+
+.national-grid {
+  display: grid;
+  grid-template-columns: 1.35fr .65fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.metro-panel,
+.coverage-panel {
+  border: 1px solid #2c4260;
+  background: #0a2144;
+}
+
+.cohort-switch { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid #2c4260; }
+.cohort-switch button { border: 0; border-right: 1px solid #2c4260; background: transparent; color: #93a3b8; padding: 17px; text-transform: uppercase; font-size: 10px; font-weight: 800; letter-spacing: .1em; }
+.cohort-switch button:last-child { border-right: 0; }
+.cohort-switch button.selected { background: #d9ff55; color: #071a38; }
+
+.metro-list { list-style: none; margin: 0; padding: 0; }
+.metro-list li { display: grid; grid-template-columns: 38px 1fr auto; gap: 13px; align-items: center; min-height: 67px; padding: 10px 18px; border-bottom: 1px solid #263c5b; }
+.metro-list li:last-child { border-bottom: 0; }
+.metro-list li > b { color: #7890ad; font-size: 10px; }
+.metro-list li div { min-width: 0; }
+.metro-list li div > strong { display: block; font-size: 13px; }
+.metro-list li div > span { display: block; margin-top: 4px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: #8395ad; font-size: 9px; }
+.metro-list .metro-stat { text-align: right; }
+.metro-list .metro-stat > span { color: #d9ff55; }
+.metro-list .metro-stat > span.down { color: #ff8c80; }
+
+.coverage-panel { padding: 27px; }
+.coverage-panel h3 { margin: 0 0 25px; font-size: 28px; letter-spacing: -.04em; }
+.feed-list > div { display: grid; grid-template-columns: 82px 1fr; gap: 12px; align-items: center; padding: 13px 0; border-top: 1px solid #2c4260; }
+.feed-status { font-size: 8px; text-align: center; padding: 5px; border: 1px solid; text-transform: uppercase; letter-spacing: .06em; }
+.feed-status.ready { color: #d9ff55; border-color: #637a39; }
+.feed-status.needed { color: #ffb4aa; border-color: #774b53; }
+.feed-list strong { display: block; font-size: 11px; }
+.feed-list small { display: block; color: #8193aa; font-size: 9px; margin-top: 4px; }
+.gap-callout { margin-top: 24px; padding: 18px; background: #06142e; border-left: 3px solid #ff7568; }
+.gap-callout b { color: #ff8a7d; text-transform: uppercase; font-size: 9px; letter-spacing: .1em; }
+.gap-callout p { margin: 9px 0 0; color: #9aabc0; font-size: 11px; line-height: 1.55; }
+
+.edge { background: #f5f2e9; }
+.edge-layout { display: grid; grid-template-columns: 1.1fr .72fr .72fr; gap: 18px; }
+.edge-components { border-top: 2px solid #06142e; }
+.edge-components button { width: 100%; display: grid; grid-template-columns: 54px 1fr; gap: 14px; align-items: center; text-align: left; border: 0; border-bottom: 1px solid #c7ccc7; background: transparent; padding: 16px 12px; }
+.edge-components button:hover,.edge-components button.active { background: white; }
+.edge-components button.active { box-shadow: inset 4px 0 #8abc16; }
+.edge-components button > span { color: #78a50f; font-size: 18px; font-weight: 900; }
+.edge-components strong,.edge-components small { display: block; }
+.edge-components strong { font-size: 13px; }
+.edge-components small { margin-top: 4px; color: #778390; font-size: 10px; line-height: 1.35; }
+.edge-detail,.action-ladder { padding: 25px; border: 1px solid #c4cac4; background: white; }
+.edge-detail > p:first-child,.action-ladder > p:first-child { margin: 0; color: #7a8693; font-size: 9px; font-weight: 800; letter-spacing: .12em; }
+.edge-weight { margin-top: 32px; color: #79a90e; font-size: 72px; font-weight: 900; line-height: .8; letter-spacing: -.07em; }
+.edge-weight span { font-size: 17px; }
+.edge-detail h3,.action-ladder h3 { font-size: 23px; letter-spacing: -.03em; }
+.edge-detail > p { color: #687585; font-size: 12px; line-height: 1.55; }
+.edge-detail dl { margin-top: 28px; }
+.edge-detail dl div { border-top: 1px solid #d6dad6; padding: 11px 0; }
+.edge-detail dt { color: #89939e; font-size: 9px; text-transform: uppercase; }
+.edge-detail dd { margin: 4px 0 0; font-size: 10px; line-height: 1.4; }
+.action-ladder { background: #e8f0cf; }
+.action-ladder > div { padding: 16px 0; border-top: 1px solid #c4cfa8; }
+.action-ladder b,.action-ladder span,.action-ladder small { display: block; }
+.action-ladder b { font-size: 10px; color: #5d7625; }
+.action-ladder span { margin-top: 5px; font-size: 15px; font-weight: 900; }
+.action-ladder small { margin-top: 5px; color: #667258; font-size: 10px; line-height: 1.4; }
+.edge-footnote { max-width: 870px; margin: 25px 0 0; color: #6e7884; font-size: 11px; line-height: 1.6; }
+
+@media (max-width: 900px) {
+  .national-grid,.edge-layout { grid-template-columns: 1fr; }
+  .edge-layout { grid-template-columns: 1fr 1fr; }
+  .edge-components { grid-column: 1 / -1; }
+}
+
+@media (max-width: 600px) {
+  .national,.edge { padding: 64px 5vw; }
+  .national-grid,.edge-layout { grid-template-columns: 1fr; }
+  .edge-components { grid-column: auto; }
+  .metro-list li { grid-template-columns: 30px 1fr; }
+  .metro-list .metro-stat { grid-column: 2; text-align: left; display: flex; gap: 10px; align-items: center; }
+  .metro-list .metro-stat > span { margin-top: 0; }
+}

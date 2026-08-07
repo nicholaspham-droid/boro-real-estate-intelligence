@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { GooglePropertyMap } from "./GooglePropertyMap";
+import { EDGE_COMPONENTS, METROS, NATIONAL_FEEDS } from "./metroData";
 
 type Area = {
   cd: number;
@@ -38,12 +39,22 @@ const AREAS: Area[] = [
 
 const BOROUGHS = ["All boroughs", "Manhattan", "Brooklyn", "Queens", "Bronx", "Staten Island"];
 
+function edgeRead(area: Area) {
+  if (area.farGap >= 1.5 && area.altered >= 4) return { type: "Capacity edge", action: "Verify zoning, ownership and recent permits" };
+  if (area.farGap >= 1.25 && area.transit >= 99) return { type: "Transit capacity", action: "Test sites near stations for deliverable FAR" };
+  if (area.altered >= 3 && area.resilience >= 99) return { type: "Momentum edge", action: "Trace alteration clusters and sales activity" };
+  if (area.resilience < 90) return { type: "Capacity / risk split", action: "Price flood and insurance exposure before review" };
+  return { type: "Watch signal", action: "Add sales and permit evidence before escalation" };
+}
+
 export default function Home() {
   const [borough, setBorough] = useState("All boroughs");
   const [layer, setLayer] = useState<"score" | "capacity" | "resilience">("score");
   const [selected, setSelected] = useState(AREAS[0]);
   const [query, setQuery] = useState("");
   const [showGaps, setShowGaps] = useState(false);
+  const [metroCohort, setMetroCohort] = useState<"largest" | "fastest">("largest");
+  const [edgeComponent, setEdgeComponent] = useState(EDGE_COMPONENTS[0]);
 
   const areas = useMemo(() => {
     return AREAS.filter((a) => borough === "All boroughs" || a.borough === borough)
@@ -57,8 +68,9 @@ export default function Home() {
         <nav aria-label="Primary navigation">
           <a className="active" href="#outlook">Outlook</a>
           <a href="#rankings">Rankings</a>
+          <a href="#national">U.S. markets</a>
+          <a href="#edge">Edge score</a>
           <a href="#sources">Sources</a>
-          <a href="#methodology">Methodology</a>
         </nav>
         <button className="data-status" onClick={() => setShowGaps(true)}><i /> PLUTO 26v1 · 858,602 lots</button>
       </header>
@@ -103,7 +115,7 @@ export default function Home() {
           />
           <article className="map-card">
             <button aria-label="Close detail" onClick={() => setSelected(AREAS[0])}>×</button>
-            <p>#{selected.rank} PLUTO SIGNAL RANK</p><h3>{selected.name}</h3><span>{selected.borough}</span>
+            <p>#{selected.rank} PLUTO SIGNAL RANK</p><h3>{selected.name}</h3><span>{selected.borough} · {edgeRead(selected).type}</span>
             <div className="score-row"><strong>{selected.score}</strong><small>/100<br />POTENTIAL</small><b>{selected.farGap.toFixed(2)} FAR</b></div>
             <div className="meter"><i style={{ width: `${selected.score}%` }} /></div>
             <dl><div><dt>PLUTO lots observed</dt><dd>{selected.lots.toLocaleString()}</dd></div><div><dt>Altered since 2020</dt><dd>{selected.altered.toFixed(1)}%</dd></div><div><dt>Greater transit zone</dt><dd>{selected.transit.toFixed(1)}%</dd></div></dl>
@@ -113,10 +125,52 @@ export default function Home() {
       </section>
 
       <section className="rankings" id="rankings">
-        <div className="section-title"><div><p className="eyebrow">PLUTO-DERIVED INDEX</p><h2>Development potential,<br />made inspectable.</h2></div><p>Community districts ranked only on fields available in PLUTO 26v1. This is a land-use potential score—not a price forecast or appraisal. Select a row to locate it on the map.</p></div>
-        <div className="table-wrap"><table><thead><tr><th>Rank</th><th>Community district</th><th>Potential</th><th>Avg. FAR gap</th><th>Recent alterations</th><th>Primary signals</th></tr></thead><tbody>
-          {areas.map(a => <tr key={a.name} onClick={() => setSelected(a)} className={selected.name === a.name ? "row-active" : ""}><td><b>{String(a.rank).padStart(2,"0")}</b></td><td><strong>{a.name}</strong><small>{a.borough} · {a.lots.toLocaleString()} lots</small></td><td><div className="table-score"><b>{a.score}</b><i><span style={{ width: `${a.score}%` }} /></i></div></td><td className="positive">{a.farGap.toFixed(2)}</td><td>{a.altered.toFixed(1)}%</td><td>{a.drivers.map(d => <span className="tag" key={d}>{d}</span>)}</td></tr>)}
+        <div className="section-title"><div><p className="eyebrow">PLUTO-DERIVED INDEX</p><h2>Potential, translated<br />into a next test.</h2></div><p>Each district now carries an edge pattern and a diligence action. The current rank remains PLUTO-only; national demand, price and supply feeds will graduate it into the full Edge Score.</p></div>
+        <div className="table-wrap"><table><thead><tr><th>Rank</th><th>Community district</th><th>Potential</th><th>Avg. FAR gap</th><th>Edge read</th><th>Next evidence test</th></tr></thead><tbody>
+          {areas.map(a => <tr key={a.name} onClick={() => setSelected(a)} className={selected.name === a.name ? "row-active" : ""}><td><b>{String(a.rank).padStart(2,"0")}</b></td><td><strong>{a.name}</strong><small>{a.borough} · {a.lots.toLocaleString()} lots</small></td><td><div className="table-score"><b>{a.score}</b><i><span style={{ width: `${a.score}%` }} /></i></div></td><td className="positive">{a.farGap.toFixed(2)}</td><td><span className="edge-pill">{edgeRead(a).type}</span></td><td className="next-test">{edgeRead(a).action}</td></tr>)}
         </tbody></table>{areas.length === 0 && <p className="empty">No neighborhoods match this view.</p>}</div>
+      </section>
+
+      <section className="national" id="national">
+        <div className="section-title"><div><p className="eyebrow">20-MARKET EXPANSION · CENSUS VINTAGE 2025</p><h2>One national spine.<br />Local depth by adapter.</h2></div><p>The first portfolio combines the 10 largest metros and the 10 fastest-growing metros by 2024–2025 population change. No metros overlap. Population is standardized now; parcel-level comparability is the active data-acquisition gap.</p></div>
+        <div className="national-grid">
+          <div className="metro-panel">
+            <div className="cohort-switch" aria-label="Metro cohort">
+              <button className={metroCohort === "largest" ? "selected" : ""} onClick={() => setMetroCohort("largest")}>10 largest</button>
+              <button className={metroCohort === "fastest" ? "selected" : ""} onClick={() => setMetroCohort("fastest")}>10 fastest growth</button>
+            </div>
+            <ol className="metro-list">
+              {METROS.filter((metro) => metro.cohort === metroCohort).map((metro, index) => <li key={metro.name}>
+                <b>{String(index + 1).padStart(2, "0")}</b><div><strong>{metro.short}</strong><span>{metro.name}</span></div><div className="metro-stat"><strong>{metro.population.toLocaleString()}</strong><span className={metro.growth < 0 ? "down" : ""}>{metro.growth > 0 ? "+" : ""}{metro.growth.toFixed(2)}% YoY</span></div>
+              </li>)}
+            </ol>
+          </div>
+          <div className="coverage-panel">
+            <p className="eyebrow">ACQUISITION STACK</p><h3>Comparable first.<br />Granular second.</h3>
+            <div className="feed-list">{NATIONAL_FEEDS.map(feed => <div key={feed.label}><span className={`feed-status ${feed.status === "ready" ? "ready" : "needed"}`}>{feed.status}</span><div><strong>{feed.label}</strong><small>{feed.source} · {feed.role}</small></div></div>)}</div>
+            <div className="gap-callout"><b>Known gap</b><p>There is no national PLUTO equivalent. Assessment, parcel geometry, zoning and arms-length sales differ in licensing, geography, identifiers and refresh cadence. Every local adapter will publish its own coverage grade.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section className="edge" id="edge">
+        <div className="section-title"><div><p className="eyebrow">EDGE SCORE V0.2</p><h2>Rank the thesis.<br />Expose the evidence.</h2></div><p>A 0–100 composite should explain why a neighborhood may be mispriced, what could unlock it, and what can invalidate it. Confidence stays separate so sparse local data cannot masquerade as conviction.</p></div>
+        <div className="edge-layout">
+          <div className="edge-components">
+            {EDGE_COMPONENTS.map(component => <button key={component.key} onClick={() => setEdgeComponent(component)} className={edgeComponent.key === component.key ? "active" : ""}><span>{component.weight}%</span><div><strong>{component.label}</strong><small>{component.detail}</small></div></button>)}
+          </div>
+          <article className="edge-detail">
+            <p>SELECTED COMPONENT</p><div className="edge-weight">{edgeComponent.weight}<span>%</span></div><h3>{edgeComponent.label}</h3><p>{edgeComponent.detail}.</p>
+            <dl><div><dt>Output</dt><dd>Percentile within comparable metro peers</dd></div><div><dt>Guardrail</dt><dd>Winsorized inputs + vintage alignment</dd></div><div><dt>Required evidence</dt><dd>At least 70% weighted coverage</dd></div></dl>
+          </article>
+          <article className="action-ladder">
+            <p>DECISION LAYER</p><h3>Score × evidence grade</h3>
+            <div><b>80–100 · A/B</b><span>Investigate now</span><small>Open parcel, ownership, pipeline and risk diligence</small></div>
+            <div><b>65–79 · A–C</b><span>Build watchlist</span><small>Track catalysts and price confirmation</small></div>
+            <div><b>Any score · D</b><span>Data hold</span><small>Acquire missing evidence before ranking</small></div>
+          </article>
+        </div>
+        <p className="edge-footnote">The existing NYC potential score remains visible as a land-use signal. It is not silently relabeled as Edge Score until sales, pricing, demand and pipeline components pass their coverage tests.</p>
       </section>
 
       <section className="method" id="methodology">
@@ -138,6 +192,11 @@ export default function Home() {
           <a href="https://data.cityofnewyork.us/City-Government/Zoning-Application-Portal-ZAP-BBL/2iga-a6mk" target="_blank" rel="noreferrer"><b>Next</b><h3>ZAP applications</h3><p>Lots attached to active and historical land-use applications.</p><span>Monthly · validated BBL ↗</span></a>
           <a href="https://data.cityofnewyork.us/Environment/NYC-Building-Energy-and-Water-Data-Disclosure-/5zyy-y8am" target="_blank" rel="noreferrer"><b>Candidate</b><h3>Energy disclosure</h3><p>Benchmarking for covered buildings, not the full property universe.</p><span>Annual · BBL available ↗</span></a>
           <a href="https://data.ny.gov/Transportation/MTA-Subway-Entrances-and-Exits-2024/i9wp-a4ja" target="_blank" rel="noreferrer"><b>Candidate</b><h3>MTA entrances</h3><p>Official station entrances for walking-distance calculations.</p><span>Static 2024 · spatial join ↗</span></a>
+          <a href="https://www.census.gov/programs-surveys/metro-micro/data/tables.html" target="_blank" rel="noreferrer"><b>National core</b><h3>Census metro estimates</h3><p>Official population vintages used to define both 10-market cohorts.</p><span>Annual · CBSA join · Vintage 2025 ↗</span></a>
+          <a href="https://www.census.gov/construction/bps/msamonthly.html" target="_blank" rel="noreferrer"><b>National core</b><h3>Building Permits Survey</h3><p>Authorized housing units at CBSA, county and permit-place levels.</p><span>Monthly · CBSA / FIPS join ↗</span></a>
+          <a href="https://www.bls.gov/cew/home.htm" target="_blank" rel="noreferrer"><b>National core</b><h3>BLS QCEW</h3><p>Employment, establishments and wages covering more than 95% of U.S. jobs.</p><span>Quarterly · county / MSA join ↗</span></a>
+          <a href="https://www.fhfa.gov/house-price-index" target="_blank" rel="noreferrer"><b>National core</b><h3>FHFA HPI</h3><p>Public house-price indexes across metro, county, ZIP and tract geographies.</p><span>Quarterly · geographic series ↗</span></a>
+          <a href="https://hazards.fema.gov/nri/data-resources" target="_blank" rel="noreferrer"><b>National core</b><h3>FEMA risk data</h3><p>Expected loss, social vulnerability and resilience measures.</p><span>County / tract · FIPS join ↗</span></a>
         </div>
       </section>
 
