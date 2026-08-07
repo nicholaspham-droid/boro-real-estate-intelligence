@@ -5,6 +5,7 @@ import handler from "vinext/server/app-router-entry";
 interface Env {
   ASSETS: Fetcher;
   DB: D1Database;
+  GOOGLE_MAPS_API_KEY?: string;
   IMAGES: {
     input(stream: ReadableStream): {
       transform(options: Record<string, unknown>): {
@@ -28,6 +29,16 @@ interface ExecutionContext {
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+
+    if (url.pathname === "/api/maps-config") {
+      if (!env.GOOGLE_MAPS_API_KEY) {
+        return Response.json({ error: "Map configuration unavailable" }, { status: 503 });
+      }
+      return Response.json(
+        { apiKey: env.GOOGLE_MAPS_API_KEY },
+        { headers: { "Cache-Control": "private, no-store, max-age=0" } },
+      );
+    }
 
     if (url.pathname === "/_vinext/image") {
       const allowedWidths = [...DEFAULT_DEVICE_SIZES, ...DEFAULT_IMAGE_SIZES];

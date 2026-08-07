@@ -1,8 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { GooglePropertyMap } from "./GooglePropertyMap";
 
 type Area = {
+  cd: number;
   rank: number;
   name: string;
   borough: string;
@@ -17,21 +19,21 @@ type Area = {
 };
 
 const AREAS: Area[] = [
-  { rank: 1, name: "Highbridge / Concourse", borough: "Bronx", score: 97, lots: 3323, farGap: 1.76, altered: 6.2, transit: 99.9, resilience: 98.4, drivers: ["Capacity", "Alterations"], cells: [83, 94, 88, 97, 91, 86, 95, 79] },
-  { rank: 2, name: "Fordham / University Hts.", borough: "Bronx", score: 89, lots: 3243, farGap: 1.52, altered: 5.0, transit: 99.6, resilience: 99.5, drivers: ["Capacity", "Transit"], cells: [78, 89, 84, 92, 87, 81, 90, 75] },
-  { rank: 3, name: "Upper East Side", borough: "Manhattan", score: 79, lots: 5474, farGap: 1.56, altered: 1.9, transit: 99.6, resilience: 97.6, drivers: ["Capacity", "Transit"], cells: [70, 81, 76, 84, 79, 73, 82, 67] },
-  { rank: 4, name: "Belmont / East Tremont", borough: "Bronx", score: 79, lots: 4100, farGap: 1.14, altered: 4.2, transit: 99.6, resilience: 99.8, drivers: ["Alterations", "Resilience"], cells: [72, 80, 77, 85, 74, 82, 69, 78] },
-  { rank: 5, name: "East Harlem", borough: "Manhattan", score: 78, lots: 3062, farGap: 1.90, altered: 0.8, transit: 99.5, resilience: 71.3, drivers: ["Capacity", "Flood flag"], cells: [68, 79, 75, 83, 71, 80, 65, 76] },
-  { rank: 6, name: "Morrisania / Crotona", borough: "Bronx", score: 77, lots: 3655, farGap: 1.24, altered: 3.6, transit: 92.0, resilience: 100, drivers: ["Alterations", "Resilience"], cells: [66, 78, 73, 81, 76, 69, 79, 64] },
-  { rank: 7, name: "Murray Hill / Kips Bay", borough: "Manhattan", score: 76, lots: 2789, farGap: 1.45, altered: 1.7, transit: 98.8, resilience: 96.2, drivers: ["Capacity", "Transit"], cells: [67, 76, 72, 80, 74, 78, 63, 75] },
-  { rank: 8, name: "Chelsea / Clinton", borough: "Manhattan", score: 75, lots: 3407, farGap: 1.35, altered: 2.2, transit: 99.5, resilience: 89.9, drivers: ["Capacity", "Transit"], cells: [64, 75, 70, 79, 73, 77, 61, 72] },
-  { rank: 9, name: "Kingsbridge / Bedford", borough: "Bronx", score: 74, lots: 3588, farGap: 1.00, altered: 3.5, transit: 99.8, resilience: 99.2, drivers: ["Alterations", "Transit"], cells: [65, 74, 71, 78, 68, 76, 62, 73] },
-  { rank: 10, name: "Upper West Side", borough: "Manhattan", score: 71, lots: 4419, farGap: 1.30, altered: 0.7, transit: 99.8, resilience: 99.5, drivers: ["Capacity", "Resilience"], cells: [61, 71, 68, 75, 70, 65, 73, 59] },
-  { rank: 11, name: "Hunts Point / Longwood", borough: "Bronx", score: 70, lots: 2979, farGap: .90, altered: 2.9, transit: 99.5, resilience: 96.4, drivers: ["Alterations", "Transit"], cells: [60, 70, 66, 74, 69, 63, 72, 57] },
-  { rank: 12, name: "Mott Haven / Melrose", borough: "Bronx", score: 69, lots: 3984, farGap: .79, altered: 3.4, transit: 99.8, resilience: 93.5, drivers: ["Alterations", "Transit"], cells: [58, 69, 65, 73, 67, 62, 71, 56] },
-  { rank: 13, name: "Downtown / Fort Greene", borough: "Brooklyn", score: 69, lots: 8107, farGap: .45, altered: 5.1, transit: 99.8, resilience: 99.0, drivers: ["Alterations", "Resilience"], cells: [61, 68, 64, 72, 66, 70, 57, 67] },
-  { rank: 14, name: "Bedford-Stuyvesant", borough: "Brooklyn", score: 67, lots: 16805, farGap: .60, altered: 3.3, transit: 99.9, resilience: 100, drivers: ["Alterations", "Resilience"], cells: [57, 67, 63, 71, 65, 60, 69, 54] },
-  { rank: 15, name: "Brownsville", borough: "Brooklyn", score: 66, lots: 8070, farGap: 1.04, altered: .8, transit: 100, resilience: 100, drivers: ["Capacity", "Resilience"], cells: [56, 66, 62, 70, 64, 59, 68, 53] },
+  { cd: 204, rank: 1, name: "Highbridge / Concourse", borough: "Bronx", score: 97, lots: 3323, farGap: 1.76, altered: 6.2, transit: 99.9, resilience: 98.4, drivers: ["Capacity", "Alterations"], cells: [83, 94, 88, 97, 91, 86, 95, 79] },
+  { cd: 205, rank: 2, name: "Fordham / University Hts.", borough: "Bronx", score: 89, lots: 3243, farGap: 1.52, altered: 5.0, transit: 99.6, resilience: 99.5, drivers: ["Capacity", "Transit"], cells: [78, 89, 84, 92, 87, 81, 90, 75] },
+  { cd: 108, rank: 3, name: "Upper East Side", borough: "Manhattan", score: 79, lots: 5474, farGap: 1.56, altered: 1.9, transit: 99.6, resilience: 97.6, drivers: ["Capacity", "Transit"], cells: [70, 81, 76, 84, 79, 73, 82, 67] },
+  { cd: 206, rank: 4, name: "Belmont / East Tremont", borough: "Bronx", score: 79, lots: 4100, farGap: 1.14, altered: 4.2, transit: 99.6, resilience: 99.8, drivers: ["Alterations", "Resilience"], cells: [72, 80, 77, 85, 74, 82, 69, 78] },
+  { cd: 111, rank: 5, name: "East Harlem", borough: "Manhattan", score: 78, lots: 3062, farGap: 1.90, altered: 0.8, transit: 99.5, resilience: 71.3, drivers: ["Capacity", "Flood flag"], cells: [68, 79, 75, 83, 71, 80, 65, 76] },
+  { cd: 203, rank: 6, name: "Morrisania / Crotona", borough: "Bronx", score: 77, lots: 3655, farGap: 1.24, altered: 3.6, transit: 92.0, resilience: 100, drivers: ["Alterations", "Resilience"], cells: [66, 78, 73, 81, 76, 69, 79, 64] },
+  { cd: 106, rank: 7, name: "Murray Hill / Kips Bay", borough: "Manhattan", score: 76, lots: 2789, farGap: 1.45, altered: 1.7, transit: 98.8, resilience: 96.2, drivers: ["Capacity", "Transit"], cells: [67, 76, 72, 80, 74, 78, 63, 75] },
+  { cd: 104, rank: 8, name: "Chelsea / Clinton", borough: "Manhattan", score: 75, lots: 3407, farGap: 1.35, altered: 2.2, transit: 99.5, resilience: 89.9, drivers: ["Capacity", "Transit"], cells: [64, 75, 70, 79, 73, 77, 61, 72] },
+  { cd: 207, rank: 9, name: "Kingsbridge / Bedford", borough: "Bronx", score: 74, lots: 3588, farGap: 1.00, altered: 3.5, transit: 99.8, resilience: 99.2, drivers: ["Alterations", "Transit"], cells: [65, 74, 71, 78, 68, 76, 62, 73] },
+  { cd: 107, rank: 10, name: "Upper West Side", borough: "Manhattan", score: 71, lots: 4419, farGap: 1.30, altered: 0.7, transit: 99.8, resilience: 99.5, drivers: ["Capacity", "Resilience"], cells: [61, 71, 68, 75, 70, 65, 73, 59] },
+  { cd: 202, rank: 11, name: "Hunts Point / Longwood", borough: "Bronx", score: 70, lots: 2979, farGap: .90, altered: 2.9, transit: 99.5, resilience: 96.4, drivers: ["Alterations", "Transit"], cells: [60, 70, 66, 74, 69, 63, 72, 57] },
+  { cd: 201, rank: 12, name: "Mott Haven / Melrose", borough: "Bronx", score: 69, lots: 3984, farGap: .79, altered: 3.4, transit: 99.8, resilience: 93.5, drivers: ["Alterations", "Transit"], cells: [58, 69, 65, 73, 67, 62, 71, 56] },
+  { cd: 302, rank: 13, name: "Downtown / Fort Greene", borough: "Brooklyn", score: 69, lots: 8107, farGap: .45, altered: 5.1, transit: 99.8, resilience: 99.0, drivers: ["Alterations", "Resilience"], cells: [61, 68, 64, 72, 66, 70, 57, 67] },
+  { cd: 303, rank: 14, name: "Bedford-Stuyvesant", borough: "Brooklyn", score: 67, lots: 16805, farGap: .60, altered: 3.3, transit: 99.9, resilience: 100, drivers: ["Alterations", "Resilience"], cells: [57, 67, 63, 71, 65, 60, 69, 54] },
+  { cd: 316, rank: 15, name: "Brownsville", borough: "Brooklyn", score: 66, lots: 8070, farGap: 1.04, altered: .8, transit: 100, resilience: 100, drivers: ["Capacity", "Resilience"], cells: [56, 66, 62, 70, 64, 59, 68, 53] },
 ];
 
 const BOROUGHS = ["All boroughs", "Manhattan", "Brooklyn", "Queens", "Bronx", "Staten Island"];
@@ -47,8 +49,6 @@ export default function Home() {
     return AREAS.filter((a) => borough === "All boroughs" || a.borough === borough)
       .filter((a) => `${a.name} ${a.borough}`.toLowerCase().includes(query.toLowerCase()));
   }, [borough, query]);
-
-  const intensity = (a: Area) => layer === "score" ? a.score : layer === "capacity" ? Math.min(100, a.farGap * 52) : a.resilience;
 
   return (
     <main>
@@ -92,14 +92,15 @@ export default function Home() {
           <div className="legend"><span>Lower</span>{[28,42,56,70,84,96].map(n => <i key={n} style={{ background: `hsl(${160 - n * .85} 78% ${20 + n * .48}%)` }} />)}<span>Higher</span></div>
         </div>
         <div className="map-area">
-          <div className="water-label hudson">HUDSON</div><div className="water-label east">EAST RIVER</div>
-          <div className="borough-label manhattan">MANHATTAN</div><div className="borough-label bronx">BRONX</div><div className="borough-label queens">QUEENS</div><div className="borough-label brooklyn">BROOKLYN</div>
-          <div className="parcel-grid" role="img" aria-label="Stylized neighborhood heat map of New York City">
-            {areas.flatMap((a) => a.cells.map((cell, idx) => {
-              const value = (intensity(a) * .72) + (cell * .28);
-              return <button key={`${a.name}-${idx}`} title={`${a.name}: ${Math.round(intensity(a))}`} className={selected.name === a.name ? "parcel active-parcel" : "parcel"} style={{ background: `hsl(${158 - value * .82} 78% ${18 + value * .48}%)`, transform: `rotate(${((a.rank + idx) % 3 - 1) * 1.5}deg)` }} onClick={() => setSelected(a)} aria-label={`Select ${a.name}`} />;
-            }))}
-          </div>
+          <GooglePropertyMap
+            areas={areas}
+            layer={layer}
+            selectedCd={selected.cd}
+            onSelect={(cd) => {
+              const match = AREAS.find((area) => area.cd === cd);
+              if (match) setSelected(match);
+            }}
+          />
           <article className="map-card">
             <button aria-label="Close detail" onClick={() => setSelected(AREAS[0])}>×</button>
             <p>#{selected.rank} PLUTO SIGNAL RANK</p><h3>{selected.name}</h3><span>{selected.borough}</span>
