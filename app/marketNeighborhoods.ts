@@ -1,5 +1,6 @@
 import acsAggregations from "../data/acs-market-aggregations.json";
 import pricingHistory from "../data/fhfa-pricing-history.json";
+import clusterPricingHistory from "../data/fhfa-cluster-pricing-history.json";
 import { METROS, type Metro } from "./metroData";
 
 export type ExplorerLayer = "composite" | "demographic" | "economic" | "education" | "housing" | "pricing";
@@ -31,6 +32,7 @@ export type NeighborhoodSignal = {
   medianHomeValue: number | null;
   medianRent: number | null;
   sampleGeoids: string[];
+  localPricing: (typeof clusterPricingHistory.markets)[number]["clusters"][number] | null;
 };
 
 export type MarketExplorer = {
@@ -45,6 +47,7 @@ export type MarketExplorer = {
   countyCount: number;
   tractCount: number;
   pricingHistory: (typeof pricingHistory.markets)[number];
+  localPricingCompetency: number;
   neighborhoods: NeighborhoodSignal[];
 };
 
@@ -66,7 +69,9 @@ export function weightedComposite(signal: Pick<NeighborhoodSignal, "demographic"
 export const MARKET_EXPLORERS: MarketExplorer[] = acsAggregations.markets.map((aggregate) => {
   const metro = METROS.find((candidate) => candidate.short === aggregate.label) ?? METROS[0];
   const pricing = pricingHistory.markets.find((candidate) => candidate.id === aggregate.id) ?? pricingHistory.markets[0];
+  const localPricingMarket = clusterPricingHistory.markets.find((candidate) => candidate.id === aggregate.id);
   const neighborhoods = aggregate.clusters.map((cluster) => {
+    const localPricing = localPricingMarket?.clusters.find((candidate) => candidate.id === cluster.id) ?? null;
     const base = {
       id: cluster.id,
       rank: 0,
@@ -78,8 +83,8 @@ export const MARKET_EXPLORERS: MarketExplorer[] = acsAggregations.markets.map((a
       economic: cluster.factors.economic,
       education: cluster.factors.education,
       housing: cluster.factors.housing,
-      pricing: pricing.momentumScore,
-      confidence: Math.round(cluster.acsCompetency * .55 + metro.competency * .25 + pricing.pricingCompetency * .2),
+      pricing: localPricing?.momentumScore ?? pricing.momentumScore,
+      confidence: Math.round(cluster.acsCompetency * .5 + metro.competency * .25 + (localPricing?.pricingCompetency ?? pricing.pricingCompetency) * .25),
       coverage: cluster.coverage,
       reliability: cluster.reliability,
       tractCount: cluster.tractCount,
@@ -93,6 +98,7 @@ export const MARKET_EXPLORERS: MarketExplorer[] = acsAggregations.markets.map((a
       medianHomeValue: cluster.medianHomeValue,
       medianRent: cluster.medianRent,
       sampleGeoids: cluster.sampleGeoids,
+      localPricing,
     };
     return { ...base, composite: weightedComposite(base, BALANCED_WEIGHTS) };
   }).sort((a, b) => b.composite - a.composite).map((cluster, index) => ({ ...cluster, rank: index + 1 }));
@@ -109,6 +115,7 @@ export const MARKET_EXPLORERS: MarketExplorer[] = acsAggregations.markets.map((a
     countyCount: aggregate.countyCount,
     tractCount: aggregate.tractCount,
     pricingHistory: pricing,
+    localPricingCompetency: localPricingMarket?.localPricingCompetency ?? pricing.pricingCompetency,
     neighborhoods,
   };
 });
@@ -133,4 +140,15 @@ export const PRICING_HISTORY_META = {
   sourceLabel: pricingHistory.sourceLabel,
   aggregation: pricingHistory.aggregation,
   methodology: pricingHistory.methodology,
+};
+
+export const LOCAL_PRICING_META = {
+  retrievedAt: clusterPricingHistory.retrievedAt,
+  latestYear: clusterPricingHistory.latestYear,
+  source: clusterPricingHistory.source,
+  sourceLabel: clusterPricingHistory.sourceLabel,
+  clusterCount: clusterPricingHistory.clusterCount,
+  targetTractCount: clusterPricingHistory.targetTractCount,
+  matchedTractCount: clusterPricingHistory.matchedTractCount,
+  methodology: clusterPricingHistory.methodology,
 };

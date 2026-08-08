@@ -7,6 +7,7 @@ import firstWaveSamples from "../data/snapshots/first-wave-samples.json";
 import liveAudit from "../data/snapshots/live-audit-2026-08-07.json";
 import acsAggregations from "../data/acs-market-aggregations.json";
 import pricingHistory from "../data/fhfa-pricing-history.json";
+import clusterPricingHistory from "../data/fhfa-cluster-pricing-history.json";
 
 interface Env {
   ASSETS: Fetcher;
@@ -59,6 +60,10 @@ const worker = {
           source: "FHFA All-Transactions HPI",
           latestPeriod: pricingHistory.latestPeriod,
           marketCount: pricingHistory.marketCount,
+          localSource: "FHFA Annual Census Tract HPI",
+          latestLocalYear: clusterPricingHistory.latestYear,
+          localClusterCount: clusterPricingHistory.clusterCount,
+          matchedTractCount: clusterPricingHistory.matchedTractCount,
         },
       }, { headers: snapshotHeaders });
     }
@@ -116,6 +121,18 @@ const worker = {
       const market = pricingHistory.markets.find((candidate) => candidate.id === marketId);
       return market
         ? Response.json({ retrievedAt: pricingHistory.retrievedAt, source: pricingHistory.source, methodology: pricingHistory.methodology, market }, { headers: snapshotHeaders })
+        : Response.json({ error: "Unknown market" }, { status: 404, headers: snapshotHeaders });
+    }
+
+    if (url.pathname === "/api/market-intelligence/pricing-clusters") {
+      return Response.json(clusterPricingHistory, { headers: snapshotHeaders });
+    }
+
+    if (url.pathname.startsWith("/api/market-intelligence/pricing-clusters/")) {
+      const marketId = decodeURIComponent(url.pathname.slice("/api/market-intelligence/pricing-clusters/".length));
+      const market = clusterPricingHistory.markets.find((candidate) => candidate.id === marketId);
+      return market
+        ? Response.json({ retrievedAt: clusterPricingHistory.retrievedAt, source: clusterPricingHistory.source, methodology: clusterPricingHistory.methodology, market }, { headers: snapshotHeaders })
         : Response.json({ error: "Unknown market" }, { status: 404, headers: snapshotHeaders });
     }
 

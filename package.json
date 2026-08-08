@@ -13,6 +13,7 @@
     "ingest:verify": "node scripts/ingestion/verify-first-wave.mjs",
     "ingest:acs": "node scripts/ingestion/build-acs-market-aggregations.mjs",
     "ingest:fhfa": "node scripts/ingestion/build-fhfa-pricing-history.mjs",
+    "ingest:fhfa-tract": "node scripts/ingestion/build-fhfa-cluster-pricing-history.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate"
   },

@@ -3,6 +3,7 @@ import { readFile, writeFile } from "node:fs/promises";
 const ROOT = new URL("../../", import.meta.url);
 const CONFIG_PATH = new URL("../../data/market-geographies.json", import.meta.url);
 const OUTPUT_PATH = new URL("../../data/acs-market-aggregations.json", import.meta.url);
+const MEMBERSHIP_PATH = new URL("../../data/acs-cluster-membership.json", import.meta.url);
 const TABLES = ["B01003", "B01002", "B15003", "B23025", "B19013", "B17001", "B25002", "B25077", "B25064"];
 
 const config = JSON.parse(await readFile(CONFIG_PATH, "utf8"));
@@ -156,6 +157,7 @@ function percentile(values, value, invert = false) {
 }
 
 const markets = [];
+const memberships = [];
 for (const market of config.markets) {
   process.stdout.write(`Aggregating ${market.label} (${market.counties.length} counties)\n`);
   const batches = [];
@@ -170,6 +172,16 @@ for (const market of config.markets) {
     ["central", "Central Core"], ["north", "North Arc"], ["east", "East Corridor"], ["south", "South Arc"], ["west", "West Corridor"],
   ];
   const clusters = sectors.map(([key, name]) => aggregateCluster(`${market.id}-${key}`, name, tracts.filter((tract) => sector(tract, { lat: market.center[0], lng: market.center[1] }, centralRadius) === key))).filter((cluster) => cluster.tractCount);
+  memberships.push({
+    id: market.id,
+    clusters: sectors.map(([key, name]) => ({
+      id: `${market.id}-${key}`,
+      name,
+      tracts: tracts
+        .filter((tract) => sector(tract, { lat: market.center[0], lng: market.center[1] }, centralRadius) === key)
+        .map((tract) => ({ geoid: tract.geoid, population: tract.population })),
+    })).filter((cluster) => cluster.tracts.length),
+  });
   markets.push({ id: market.id, label: market.label, center: { lat: market.center[0], lng: market.center[1] }, zoom: market.zoom, countyCount: market.counties.length, tractCount: tracts.length, clusters });
 }
 
@@ -220,6 +232,14 @@ await writeFile(OUTPUT_PATH, JSON.stringify({
   marketCount: markets.length,
   clusterCount: allClusters.length,
   markets,
+}, null, 2) + "\n");
+
+await writeFile(MEMBERSHIP_PATH, JSON.stringify({
+  generatedAt: now,
+  vintage: config.vintage,
+  release: config.release,
+  methodology: "Exact census-tract membership used by the published directional cluster aggregation",
+  markets: memberships,
 }, null, 2) + "\n");
 
 process.stdout.write(`Wrote ${markets.length} markets and ${allClusters.length} clusters to ${OUTPUT_PATH.pathname.replace(ROOT.pathname, "")}\n`);

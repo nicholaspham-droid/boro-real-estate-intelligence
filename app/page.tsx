@@ -2,9 +2,11 @@
 
 import { useMemo, useState } from "react";
 import { NationalMarketMap } from "./NationalMarketMap";
+import { PriceHistoryChart, type PriceChartPoint } from "./PriceHistoryChart";
 import {
   ACS_AGGREGATION_META,
   BALANCED_WEIGHTS,
+  LOCAL_PRICING_META,
   MARKET_EXPLORERS,
   PRICING_HISTORY_META,
   WEIGHT_PRESETS,
@@ -36,6 +38,10 @@ function percent(value: number | null) {
   return value === null ? "—" : `${value.toFixed(1)}%`;
 }
 
+function signed(value: number | null | undefined, suffix = "%") {
+  return value === null || value === undefined ? "—" : `${value >= 0 ? "+" : ""}${value.toFixed(2)}${suffix}`;
+}
+
 function competencyGrade(score: number) {
   if (score >= 90) return "A";
   if (score >= 80) return "B";
@@ -57,6 +63,8 @@ export default function Home() {
   const [query, setQuery] = useState("");
   const [cohort, setCohort] = useState<"all" | "largest" | "fastest">("all");
   const [minimumCompetency, setMinimumCompetency] = useState(0);
+  const [priceScope, setPriceScope] = useState<"cluster" | "metro">("cluster");
+  const [historyRange, setHistoryRange] = useState<5 | 10 | "full">(10);
 
   const baseMarket = MARKET_EXPLORERS.find((item) => item.id === selectedMarketId) ?? MARKET_EXPLORERS[0];
   const scoredClusters = useMemo(() => baseMarket.neighborhoods
@@ -66,16 +74,27 @@ export default function Home() {
   const market = useMemo(() => ({ ...baseMarket, neighborhoods: scoredClusters }), [baseMarket, scoredClusters]);
   const selectedCluster = scoredClusters.find((item) => item.id === selectedClusterId) ?? scoredClusters[0];
   const visibleClusters = scoredClusters.filter((item) => item.name.toLowerCase().includes(query.toLowerCase()));
-  const integratedCompetency = Math.round(market.acsCompetency * .55 + market.metro.competency * .25 + market.pricingHistory.pricingCompetency * .2);
+  const integratedCompetency = Math.round(market.acsCompetency * .5 + market.metro.competency * .25 + market.localPricingCompetency * .25);
   const totalTracts = MARKET_EXPLORERS.reduce((sum, item) => sum + item.tractCount, 0);
-  const recentPriceHistory = market.pricingHistory.history.slice(-20);
-  const priceFloor = Math.min(...recentPriceHistory.map((item) => item.index));
-  const priceCeiling = Math.max(...recentPriceHistory.map((item) => item.index));
+  const hasLocalPricing = Boolean(selectedCluster.localPricing);
+  const showingLocalPricing = priceScope === "cluster" && hasLocalPricing;
+  const displayedPricing = showingLocalPricing ? selectedCluster.localPricing! : market.pricingHistory;
+  const latestChartYear = showingLocalPricing ? selectedCluster.localPricing!.latestYear : market.pricingHistory.history.at(-1)!.year;
+  const chartPoints = useMemo<PriceChartPoint[]>(() => {
+    if (showingLocalPricing) {
+      return selectedCluster.localPricing!.history
+        .filter((item) => historyRange === "full" || item.year >= latestChartYear - historyRange)
+        .map((item) => ({ key: String(item.year), label: String(item.year), index: item.index }));
+    }
+    return market.pricingHistory.history
+      .filter((item) => historyRange === "full" || item.year >= latestChartYear - historyRange)
+      .map((item) => ({ key: item.period, label: item.quarter === 1 ? String(item.year) : item.period, index: item.index }));
+  }, [showingLocalPricing, selectedCluster.localPricing, historyRange, latestChartYear, market.pricingHistory]);
 
   const marketRanking = useMemo(() => MARKET_EXPLORERS
     .filter((item) => cohort === "all" || item.metro.cohort === cohort)
-    .filter((item) => Math.round(item.acsCompetency * .55 + item.metro.competency * .25 + item.pricingHistory.pricingCompetency * .2) >= minimumCompetency)
-    .map((item) => ({ ...item, score: scoreMarket(item, weights), integrated: Math.round(item.acsCompetency * .55 + item.metro.competency * .25 + item.pricingHistory.pricingCompetency * .2) }))
+    .filter((item) => Math.round(item.acsCompetency * .5 + item.metro.competency * .25 + item.localPricingCompetency * .25) >= minimumCompetency)
+    .map((item) => ({ ...item, score: scoreMarket(item, weights), integrated: Math.round(item.acsCompetency * .5 + item.metro.competency * .25 + item.localPricingCompetency * .25) }))
     .sort((a, b) => b.score - a.score), [cohort, minimumCompetency, weights]);
 
   function chooseMarket(id: string) {
@@ -117,7 +136,7 @@ export default function Home() {
           <p>PUBLIC DATA FOUNDATION</p>
           <strong>{totalTracts.toLocaleString()}</strong><span>ACS tracts aggregated</span>
           <div><b>{MARKET_EXPLORERS.length}</b><span>markets</span><b>{ACS_AGGREGATION_META.clusterCount}</b><span>local clusters</span><b>{PRICING_HISTORY_META.latestPeriod}</b><span>FHFA pricing</span></div>
-          <small>Current attributes from ACS detailed tables. Historical pricing from FHFA HPI. Local parcel systems remain scored separately.</small>
+          <small>Current attributes from ACS detailed tables. Historical pricing now separates annual tract-cluster HPI from the quarterly metro benchmark.</small>
         </div>
       </section>
 
@@ -127,8 +146,8 @@ export default function Home() {
           <div className="quality-stack">
             <article><span>ACS competency</span><strong>{market.acsCompetency}%</strong><small>{market.tractCount.toLocaleString()} tracts · {market.countyCount} primary counties</small></article>
             <article><span>Parcel competency</span><strong>{market.metro.competency}%</strong><small>{market.metro.localStatus} · ±{market.metro.evidenceBand} operational points</small></article>
-            <article><span>Pricing competency</span><strong>{market.pricingHistory.pricingCompetency}%</strong><small>FHFA {market.pricingHistory.latestPeriod} · {market.pricingHistory.components.length} metro series</small></article>
-            <article className="integrated"><span>Integrated</span><strong>{integratedCompetency}% <i>{competencyGrade(integratedCompetency)}</i></strong><small>55% ACS · 25% parcels · 20% pricing</small></article>
+            <article><span>Local pricing competency</span><strong>{market.localPricingCompetency}%</strong><small>FHFA tract HPI through {LOCAL_PRICING_META.latestYear} · coverage varies by cluster</small></article>
+            <article className="integrated"><span>Integrated</span><strong>{integratedCompetency}% <i>{competencyGrade(integratedCompetency)}</i></strong><small>50% ACS · 25% parcels · 25% local pricing</small></article>
           </div>
         </div>
 
@@ -169,11 +188,14 @@ export default function Home() {
           </article>
         </div>
 
-        <section className="pricing-history-panel" aria-label={`${market.metro.short} historical home price trend`}>
-          <div className="pricing-history-copy"><p className="eyebrow">FHFA HOUSE PRICE MOMENTUM · {market.pricingHistory.latestPeriod}</p><h3>{market.pricingHistory.yoy >= 0 ? "+" : ""}{market.pricingHistory.yoy.toFixed(2)}% <span>year over year</span></h3><p>All-Transactions HPI, not seasonally adjusted. Divided metros use an equal-weight composite of the listed FHFA divisions.</p><a href={PRICING_HISTORY_META.source} target="_blank" rel="noreferrer">Open FHFA source series →</a></div>
-          <div className="pricing-history-metrics"><div><span>Momentum score</span><b>{market.pricingHistory.momentumScore}</b></div><div><span>3-year CAGR</span><b>{market.pricingHistory.threeYearCagr >= 0 ? "+" : ""}{market.pricingHistory.threeYearCagr.toFixed(2)}%</b></div><div><span>5-year growth</span><b>{market.pricingHistory.fiveYearGrowth >= 0 ? "+" : ""}{market.pricingHistory.fiveYearGrowth.toFixed(2)}%</b></div><div><span>YoY acceleration</span><b className={market.pricingHistory.acceleration < 0 ? "negative" : ""}>{market.pricingHistory.acceleration >= 0 ? "+" : ""}{market.pricingHistory.acceleration.toFixed(2)} pts</b></div></div>
-          <div className="price-bars" role="img" aria-label={`Quarterly FHFA HPI history from ${recentPriceHistory[0]?.period} through ${market.pricingHistory.latestPeriod}`}>{recentPriceHistory.map((item) => <i key={item.period} style={{ height: `${18 + ((item.index - priceFloor) / Math.max(1, priceCeiling - priceFloor)) * 82}%` }} title={`${item.period}: ${item.index.toFixed(2)}`}><span>{item.quarter === 1 ? String(item.year).slice(-2) : ""}</span></i>)}</div>
-          <small className="pricing-scope">Metro pricing context is applied equally to each local tract cluster. It improves market momentum ranking but does not claim neighborhood-level price appreciation.</small>
+        <section className="pricing-history-panel" aria-label={`${showingLocalPricing ? selectedCluster.name : market.metro.short} historical home price trend`}>
+          <div className="pricing-history-copy"><p className="eyebrow">{showingLocalPricing ? "FHFA TRACT-CLUSTER HPI" : "FHFA METRO BENCHMARK"} · {showingLocalPricing ? selectedCluster.localPricing!.latestYear : market.pricingHistory.latestPeriod}</p><h3>{signed(displayedPricing.yoy)} <span>year over year</span></h3><p>{showingLocalPricing ? `${selectedCluster.name} aggregates observed tract-level annual changes. Latest population coverage is ${selectedCluster.localPricing!.history.at(-1)!.coveragePct}%.` : "Quarterly All-Transactions HPI, not seasonally adjusted. Divided metros use an equal-weight composite."}</p><a href={showingLocalPricing ? LOCAL_PRICING_META.source : PRICING_HISTORY_META.source} target="_blank" rel="noreferrer">Open FHFA source series →</a></div>
+          <div className="pricing-history-main">
+            <div className="price-chart-controls"><div><span>Geography</span><button className={priceScope === "cluster" ? "selected" : ""} onClick={() => setPriceScope("cluster")} disabled={!hasLocalPricing}>Local cluster</button><button className={priceScope === "metro" || !hasLocalPricing ? "selected" : ""} onClick={() => setPriceScope("metro")}>Metro benchmark</button></div><div><span>History</span>{([5, 10, "full"] as const).map((range) => <button key={range} className={historyRange === range ? "selected" : ""} onClick={() => setHistoryRange(range)}>{range === "full" ? "Full" : `${range}Y`}</button>)}</div></div>
+            <PriceHistoryChart points={chartPoints} seriesLabel={showingLocalPricing ? `${selectedCluster.name} annual tract-cluster HPI` : `${market.metro.short} quarterly metro HPI`} />
+          </div>
+          <div className="pricing-history-metrics"><div><span>Momentum score</span><b>{displayedPricing.momentumScore}</b></div><div><span>3-year CAGR</span><b>{signed(displayedPricing.threeYearCagr)}</b></div><div><span>5-year growth</span><b>{signed(displayedPricing.fiveYearGrowth)}</b></div><div><span>YoY acceleration</span><b className={(displayedPricing.acceleration ?? 0) < 0 ? "negative" : ""}>{signed(displayedPricing.acceleration, " pts")}</b></div></div>
+          <small className="pricing-scope">{showingLocalPricing ? `This chart changes with the selected cluster. FHFA tract HPI is developmental; ${selectedCluster.localPricing!.history.at(-1)!.observedTracts} of ${selectedCluster.localPricing!.totalTractCount} tracts support the latest annual change, so the ${selectedCluster.localPricing!.pricingCompetency}% pricing competency should travel with the signal.` : `This is the entire metropolitan benchmark. Switch to Local cluster to see the selected map cluster; ${hasLocalPricing ? "a local series is available here." : "FHFA does not have enough repeat-transaction observations for this cluster."}`}</small>
         </section>
 
         <div className="cluster-table"><table><thead><tr><th>Rank</th><th>Local tract cluster</th><th>Composite</th><th>Demographic</th><th>Economic</th><th>Education</th><th>Housing</th><th>Pricing</th><th>Data competency</th></tr></thead><tbody>{visibleClusters.map((item) => <tr key={item.id} className={item.id === selectedCluster.id ? "active" : ""} onClick={() => setSelectedClusterId(item.id)}><td>{String(item.rank).padStart(2, "0")}</td><td><strong>{item.name}</strong><small>{item.tractCount} tracts · {compact(item.population)} people</small></td><td><b>{item.composite}</b></td><td>{item.demographic}</td><td>{item.economic}</td><td>{item.education}</td><td>{item.housing}</td><td>{item.pricing}</td><td><span>{item.confidence}%</span></td></tr>)}</tbody></table>{!visibleClusters.length && <p className="empty">No local cluster matches that search.</p>}</div>
@@ -188,11 +210,11 @@ export default function Home() {
       <section className="quality-section" id="quality">
         <div className="section-title"><div><p className="eyebrow">DATA COMPETENCY, NOT FALSE PRECISION</p><h2>What is measured.<br />What is still missing.</h2></div><p>The national layer now combines observed ACS conditions with measured FHFA price history. It does not pretend either source can replace property records.</p></div>
         <div className="quality-grid">
-          <article className="quality-now"><span>Measured now</span><h3>Tracts + price history</h3><ul><li><b>17,959</b> ACS tracts across primary-market counties</li><li><b>97</b> reproducible local clusters positioned with official TIGER geometry</li><li><b>20</b> quarterly FHFA market histories with true same-quarter YoY growth</li><li>ACS, FHFA and parcel competency remain separately visible</li></ul></article>
+          <article className="quality-now"><span>Measured now</span><h3>Tracts + price history</h3><ul><li><b>{LOCAL_PRICING_META.targetTractCount.toLocaleString()}</b> ACS tracts across primary-market counties</li><li><b>{LOCAL_PRICING_META.clusterCount}</b> local clusters with annual FHFA tract history</li><li><b>20</b> quarterly FHFA metro benchmarks retained for context</li><li>Cluster pricing scores now vary with measured local momentum</li></ul></article>
           <article className="quality-gap"><span>Principal gap</span><h3>No national PLUTO equivalent</h3><p>Assessment parcels, deeds, zoning, permits and building attributes live in separate city, county and state systems. IDs, licensing, field meanings and update cycles vary. A high ACS score therefore describes market conditions—not a parcel’s likely future value.</p><div><b>Next integrations</b><small>Parcel geometry → assessment history → qualified sales → zoning capacity → permits and catalysts</small></div></article>
           <article className="quality-access"><span>Access path</span><h3>API key gap mitigated</h3><p>The official Census Data API now requires a key. Until one is added, this build uses Census Reporter’s open-source mirror of the 2020–2024 ACS and joins it to the Census Bureau’s official TIGERweb service.</p><a href="https://api.census.gov/data/key_signup.html" target="_blank" rel="noreferrer">Add a Census API key →</a><a href="https://censusreporter.org/about/" target="_blank" rel="noreferrer">Audit the mirror →</a></article>
         </div>
-        <div className="method-ribbon"><span><b>Composite scope</b> Weighted percentile of five selectable factors</span><span><b>Pricing momentum</b> 50% YoY, 25% 3Y CAGR, 15% 5Y growth, 10% acceleration</span><span><b>Reliability</b> ACS margins of error plus FHFA standard error and division coverage</span><span><b>Not included yet</b> Neighborhood appreciation history, parcel liquidity or causal inference</span></div>
+        <div className="method-ribbon"><span><b>Composite scope</b> Weighted percentile of five selectable factors</span><span><b>Local pricing momentum</b> 50% YoY, 25% 3Y CAGR, 15% 5Y growth, 10% acceleration</span><span><b>Pricing competency</b> Latest tract population coverage plus 10-year observation completeness</span><span><b>Still excluded</b> Parcel liquidity, property-level forecasts and causal inference</span></div>
       </section>
 
       <section className="sources" id="sources">

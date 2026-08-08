@@ -103,7 +103,7 @@ const markets = config.markets.map((market) => {
     standardErrorPct: round(standardErrorPct),
     pricingCompetency: Math.round(latest.componentCoverage * .7 + Math.max(0, 100 - standardErrorPct * 8) * .3),
     seriesStart: fullSeries[0].period,
-    history: fullSeries.filter((row) => row.year >= latest.year - 10),
+    history: fullSeries,
   };
 });
 
@@ -131,7 +131,7 @@ await writeFile(OUTPUT_PATH, JSON.stringify({
   methodology: {
     yoy: "Latest quarter divided by the same quarter one year earlier, minus one",
     momentumScore: "50% latest YoY percentile, 25% three-year CAGR percentile, 15% five-year growth percentile, 10% YoY acceleration percentile",
-    scope: "Metro-level pricing context applied equally to local tract clusters; not a neighborhood price series",
+    scope: "Metro-level quarterly benchmark retained alongside the annual tract-cluster series",
   },
   latestPeriod: markets[0].latestPeriod,
   marketCount: markets.length,
