@@ -2,7 +2,9 @@
 
 import { useMemo, useState } from "react";
 import { GooglePropertyMap } from "./GooglePropertyMap";
+import { NationalMarketMap } from "./NationalMarketMap";
 import { COMPETENCY_FACTORS, EDGE_COMPONENTS, METROS, NATIONAL_FEEDS } from "./metroData";
+import { MARKET_EXPLORERS, explorerLayerValue, type ExplorerLayer } from "./marketNeighborhoods";
 import sourceRegistry from "../data/source-registry.json";
 
 type Area = {
@@ -63,19 +65,36 @@ export default function Home() {
   const [showGaps, setShowGaps] = useState(false);
   const [metroCohort, setMetroCohort] = useState<"largest" | "fastest">("largest");
   const [edgeComponent, setEdgeComponent] = useState(EDGE_COMPONENTS[0]);
+  const [selectedMarketId, setSelectedMarketId] = useState(MARKET_EXPLORERS[0].id);
+  const [selectedNeighborhoodId, setSelectedNeighborhoodId] = useState(MARKET_EXPLORERS[0].neighborhoods[0].id);
+  const [marketLayer, setMarketLayer] = useState<ExplorerLayer>("edge");
+  const [marketQuery, setMarketQuery] = useState("");
 
   const areas = useMemo(() => {
     return AREAS.filter((a) => borough === "All boroughs" || a.borough === borough)
       .filter((a) => `${a.name} ${a.borough}`.toLowerCase().includes(query.toLowerCase()));
   }, [borough, query]);
 
+  const market = MARKET_EXPLORERS.find((item) => item.id === selectedMarketId) ?? MARKET_EXPLORERS[0];
+  const marketNeighborhoods = useMemo(() => market.neighborhoods.filter((item) => item.name.toLowerCase().includes(marketQuery.toLowerCase())), [market, marketQuery]);
+  const selectedNeighborhood = market.neighborhoods.find((item) => item.id === selectedNeighborhoodId) ?? market.neighborhoods[0];
+
+  function chooseMarket(id: string) {
+    const next = MARKET_EXPLORERS.find((item) => item.id === id) ?? MARKET_EXPLORERS[0];
+    setSelectedMarketId(next.id);
+    setSelectedNeighborhoodId(next.neighborhoods[0].id);
+    setMarketQuery("");
+  }
+
   return (
     <main>
       <header className="topbar">
         <a className="brand" href="#top" aria-label="Borocast home"><span>BORO</span>CAST</a>
+        <label className="region-picker"><span>Region</span><select aria-label="Select metro region" value={selectedMarketId} onChange={(event) => chooseMarket(event.target.value)}>{MARKET_EXPLORERS.map((item) => <option key={item.id} value={item.id}>{item.metro.short}</option>)}</select><a href="#market-explorer">View</a></label>
         <nav aria-label="Primary navigation">
           <a href="#outlook">Outlook</a>
           <a href="#rankings">Rankings</a>
+          <a href="#market-explorer">Explorer</a>
           <a href="#national">U.S. markets</a>
           <a href="#edge">Edge score</a>
           <a href="#sources">Sources</a>
@@ -139,6 +158,32 @@ export default function Home() {
         </tbody></table>{areas.length === 0 && <p className="empty">No neighborhoods match this view.</p>}</div>
       </section>
 
+      <section className="market-explorer" id="market-explorer">
+        <div className="market-explorer-title">
+          <div><p className="eyebrow">20-MARKET NEIGHBORHOOD EXPLORER</p><h2>{market.metro.short}<br /><em>local edge map.</em></h2></div>
+          <div className="market-evidence"><span className={`connection-status ${market.metro.localStatus.replace(" ", "-")}`}>{market.metro.localStatus}</span><strong>{market.metro.competency}%</strong><small>data competency · ±{market.metro.evidenceBand} evidence points</small><p>{market.basis === "measured" ? "Measured NYC community-district layer." : market.basis === "connected proxy" ? "Official market source connected; neighborhood aggregation remains a proxy." : "National inputs available; local parcel adapter remains in source inventory."}</p></div>
+        </div>
+        <div className="market-explorer-controls">
+          <label><span>Region</span><select value={market.id} onChange={(event) => chooseMarket(event.target.value)}>{MARKET_EXPLORERS.map((item) => <option key={item.id} value={item.id}>{item.metro.name}</option>)}</select></label>
+          <label className="market-search"><span>Search</span><input aria-label="Search neighborhoods" value={marketQuery} onChange={(event) => setMarketQuery(event.target.value)} placeholder="Neighborhood or local place" /></label>
+          <div className="market-layer"><span>Signal</span>{(["edge", "demand", "supply"] as const).map((item) => <button key={item} className={marketLayer === item ? "selected" : ""} onClick={() => setMarketLayer(item)}>{item === "supply" ? "Supply friction" : item}</button>)}</div>
+        </div>
+        <div className="market-map-grid">
+          <div className="market-map-stage"><NationalMarketMap market={market} neighborhoods={marketNeighborhoods} layer={marketLayer} selectedId={selectedNeighborhood.id} onSelect={setSelectedNeighborhoodId} /></div>
+          <article className="market-signal-card">
+            <p>#{selectedNeighborhood.rank} {marketLayer.toUpperCase()} SIGNAL</p>
+            <h3>{selectedNeighborhood.name}</h3>
+            <span>{market.metro.short} · {selectedNeighborhood.focus}</span>
+            <div className="market-score"><strong>{explorerLayerValue(selectedNeighborhood, marketLayer)}</strong><small>/100<br />{marketLayer}</small><b>{selectedNeighborhood.confidence}% evidence</b></div>
+            <div className="meter"><i style={{ width: `${explorerLayerValue(selectedNeighborhood, marketLayer)}%` }} /></div>
+            <dl><div><dt>Demand acceleration</dt><dd>{selectedNeighborhood.demand}</dd></div><div><dt>Supply friction</dt><dd>{selectedNeighborhood.supply}</dd></div><div><dt>Price dislocation</dt><dd>{selectedNeighborhood.pricing}</dd></div><div><dt>Catalyst pipeline</dt><dd>{selectedNeighborhood.catalyst}</dd></div></dl>
+            <div className="market-next"><b>Next evidence test</b><p>{selectedNeighborhood.action}.</p></div>
+          </article>
+        </div>
+        <div className="market-ranking-wrap"><table><thead><tr><th>Rank</th><th>Neighborhood / local place</th><th>Edge</th><th>Demand</th><th>Supply friction</th><th>Evidence</th><th>Next test</th></tr></thead><tbody>{marketNeighborhoods.map((item) => <tr key={item.id} onClick={() => setSelectedNeighborhoodId(item.id)} className={selectedNeighborhood.id === item.id ? "market-row-active" : ""}><td><b>{String(item.rank).padStart(2, "0")}</b></td><td><strong>{item.name}</strong><small>{item.focus}</small></td><td><div className="table-score"><b>{item.edge}</b><i><span style={{ width: `${item.edge}%` }} /></i></div></td><td>{item.demand}</td><td>{item.supply}</td><td><span className="evidence-chip">{item.confidence}%</span></td><td className="next-test">{item.action}</td></tr>)}</tbody></table>{marketNeighborhoods.length === 0 && <p className="empty">No local units match this search.</p>}</div>
+        <p className="market-proxy-note"><b>Coverage note:</b> NYC uses measured community-district aggregates. The other markets currently use named neighborhood/place markers with scenario-ranked metro inputs; markers are approximate and scores are not yet parcel-aggregated estimates of future value. Connected government sources will replace each proxy as local joins clear audit.</p>
+      </section>
+
       <section className="national" id="national">
         <div className="section-title"><div><p className="eyebrow">20-MARKET EXPANSION · CENSUS VINTAGE 2025</p><h2>One national spine.<br />Local depth by adapter.</h2></div><p>The first portfolio combines the 10 largest metros and the 10 fastest-growing metros by 2024–2025 population change. Ten markets now have verified government parcel connections; the remaining scores are source-inventory estimates.</p></div>
         <div className="national-grid">
@@ -149,7 +194,7 @@ export default function Home() {
             </div>
             <ol className="metro-list">
               {METROS.filter((metro) => metro.cohort === metroCohort).map((metro, index) => <li key={metro.name}>
-                <b>{String(index + 1).padStart(2, "0")}</b><div><strong>{metro.short}</strong><span>{metro.name}</span><small className={`connection-status ${metro.localStatus.replace(" ", "-")}`}>{metro.localStatus}</small></div><div className="metro-stat"><strong>{metro.population.toLocaleString()}</strong><span className={metro.growth < 0 ? "down" : ""}>{metro.growth > 0 ? "+" : ""}{metro.growth.toFixed(2)}% YoY</span></div><div className="competency-score"><strong>{metro.competency}% <i>{competencyGrade(metro.competency)}</i></strong><span><i style={{ width: `${metro.competency}%` }} /></span><small>±{metro.evidenceBand} pts</small></div>
+                <b>{String(index + 1).padStart(2, "0")}</b><div><strong>{metro.short}</strong><span>{metro.name}</span><small className={`connection-status ${metro.localStatus.replace(" ", "-")}`}>{metro.localStatus}</small><a className="market-open" href="#market-explorer" onClick={() => chooseMarket(MARKET_EXPLORERS.find((item) => item.metro.short === metro.short)?.id ?? MARKET_EXPLORERS[0].id)}>Open neighborhood map →</a></div><div className="metro-stat"><strong>{metro.population.toLocaleString()}</strong><span className={metro.growth < 0 ? "down" : ""}>{metro.growth > 0 ? "+" : ""}{metro.growth.toFixed(2)}% YoY</span></div><div className="competency-score"><strong>{metro.competency}% <i>{competencyGrade(metro.competency)}</i></strong><span><i style={{ width: `${metro.competency}%` }} /></span><small>±{metro.evidenceBand} pts</small></div>
               </li>)}
             </ol>
             <div className="competency-legend"><strong>Data competency</strong><span>A 85+ · B 70–84 · C 55–69 · D hold</span><small>The ± band is an operational confidence range: potential Edge Score movement from missing or weak inputs. It is not a statistical forecast interval for property values.</small></div>

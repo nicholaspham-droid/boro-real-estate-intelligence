@@ -22,6 +22,10 @@ test("server-renders Borocast and the verified registry", async () => {
   assert.match(html, /Government feeds/);
   assert.match(html, /FIRST-WAVE LIVE ENDPOINTS/);
   assert.match(html, /Florida Statewide Parcels 2025/);
+  assert.match(html, /20-MARKET NEIGHBORHOOD EXPLORER/);
+  assert.match(html, /local edge map/);
+  assert.match(html, /Northwest Arkansas/);
+  assert.match(html, /Coverage note:/);
 });
 
 test("property-data APIs expose health and market evidence", async () => {
