@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "1.0.0",
+  "checkedAt": "2026-08-08T00:02:39.323Z",
+  "coverageDefinition": "Share of the audit sample with a non-null value in at least one mapped source field. Zero can mean the attribute lives in a related dataset that has not yet been joined.",
+  "sources": [
+    { "id": "nyc-pluto", "ok": true, "adapter": "socrata", "recordCount": 858602, "sampleSize": 100, "coverage": { "stableId": 1, "address": 1, "totalValue": 1, "landUse": 0.99, "yearBuilt": 1, "saleEvidence": 0 }, "latencyMs": 931 },
+    { "id": "cook-parcel-universe", "ok": true, "adapter": "socrata", "recordCount": 1863575, "sampleSize": 100, "coverage": { "stableId": 1, "address": 0, "totalValue": 0, "landUse": 1, "yearBuilt": 0, "saleEvidence": 0 }, "latencyMs": 951, "note": "Address, values, characteristics and sales are in separately verified Cook County datasets and are not yet normalized into this snapshot." },
+    { "id": "philadelphia-opa", "ok": true, "adapter": "carto", "recordCount": 583700, "sampleSize": 100, "coverage": { "stableId": 1, "address": 1, "totalValue": 1, "landUse": 1, "yearBuilt": 0.93, "saleEvidence": 1 }, "latencyMs": 839 },
+    { "id": "nc-one-map-parcels", "ok": true, "adapter": "arcgis", "recordCount": 538869, "sampleSize": 100, "maxRecordCount": 5000, "coverage": { "stableId": 1, "address": 0.57, "totalValue": 1, "landUse": 0, "yearBuilt": 0, "saleEvidence": 0 }, "latencyMs": 5769, "note": "Coverage reflects the first unstratified page across Wake and New Hanover; county variance requires a stratified audit before promotion." },
+    { "id": "utah-washington-lir", "ok": true, "adapter": "arcgis", "recordCount": 134161, "sampleSize": 100, "maxRecordCount": 2000, "coverage": { "stableId": 1, "address": 1, "totalValue": 1, "landUse": 1, "yearBuilt": 0.98, "saleEvidence": 0 }, "latencyMs": 476 },
+    { "id": "florida-statewide-parcels", "ok": true, "adapter": "arcgis", "recordCount": 1523321, "sampleSize": 25, "maxRecordCount": 2000, "coverage": { "stableId": 1, "address": 1, "totalValue": 1, "landUse": 1, "yearBuilt": 1, "saleEvidence": 1 }, "latencyMs": 6311, "note": "Count is the four target counties, not all 10.8 million statewide records; the small audit sample is directional." }
+  ]
+}

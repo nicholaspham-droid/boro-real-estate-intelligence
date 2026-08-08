@@ -1,0 +1,163 @@
+{
+  "schemaVersion": "1.0.0",
+  "verifiedAt": "2026-08-07T23:58:00Z",
+  "policy": {
+    "admissionRule": "A source may raise market competency only after its official endpoint, stable identifier, record count, update metadata, fields, pagination and stated limitations are verified.",
+    "privacyRule": "Hosted samples omit owner names and mailing addresses even when the government source publishes them.",
+    "scoreRule": "Competency is an evidence-availability score. Its interval reflects revision risk from missing or weak inputs; it is not a calibrated statistical confidence interval for property appreciation."
+  },
+  "sources": [
+    {
+      "id": "nyc-pluto",
+      "name": "NYC PLUTO 26v1",
+      "publisher": "NYC Department of City Planning",
+      "adapter": "socrata",
+      "marketIds": ["new-york"],
+      "recordCount": 858602,
+      "marketRecordCounts": { "new-york": 858602 },
+      "asOf": "26v1",
+      "cadence": "quarterly",
+      "status": "verified",
+      "sourcePage": "https://data.cityofnewyork.us/City-Government/PLUTO/64uk-42ks",
+      "apiUrl": "https://data.cityofnewyork.us/resource/64uk-42ks.json",
+      "capabilities": {
+        "stableId": true,
+        "geometry": "point",
+        "assessment": true,
+        "building": true,
+        "sales": false,
+        "landUse": true,
+        "zoning": true,
+        "permits": false
+      },
+      "limits": ["Tax-lot record, not a transaction or appraisal feed", "Interior condition, rents, concessions, financing and insurance costs are absent"]
+    },
+    {
+      "id": "cook-parcel-universe",
+      "name": "Cook County Parcel Universe",
+      "publisher": "Cook County Assessor's Office",
+      "adapter": "socrata",
+      "marketIds": ["chicago"],
+      "recordCount": 1863575,
+      "marketRecordCounts": { "chicago": 1863575 },
+      "asOf": "tax year 2026",
+      "cadence": "rolling / annual tax year",
+      "status": "verified",
+      "sourcePage": "https://datacatalog.cookcountyil.gov/Property-Taxation/Assessor-Parcel-Universe-Current-Year-Only-/pabr-t5kh",
+      "apiUrl": "https://datacatalog.cookcountyil.gov/resource/pabr-t5kh.json",
+      "relatedDatasetIds": ["uzyt-m557", "x54s-btds", "6yjf-dfxs", "wvhk-k5uv", "3723-97qp"],
+      "capabilities": {
+        "stableId": true,
+        "geometry": "point",
+        "assessment": true,
+        "building": true,
+        "sales": true,
+        "landUse": true,
+        "zoning": false,
+        "permits": true
+      },
+      "limits": ["The Chicago metro extends beyond Cook County", "Assessment, characteristics, addresses, permits and sales require PIN-and-year joins across separate datasets"]
+    },
+    {
+      "id": "philadelphia-opa",
+      "name": "Philadelphia OPA Property Assessments",
+      "publisher": "City of Philadelphia Office of Property Assessment",
+      "adapter": "carto",
+      "marketIds": ["philadelphia"],
+      "recordCount": 583700,
+      "marketRecordCounts": { "philadelphia": 583700 },
+      "asOf": "2026-04-29 sample assessment timestamp",
+      "cadence": "rolling",
+      "status": "verified",
+      "sourcePage": "https://data.phila.gov/visualizations/property-assessments/",
+      "apiUrl": "https://phl.carto.com/api/v2/sql",
+      "table": "opa_properties_public",
+      "capabilities": {
+        "stableId": true,
+        "geometry": "point",
+        "assessment": true,
+        "building": true,
+        "sales": true,
+        "landUse": true,
+        "zoning": true,
+        "permits": false
+      },
+      "limits": ["The source covers Philadelphia, not the full four-state metro", "Sale fields need arms-length qualification before model use"]
+    },
+    {
+      "id": "nc-one-map-parcels",
+      "name": "NC OneMap Standardized Parcels",
+      "publisher": "North Carolina Center for Geographic Information and Analysis",
+      "adapter": "arcgis",
+      "marketIds": ["raleigh", "wilmington"],
+      "recordCount": 538869,
+      "marketRecordCounts": { "raleigh": 435380, "wilmington": 103489 },
+      "asOf": "live county-standardized service",
+      "cadence": "county-dependent",
+      "status": "verified",
+      "sourcePage": "https://www.nconemap.gov/pages/parcels",
+      "apiUrl": "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/0",
+      "capabilities": {
+        "stableId": true,
+        "geometry": "point + polygon sibling layer",
+        "assessment": true,
+        "building": true,
+        "sales": true,
+        "landUse": true,
+        "zoning": false,
+        "permits": false
+      },
+      "limits": ["County refresh dates and field semantics vary", "Raleigh count currently uses Wake County and Wilmington uses New Hanover County rather than complete CBSA boundaries"]
+    },
+    {
+      "id": "utah-washington-lir",
+      "name": "Utah Washington County Parcels LIR",
+      "publisher": "Utah Geospatial Resource Center",
+      "adapter": "arcgis",
+      "marketIds": ["st-george"],
+      "recordCount": 134161,
+      "marketRecordCounts": { "st-george": 134161 },
+      "asOf": "2025-10-23 tax attributes",
+      "cadence": "annual tax attributes; monthly basic parcel target",
+      "status": "verified",
+      "sourcePage": "https://gis.utah.gov/products/sgid/cadastre/parcels/",
+      "apiUrl": "https://services1.arcgis.com/99lidPhWCzftIe9K/ArcGIS/rest/services/Parcels_Washington_LIR/FeatureServer/0",
+      "capabilities": {
+        "stableId": true,
+        "geometry": "polygon",
+        "assessment": true,
+        "building": true,
+        "sales": false,
+        "landUse": true,
+        "zoning": false,
+        "permits": false
+      },
+      "limits": ["LIR assessment attributes are annual", "No verified transaction or permit feed is joined yet"]
+    },
+    {
+      "id": "florida-statewide-parcels",
+      "name": "Florida Statewide Parcels 2025",
+      "publisher": "Florida Geographic Information Office / Department of Revenue",
+      "adapter": "arcgis",
+      "marketIds": ["miami", "ocala", "lakeland", "punta-gorda"],
+      "recordCount": 10831924,
+      "marketRecordCounts": { "miami": 585220, "ocala": 283399, "lakeland": 424289, "punta-gorda": 230413 },
+      "asOf": "assessment year 2025",
+      "cadence": "annual statewide publication",
+      "status": "verified",
+      "sourcePage": "https://geodata.floridagio.gov/search?q=parcels",
+      "apiUrl": "https://services9.arcgis.com/Gh9awoU677aKree0/arcgis/rest/services/Florida_Statewide_Parcel_Centroid_Version/FeatureServer/0",
+      "capabilities": {
+        "stableId": true,
+        "geometry": "point; statewide polygon sibling service",
+        "assessment": true,
+        "building": true,
+        "sales": true,
+        "landUse": true,
+        "zoning": false,
+        "permits": false
+      },
+      "limits": ["Annual vintage can lag fast-moving markets", "Sale fields need qualification-code filtering", "Miami market count shown is Miami-Dade only; Broward and Palm Beach remain to be aggregated for full CBSA coverage"]
+    }
+  ]
+}

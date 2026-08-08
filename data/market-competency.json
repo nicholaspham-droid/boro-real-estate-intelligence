@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "verifiedAt": "2026-08-07T23:58:00Z",
+  "method": {
+    "nationalComparableFeeds": 35,
+    "parcelGeometryStableId": 15,
+    "assessmentBuildingAttributes": 15,
+    "verifiedArmsLengthSales": 15,
+    "zoningLandUseCapacity": 8,
+    "permitsDevelopmentPipeline": 7,
+    "freshnessTermsJoinQuality": 5
+  },
+  "markets": [
+    { "id": "new-york", "label": "New York", "competency": 88, "interval": 6, "status": "live", "sourceIds": ["nyc-pluto"], "coveredRecords": 858602, "principalGap": "NJ/CT metro coverage and qualified sale/permit joins" },
+    { "id": "chicago", "label": "Chicago", "competency": 86, "interval": 7, "status": "connected", "sourceIds": ["cook-parcel-universe"], "coveredRecords": 1863575, "principalGap": "Metro counties outside Cook County and municipal zoning normalization" },
+    { "id": "philadelphia", "label": "Philadelphia", "competency": 82, "interval": 9, "status": "connected", "sourceIds": ["philadelphia-opa"], "coveredRecords": 583700, "principalGap": "PA suburbs plus NJ/DE/MD portions of the CBSA" },
+    { "id": "miami", "label": "Miami", "competency": 79, "interval": 10, "status": "connected", "sourceIds": ["florida-statewide-parcels"], "coveredRecords": 585220, "principalGap": "Broward/Palm Beach aggregation, zoning and permit normalization" },
+    { "id": "ocala", "label": "Ocala", "competency": 79, "interval": 10, "status": "connected", "sourceIds": ["florida-statewide-parcels"], "coveredRecords": 283399, "principalGap": "Local zoning, permits and more frequent transaction refresh" },
+    { "id": "lakeland", "label": "Lakeland", "competency": 79, "interval": 10, "status": "connected", "sourceIds": ["florida-statewide-parcels"], "coveredRecords": 424289, "principalGap": "Local zoning, permits and more frequent transaction refresh" },
+    { "id": "punta-gorda", "label": "Punta Gorda", "competency": 79, "interval": 10, "status": "connected", "sourceIds": ["florida-statewide-parcels"], "coveredRecords": 230413, "principalGap": "Local zoning, permits and more frequent transaction refresh" },
+    { "id": "raleigh", "label": "Raleigh", "competency": 80, "interval": 9, "status": "connected", "sourceIds": ["nc-one-map-parcels"], "coveredRecords": 435380, "principalGap": "CBSA counties beyond Wake, zoning and permit normalization" },
+    { "id": "wilmington", "label": "Wilmington", "competency": 80, "interval": 9, "status": "connected", "sourceIds": ["nc-one-map-parcels"], "coveredRecords": 103489, "principalGap": "CBSA counties beyond New Hanover, zoning and permit normalization" },
+    { "id": "st-george", "label": "St. George", "competency": 81, "interval": 8, "status": "connected", "sourceIds": ["utah-washington-lir"], "coveredRecords": 134161, "principalGap": "Verified arms-length sales, permits and local zoning" }
+  ]
+}

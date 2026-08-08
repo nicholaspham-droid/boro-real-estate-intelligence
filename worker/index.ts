@@ -1,6 +1,10 @@
 /** Cloudflare Worker entry point for the vinext-starter template. */
 import { handleImageOptimization, DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
+import sourceRegistry from "../data/source-registry.json";
+import marketCompetency from "../data/market-competency.json";
+import firstWaveSamples from "../data/snapshots/first-wave-samples.json";
+import liveAudit from "../data/snapshots/live-audit-2026-08-07.json";
 
 interface Env {
   ASSETS: Fetcher;
@@ -29,6 +33,54 @@ interface ExecutionContext {
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+
+    const snapshotHeaders = {
+      "Cache-Control": "public, max-age=300, s-maxage=900",
+      "Access-Control-Allow-Origin": "*",
+    };
+
+    if (url.pathname === "/api/property-data/health") {
+      return Response.json({
+        status: "operational",
+        verifiedAt: sourceRegistry.verifiedAt,
+        sourceCount: sourceRegistry.sources.length,
+        connectedMarketCount: marketCompetency.markets.length,
+        representedRecords: sourceRegistry.sources.reduce((total, source) => total + source.recordCount, 0),
+        adapters: [...new Set(sourceRegistry.sources.map((source) => source.adapter))],
+      }, { headers: snapshotHeaders });
+    }
+
+    if (url.pathname === "/api/property-data/sources") {
+      return Response.json(sourceRegistry, { headers: snapshotHeaders });
+    }
+
+    if (url.pathname === "/api/property-data/audit") {
+      return Response.json(liveAudit, { headers: snapshotHeaders });
+    }
+
+    if (url.pathname.startsWith("/api/property-data/sources/")) {
+      const sourceId = decodeURIComponent(url.pathname.slice("/api/property-data/sources/".length));
+      const source = sourceRegistry.sources.find((candidate) => candidate.id === sourceId);
+      return source
+        ? Response.json({ verifiedAt: sourceRegistry.verifiedAt, source }, { headers: snapshotHeaders })
+        : Response.json({ error: "Unknown source" }, { status: 404, headers: snapshotHeaders });
+    }
+
+    if (url.pathname === "/api/property-data/markets") {
+      return Response.json(marketCompetency, { headers: snapshotHeaders });
+    }
+
+    if (url.pathname.startsWith("/api/property-data/markets/")) {
+      const marketId = decodeURIComponent(url.pathname.slice("/api/property-data/markets/".length));
+      const market = marketCompetency.markets.find((candidate) => candidate.id === marketId);
+      if (!market) return Response.json({ error: "Unknown market" }, { status: 404, headers: snapshotHeaders });
+      const sources = sourceRegistry.sources.filter((source) => market.sourceIds.includes(source.id));
+      return Response.json({ verifiedAt: marketCompetency.verifiedAt, market, sources }, { headers: snapshotHeaders });
+    }
+
+    if (url.pathname === "/api/property-data/samples") {
+      return Response.json(firstWaveSamples, { headers: snapshotHeaders });
+    }
 
     if (url.pathname === "/api/maps-config") {
       if (!env.GOOGLE_MAPS_API_KEY) {

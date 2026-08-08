@@ -19,21 +19,42 @@ type Props = {
   onSelect: (cd: number) => void;
 };
 
+type GoogleDataFeature = { getProperty(name: string): unknown };
+type GoogleDataMouseEvent = { feature: GoogleDataFeature; latLng: unknown };
+type GoogleMapStyle = Record<string, string | number | boolean>;
+type GoogleDataLayer = {
+  addGeoJson(geojson: unknown): unknown;
+  addListener(eventName: "click" | "mouseover", handler: (event: GoogleDataMouseEvent) => void): unknown;
+  addListener(eventName: "mouseout", handler: () => void): unknown;
+  setStyle(style: (feature: GoogleDataFeature) => GoogleMapStyle): void;
+};
+type GoogleMapInstance = { data: GoogleDataLayer };
+type GoogleInfoWindow = {
+  setContent(content: string): void;
+  setPosition(position: unknown): void;
+  open(options: { map: GoogleMapInstance }): void;
+  close(): void;
+};
+type GoogleMapsNamespace = {
+  Map: new (element: HTMLElement, options: Record<string, unknown>) => GoogleMapInstance;
+  InfoWindow: new (options: Record<string, unknown>) => GoogleInfoWindow;
+};
+
 declare global {
   interface Window {
-    google?: any;
+    google?: { maps: GoogleMapsNamespace };
     __borocastGoogleMapsReady?: () => void;
   }
 }
 
-let mapsLoader: Promise<any> | null = null;
+let mapsLoader: Promise<GoogleMapsNamespace> | null = null;
 
 function loadGoogleMaps(apiKey: string) {
   if (window.google?.maps) return Promise.resolve(window.google.maps);
   if (mapsLoader) return mapsLoader;
 
   mapsLoader = new Promise((resolve, reject) => {
-    window.__borocastGoogleMapsReady = () => resolve(window.google.maps);
+    window.__borocastGoogleMapsReady = () => resolve(window.google!.maps);
     const script = document.createElement("script");
     script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&loading=async&callback=__borocastGoogleMapsReady&v=weekly&auth_referrer_policy=origin`;
     script.async = true;
@@ -58,9 +79,7 @@ function heatColor(value: number) {
 
 export function GooglePropertyMap({ areas, layer, selectedCd, onSelect }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<any>(null);
-  const dataRef = useRef<any>(null);
-  const infoRef = useRef<any>(null);
+  const dataRef = useRef<GoogleDataLayer | null>(null);
   const onSelectRef = useRef(onSelect);
   const areasRef = useRef(areas);
   const [ready, setReady] = useState(false);
@@ -113,11 +132,11 @@ export function GooglePropertyMap({ areas, layer, selectedCd, onSelect }: Props)
         map.data.addGeoJson(geojson);
 
         const info = new maps.InfoWindow({ disableAutoPan: true });
-        map.data.addListener("click", (event: any) => {
+        map.data.addListener("click", (event) => {
           const cd = Number(event.feature.getProperty("boro_cd"));
           if (areasRef.current.some((area) => area.cd === cd)) onSelectRef.current(cd);
         });
-        map.data.addListener("mouseover", (event: any) => {
+        map.data.addListener("mouseover", (event) => {
           const cd = Number(event.feature.getProperty("boro_cd"));
           const area = areasRef.current.find((item) => item.cd === cd);
           if (!area) return;
@@ -127,9 +146,7 @@ export function GooglePropertyMap({ areas, layer, selectedCd, onSelect }: Props)
         });
         map.data.addListener("mouseout", () => info.close());
 
-        mapRef.current = map;
         dataRef.current = map.data;
-        infoRef.current = info;
         setReady(true);
       } catch (reason) {
         if (!cancelled) setError(reason instanceof Error ? reason.message : "The map could not be loaded.");
@@ -142,7 +159,7 @@ export function GooglePropertyMap({ areas, layer, selectedCd, onSelect }: Props)
 
   useEffect(() => {
     if (!ready || !dataRef.current) return;
-    dataRef.current.setStyle((feature: any) => {
+    dataRef.current.setStyle((feature) => {
       const cd = Number(feature.getProperty("boro_cd"));
       const area = byCd.get(cd);
       const selected = cd === selectedCd;

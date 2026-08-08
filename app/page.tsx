@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { GooglePropertyMap } from "./GooglePropertyMap";
 import { COMPETENCY_FACTORS, EDGE_COMPONENTS, METROS, NATIONAL_FEEDS } from "./metroData";
+import sourceRegistry from "../data/source-registry.json";
 
 type Area = {
   cd: number;
@@ -73,7 +74,7 @@ export default function Home() {
       <header className="topbar">
         <a className="brand" href="#top" aria-label="Borocast home"><span>BORO</span>CAST</a>
         <nav aria-label="Primary navigation">
-          <a className="active" href="#outlook">Outlook</a>
+          <a href="#outlook">Outlook</a>
           <a href="#rankings">Rankings</a>
           <a href="#national">U.S. markets</a>
           <a href="#edge">Edge score</a>
@@ -139,7 +140,7 @@ export default function Home() {
       </section>
 
       <section className="national" id="national">
-        <div className="section-title"><div><p className="eyebrow">20-MARKET EXPANSION · CENSUS VINTAGE 2025</p><h2>One national spine.<br />Local depth by adapter.</h2></div><p>The first portfolio combines the 10 largest metros and the 10 fastest-growing metros by 2024–2025 population change. No metros overlap. Population is standardized now; parcel-level comparability is the active data-acquisition gap.</p></div>
+        <div className="section-title"><div><p className="eyebrow">20-MARKET EXPANSION · CENSUS VINTAGE 2025</p><h2>One national spine.<br />Local depth by adapter.</h2></div><p>The first portfolio combines the 10 largest metros and the 10 fastest-growing metros by 2024–2025 population change. Ten markets now have verified government parcel connections; the remaining scores are source-inventory estimates.</p></div>
         <div className="national-grid">
           <div className="metro-panel">
             <div className="cohort-switch" aria-label="Metro cohort">
@@ -148,10 +149,10 @@ export default function Home() {
             </div>
             <ol className="metro-list">
               {METROS.filter((metro) => metro.cohort === metroCohort).map((metro, index) => <li key={metro.name}>
-                <b>{String(index + 1).padStart(2, "0")}</b><div><strong>{metro.short}</strong><span>{metro.name}</span></div><div className="metro-stat"><strong>{metro.population.toLocaleString()}</strong><span className={metro.growth < 0 ? "down" : ""}>{metro.growth > 0 ? "+" : ""}{metro.growth.toFixed(2)}% YoY</span></div><div className="competency-score"><strong>{metro.competency}% <i>{competencyGrade(metro.competency)}</i></strong><span><i style={{ width: `${metro.competency}%` }} /></span><small>±{metro.evidenceBand} pts</small></div>
+                <b>{String(index + 1).padStart(2, "0")}</b><div><strong>{metro.short}</strong><span>{metro.name}</span><small className={`connection-status ${metro.localStatus.replace(" ", "-")}`}>{metro.localStatus}</small></div><div className="metro-stat"><strong>{metro.population.toLocaleString()}</strong><span className={metro.growth < 0 ? "down" : ""}>{metro.growth > 0 ? "+" : ""}{metro.growth.toFixed(2)}% YoY</span></div><div className="competency-score"><strong>{metro.competency}% <i>{competencyGrade(metro.competency)}</i></strong><span><i style={{ width: `${metro.competency}%` }} /></span><small>±{metro.evidenceBand} pts</small></div>
               </li>)}
             </ol>
-            <div className="competency-legend"><strong>Data competency</strong><span>A 85+ · B 70–84 · C 55–69 · D hold</span><small>Evidence band estimates potential Edge Score movement from missing or weak inputs. It is not yet a statistical confidence interval.</small></div>
+            <div className="competency-legend"><strong>Data competency</strong><span>A 85+ · B 70–84 · C 55–69 · D hold</span><small>The ± band is an operational confidence range: potential Edge Score movement from missing or weak inputs. It is not a statistical forecast interval for property values.</small></div>
           </div>
           <div className="coverage-panel">
             <p className="eyebrow">ACQUISITION STACK</p><h3>Comparable first.<br />Granular second.</h3>
@@ -193,7 +194,18 @@ export default function Home() {
       </section>
 
       <section className="sources" id="sources">
-        <div className="section-title"><div><p className="eyebrow">OFFICIAL DATA DIRECTORY</p><h2>Government feeds<br />we can actually join.</h2></div><p>PLUTO is the spine. BBL joins are direct; geographic joins use official coordinates or district identifiers. Feeds are listed here before they are allowed into the score.</p></div>
+        <div className="section-title"><div><p className="eyebrow">OFFICIAL DATA DIRECTORY</p><h2>Government feeds<br />we can actually join.</h2></div><p>Sources enter the score only after their endpoint, identifier, count, cadence, fields, pagination and limitations are recorded. Public samples intentionally omit owner names and mailing addresses.</p></div>
+        <div className="registry-summary">
+          <div><strong>{sourceRegistry.sources.length}</strong><span>verified local sources</span></div>
+          <div><strong>10</strong><span>connected target markets</span></div>
+          <div><strong>{sourceRegistry.sources.reduce((total, source) => total + source.recordCount, 0).toLocaleString()}</strong><span>represented source records</span></div>
+          <a href="/api/property-data/audit">Open live field audit →</a>
+        </div>
+        <div className="registry-head"><p className="eyebrow">FIRST-WAVE LIVE ENDPOINTS</p><p>ArcGIS, Socrata and CARTO adapters now share one audit contract.</p></div>
+        <div className="source-grid first-wave-grid">
+          {sourceRegistry.sources.map((source) => <a key={source.id} href={source.sourcePage} target="_blank" rel="noreferrer"><b>{source.status} · {source.adapter}</b><h3>{source.name}</h3><p>{source.publisher}. Covers {source.marketIds.map((marketId) => marketId.split("-").map((word) => word[0].toUpperCase() + word.slice(1)).join(" ")).join(", ")}.</p><span>{source.recordCount.toLocaleString()} records · {source.asOf} ↗</span></a>)}
+        </div>
+        <div className="registry-head"><p className="eyebrow">NYC + NATIONAL EVIDENCE STACK</p><p>Candidate feeds remain outside the score until their joins pass the same audit.</p></div>
         <div className="source-grid">
           <a href="https://data.cityofnewyork.us/resource/64uk-42ks.json" target="_blank" rel="noreferrer"><b>Core</b><h3>PLUTO 26v1</h3><p>Tax-lot, building, zoning, assessment and district attributes.</p><span>Quarterly · direct BBL · 858,602 rows ↗</span></a>
           <a href="https://data.cityofnewyork.us/City-Government/NYC-Citywide-Rolling-Calendar-Sales/usep-8jbt" target="_blank" rel="noreferrer"><b>Next</b><h3>Rolling Sales</h3><p>Recorded transfers and prices; $0/non-market transactions require filtering.</p><span>Monthly · borough/block/lot join ↗</span></a>
@@ -211,7 +223,7 @@ export default function Home() {
 
       <footer><a className="brand" href="#top"><span>BORO</span>CAST</a><p>Public-record research prototype · This is not an appraisal or investment advice.</p><span>Snapshot: PLUTO 26v1 · accessed Aug 7, 2026</span></footer>
 
-      {showGaps && <div className="modal-backdrop" onClick={() => setShowGaps(false)}><section className="modal" onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="gaps-title"><button className="modal-close" onClick={() => setShowGaps(false)}>×</button><p className="eyebrow">PLUTO 26V1 AUDIT</p><h2 id="gaps-title">Coverage is high.<br />Meaning is bounded.</h2><p className="modal-intro">The feed is broad and joinable. The bigger gaps are conceptual: PLUTO describes tax lots and zoning, not transaction intent or future market value.</p><ul>
+      {showGaps && <div className="modal-backdrop" role="button" tabIndex={0} aria-label="Close data audit" onClick={(event) => { if (event.target === event.currentTarget) setShowGaps(false); }} onKeyDown={(event) => { if (event.key === "Escape" || event.key === "Enter" || event.key === " ") setShowGaps(false); }}><section className="modal" role="dialog" aria-modal="true" aria-labelledby="gaps-title"><button className="modal-close" onClick={() => setShowGaps(false)}>×</button><p className="eyebrow">PLUTO 26V1 AUDIT</p><h2 id="gaps-title">Coverage is high.<br />Meaning is bounded.</h2><p className="modal-intro">The feed is broad and joinable. The bigger gaps are conceptual: PLUTO describes tax lots and zoning, not transaction intent or future market value.</p><ul>
         <li><b>BBL</b><span>858,602 of 858,602 rows populated — 100% field coverage.</span></li>
         <li><b>Coordinates</b><span>857,103 rows populated — approximately 99.8% coverage.</span></li>
         <li><b>Year built</b><span>818,364 rows have a nonzero value — approximately 95.3%.</span></li>

@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-08-07T23:58:00Z",
+  "privacy": "Owner names and mailing addresses intentionally omitted.",
+  "records": [
+    { "marketId": "new-york", "sourceId": "nyc-pluto", "parcelId": "2054800111", "address": "761 CLARENCE AVENUE", "city": "Bronx", "state": "NY", "postalCode": "10465", "landValue": 10080, "totalValue": 40140, "landUse": "1", "zoning": "R3A", "yearBuilt": 1950, "buildingSqft": 1683, "latitude": 40.830953, "longitude": -73.8165508, "sourceAsOf": "26v1" },
+    { "marketId": "raleigh", "sourceId": "nc-one-map-parcels", "parcelId": "0695327712", "address": "7712 BILL LOVE RD", "county": "Wake", "state": "NC", "landValue": 141675, "improvementValue": 478292, "totalValue": 619967, "saleDate": "2024-12-16", "landUse": "R" },
+    { "marketId": "st-george", "sourceId": "utah-washington-lir", "parcelId": "SG-SJP-13", "address": "1202 E ST JAMES LN", "city": "St. George", "state": "UT", "landValue": 145000, "totalValue": 574700, "landUse": "Residential", "yearBuilt": 1990, "buildingSqft": 3007, "sourceAsOf": "2025-10-23" },
+    { "marketId": "chicago", "sourceId": "cook-parcel-universe", "parcelId": "01011000090000", "city": "Barrington", "state": "IL", "postalCode": "60010", "landUse": "212", "latitude": 42.1539451941, "longitude": -88.1384273773, "sourceAsOf": "tax year 2026" },
+    { "marketId": "philadelphia", "sourceId": "philadelphia-opa", "parcelId": "871226500", "address": "5014 OLD YORK RD", "city": "Philadelphia", "state": "PA", "postalCode": "19141", "totalValue": 134100, "salePrice": 81200, "saleDate": "2026-05-19", "landUse": "MIXED USE", "zoning": "CMX2", "yearBuilt": 1925, "buildingSqft": 2064, "sourceAsOf": "2026-04-29" },
+    { "marketId": "punta-gorda", "sourceId": "florida-statewide-parcels", "parcelId": "412706301006", "address": "48049 BERMONT RD", "city": "Punta Gorda", "state": "FL", "postalCode": "33982", "landValue": 7225, "totalValue": 7225, "landUse": "099", "latitude": 26.9345077191, "longitude": -81.6612605758, "sourceAsOf": "assessment year 2025" },
+    { "marketId": "ocala", "sourceId": "florida-statewide-parcels", "parcelId": "48263-006-39", "address": "11001 SE SUNSET HARBOR RD UNIT F39", "city": "Summerfield", "state": "FL", "postalCode": "34491", "landValue": 64698, "totalValue": 227288, "salePrice": 100, "saleDate": "2024-12", "landUse": "004", "yearBuilt": 2018, "buildingSqft": 1099, "latitude": 28.9869818018, "longitude": -81.9710861259, "sourceAsOf": "assessment year 2025" }
+  ]
+}

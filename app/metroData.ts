@@ -1,15 +1,17 @@
+import marketCompetency from "../data/market-competency.json";
+
 export type Metro = {
   name: string;
   short: string;
   population: number;
   growth: number;
   cohort: "largest" | "fastest";
-  localStatus: "live" | "source inventory" | "cataloging";
+  localStatus: "live" | "connected" | "source inventory" | "cataloging";
   competency: number;
   evidenceBand: number;
 };
 
-export const METROS: Metro[] = [
+const BASE_METROS: Metro[] = [
   { name: "New York–Newark–Jersey City, NY–NJ", short: "New York", population: 20112448, growth: 0.16, cohort: "largest", localStatus: "live", competency: 88, evidenceBand: 6 },
   { name: "Los Angeles–Long Beach–Anaheim, CA", short: "Los Angeles", population: 12844441, growth: -0.48, cohort: "largest", localStatus: "source inventory", competency: 78, evidenceBand: 10 },
   { name: "Chicago–Naperville–Elgin, IL–IN", short: "Chicago", population: 9434123, growth: 0.24, cohort: "largest", localStatus: "source inventory", competency: 90, evidenceBand: 6 },
@@ -31,6 +33,16 @@ export const METROS: Metro[] = [
   { name: "Fayetteville–Springdale–Rogers, AR", short: "Northwest Arkansas", population: 622177, growth: 2.43, cohort: "fastest", localStatus: "cataloging", competency: 74, evidenceBand: 12 },
   { name: "Raleigh–Cary, NC", short: "Raleigh", population: 1595720, growth: 2.36, cohort: "fastest", localStatus: "cataloging", competency: 86, evidenceBand: 8 },
 ];
+
+export const METROS: Metro[] = BASE_METROS.map((metro) => {
+  const verified = marketCompetency.markets.find((market) => market.label === metro.short);
+  return verified ? {
+    ...metro,
+    localStatus: verified.status as Metro["localStatus"],
+    competency: verified.competency,
+    evidenceBand: verified.interval,
+  } : metro;
+});
 
 export const COMPETENCY_FACTORS = [
   { label: "National comparable feeds", weight: 35 },

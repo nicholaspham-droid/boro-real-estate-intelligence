@@ -11,6 +11,41 @@
   border: 1px solid #c7ccc7;
 }
 
+.registry-summary {
+  display: grid;
+  grid-template-columns: .75fr .75fr 1.15fr 1.35fr;
+  border: 1px solid #c7ccc7;
+  background: #06142e;
+  color: white;
+  margin-bottom: 30px;
+}
+
+.registry-summary > div,
+.registry-summary > a {
+  min-height: 96px;
+  padding: 20px;
+  border-right: 1px solid #2b3c56;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.registry-summary strong { color: #d9ff55; font-size: 25px; letter-spacing: -.04em; }
+.registry-summary span { margin-top: 6px; color: #9baabc; font-size: 9px; text-transform: uppercase; letter-spacing: .08em; }
+.registry-summary > a { align-items: flex-start; color: #d9ff55; text-decoration: none; font-size: 11px; font-weight: 800; }
+
+.registry-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 30px;
+  margin: 36px 0 14px;
+}
+
+.registry-head .eyebrow { margin: 0; }
+.registry-head > p:last-child { margin: 0; color: #6f7a87; font-size: 11px; }
+.first-wave-grid { margin-bottom: 28px; }
+
 .source-grid a {
   background: white;
   padding: 26px;
@@ -52,11 +87,16 @@
 
 @media (max-width: 900px) {
   .source-grid { grid-template-columns: 1fr 1fr; }
+  .registry-summary { grid-template-columns: 1fr 1fr; }
+  .registry-summary > * { border-bottom: 1px solid #2b3c56; }
 }
 
 @media (max-width: 600px) {
   .sources { padding-inline: 5vw; }
   .source-grid { grid-template-columns: 1fr; }
+  .registry-summary { grid-template-columns: 1fr; }
+  .registry-head { display: block; }
+  .registry-head > p:last-child { margin-top: 8px; }
 }
 
 .google-map-wrap,
@@ -202,6 +242,8 @@
 .metro-list li div { min-width: 0; }
 .metro-list li div > strong { display: block; font-size: 13px; }
 .metro-list li div > span { display: block; margin-top: 4px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: #8395ad; font-size: 9px; }
+.connection-status { display: inline-block; width: max-content; margin-top: 5px; padding: 3px 5px; border: 1px solid #53657d; color: #91a2b8; font-size: 7px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+.connection-status.live,.connection-status.connected { border-color: #657b38; color: #d9ff55; }
 .metro-list .metro-stat { text-align: right; }
 .metro-list .metro-stat > span { color: #d9ff55; }
 .metro-list .metro-stat > span.down { color: #ff8c80; }
