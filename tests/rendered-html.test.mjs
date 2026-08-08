@@ -32,7 +32,12 @@ test("server-renders the national Borocast workbench and verified registry", asy
   assert.match(html, />Full</);
   assert.match(html, /FHFA HPI index/);
   assert.match(html, /Price momentum/);
+  assert.match(html, /LOCAL SIGNAL LEADERBOARD/);
+  assert.match(html, /Ten areas/);
+  assert.match(html, /North Arc/);
   assert.match(html, /Northwest Arkansas/);
+  assert.match(html, /WHY IT STANDS OUT/);
+  assert.match(html, /Open this area in the market workspace/);
   assert.match(html, /No national PLUTO equivalent/);
 });
 

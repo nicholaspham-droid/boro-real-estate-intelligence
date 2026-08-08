@@ -65,6 +65,7 @@ export default function Home() {
   const [minimumCompetency, setMinimumCompetency] = useState(0);
   const [priceScope, setPriceScope] = useState<"cluster" | "metro">("cluster");
   const [historyRange, setHistoryRange] = useState<5 | 10 | "full">(10);
+  const [selectedLeaderKey, setSelectedLeaderKey] = useState<string | null>(null);
 
   const baseMarket = MARKET_EXPLORERS.find((item) => item.id === selectedMarketId) ?? MARKET_EXPLORERS[0];
   const scoredClusters = useMemo(() => baseMarket.neighborhoods
@@ -96,6 +97,21 @@ export default function Home() {
     .filter((item) => Math.round(item.acsCompetency * .5 + item.metro.competency * .25 + item.localPricingCompetency * .25) >= minimumCompetency)
     .map((item) => ({ ...item, score: scoreMarket(item, weights), integrated: Math.round(item.acsCompetency * .5 + item.metro.competency * .25 + item.localPricingCompetency * .25) }))
     .sort((a, b) => b.score - a.score), [cohort, minimumCompetency, weights]);
+  const localLeaders = useMemo(() => MARKET_EXPLORERS
+    .flatMap((leaderMarket) => leaderMarket.neighborhoods.map((cluster) => ({
+      key: `${leaderMarket.id}:${cluster.id}`,
+      market: leaderMarket,
+      cluster,
+      score: weightedComposite(cluster, weights),
+    })))
+    .sort((a, b) => b.score - a.score || b.cluster.confidence - a.cluster.confidence)
+    .slice(0, 10), [weights]);
+  const selectedLeader = localLeaders.find((item) => item.key === selectedLeaderKey) ?? localLeaders[0];
+  const leaderFactors = FACTORS
+    .map((factor) => ({ ...factor, value: selectedLeader.cluster[factor.key] }))
+    .sort((a, b) => b.value - a.value);
+  const leaderPricing = selectedLeader.cluster.localPricing;
+  const leaderLatest = leaderPricing?.history.at(-1);
 
   function chooseMarket(id: string) {
     const next = MARKET_EXPLORERS.find((item) => item.id === id) ?? MARKET_EXPLORERS[0];
@@ -121,7 +137,7 @@ export default function Home() {
         <a className="brand" href="#top" aria-label="Borocast home"><span>BORO</span>CAST</a>
         <span className="product-label">Market intelligence</span>
         <label className="global-market-picker"><span>Market</span><select value={market.id} onChange={(event) => chooseMarket(event.target.value)}>{MARKET_EXPLORERS.map((item) => <option key={item.id} value={item.id}>{item.metro.short}</option>)}</select></label>
-        <nav aria-label="Primary navigation"><a href="#workspace">Workspace</a><a href="#compare">Compare</a><a href="#quality">Data quality</a><a href="#sources">Sources</a></nav>
+        <nav aria-label="Primary navigation"><a href="#workspace">Workspace</a><a href="#leaders">Top areas</a><a href="#compare">Compare</a><a href="#quality">Data quality</a><a href="#sources">Sources</a></nav>
         <a className="data-status" href="#quality"><i /> {MARKET_EXPLORERS.length} markets live</a>
       </header>
 
@@ -199,6 +215,23 @@ export default function Home() {
         </section>
 
         <div className="cluster-table"><table><thead><tr><th>Rank</th><th>Local tract cluster</th><th>Composite</th><th>Demographic</th><th>Economic</th><th>Education</th><th>Housing</th><th>Pricing</th><th>Data competency</th></tr></thead><tbody>{visibleClusters.map((item) => <tr key={item.id} className={item.id === selectedCluster.id ? "active" : ""} onClick={() => setSelectedClusterId(item.id)}><td>{String(item.rank).padStart(2, "0")}</td><td><strong>{item.name}</strong><small>{item.tractCount} tracts · {compact(item.population)} people</small></td><td><b>{item.composite}</b></td><td>{item.demographic}</td><td>{item.economic}</td><td>{item.education}</td><td>{item.housing}</td><td>{item.pricing}</td><td><span>{item.confidence}%</span></td></tr>)}</tbody></table>{!visibleClusters.length && <p className="empty">No local cluster matches that search.</p>}</div>
+      </section>
+
+      <section className="leaders-section" id="leaders">
+        <div className="section-title"><div><p className="eyebrow">LOCAL SIGNAL LEADERBOARD</p><h2>Ten areas.<br />One auditable ranking.</h2></div><p>These are the highest-scoring tract clusters under your current factor weights. The rank updates with the active lens; competency and FHFA coverage remain visible so a strong signal is never mistaken for certainty.</p></div>
+        <div className="leaders-layout">
+          <ol className="leader-list" aria-label="Top ten local areas">
+            {localLeaders.map((item, index) => <li key={item.key}><button className={selectedLeader.key === item.key ? "active" : ""} onClick={() => setSelectedLeaderKey(item.key)}><span>{String(index + 1).padStart(2, "0")}</span><div><b>{item.cluster.name}</b><small>{item.market.metro.short}</small></div><strong>{item.score}</strong><i><b>{item.cluster.confidence}%</b><small>competency</small></i></button></li>)}
+          </ol>
+          <article className="leader-detail">
+            <div className="leader-detail-head"><div><p className="eyebrow">#{localLeaders.findIndex((item) => item.key === selectedLeader.key) + 1} · DETAILED BREAKDOWN</p><h3>{selectedLeader.cluster.name}</h3><span>{selectedLeader.market.metro.short} · {selectedLeader.cluster.tractCount} tracts · {compact(selectedLeader.cluster.population)} residents</span></div><div><strong>{selectedLeader.score}</strong><small>edge score</small></div></div>
+            <div className="leader-number-grid"><div><span>Local HPI YoY</span><b className={(leaderPricing?.yoy ?? 0) < 0 ? "negative" : ""}>{signed(leaderPricing?.yoy)}</b><small>{leaderPricing ? `FHFA ${leaderPricing.latestYear}` : "Metro proxy"}</small></div><div><span>Five-year HPI</span><b>{signed(leaderPricing?.fiveYearGrowth)}</b><small>{leaderPricing ? `${leaderPricing.pricingCompetency}% pricing competency` : "No tract series"}</small></div><div><span>Household income</span><b>{currency(selectedLeader.cluster.medianIncome)}</b><small>{percent(selectedLeader.cluster.unemploymentPct)} unemployment</small></div><div><span>Home value</span><b>{currency(selectedLeader.cluster.medianHomeValue)}</b><small>{currency(selectedLeader.cluster.medianRent)} median rent</small></div></div>
+            <div className="leader-why"><div><p className="eyebrow">WHY IT STANDS OUT</p><ul><li><b>{leaderFactors[0].label} leads the profile at {leaderFactors[0].value}/100.</b> {leaderFactors[0].description}.</li><li><b>{leaderFactors[1].label} adds a {leaderFactors[1].value}/100 supporting signal.</b> {leaderFactors[1].description}.</li><li><b>Local price momentum is {selectedLeader.cluster.pricing}/100.</b> {leaderPricing ? `${signed(leaderPricing.yoy)} YoY and ${signed(leaderPricing.fiveYearGrowth)} over five years.` : "FHFA tract history is not sufficient, so the metro benchmark is used."}</li></ul></div><div className="leader-confidence"><span>Evidence check</span><strong>{selectedLeader.cluster.confidence}%</strong><i><span style={{ width: `${selectedLeader.cluster.confidence}%` }} /></i><p>{leaderPricing && leaderLatest ? `${leaderLatest.observedTracts} of ${leaderPricing.totalTractCount} tracts support the latest price change, covering ${leaderLatest.coveragePct}% of cluster population.` : "No qualified local FHFA tract series. Treat the price factor as market context only."}</p></div></div>
+            <div className="leader-factor-row">{FACTORS.map((factor) => <div key={factor.key}><span>{factor.label}</span><i><b style={{ width: `${selectedLeader.cluster[factor.key]}%` }} /></i><strong>{selectedLeader.cluster[factor.key]}</strong></div>)}</div>
+            <a href="#workspace" onClick={() => { chooseMarket(selectedLeader.market.id); setSelectedClusterId(selectedLeader.cluster.id); }}>Open this area in the market workspace →</a>
+          </article>
+        </div>
+        <p className="leaders-note">Ranking basis: weighted composite under the active lens, with competency used only as a tie-breaker. This is a screening leaderboard, not a forecast of future returns.</p>
       </section>
 
       <section className="compare-section" id="compare">
