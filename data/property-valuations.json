@@ -117,9 +117,9 @@
     {
       "id": "rentcast",
       "name": "RentCast",
-      "layer": "Property AVM + listings",
-      "status": "api-key",
-      "scope": "Value/rent estimates, ranges, comps and active listings",
+      "layer": "Listing + rent evidence",
+      "status": "connected",
+      "scope": "Server-side active sale/rental listings, rent estimates and comps; empirical market coverage audit pending",
       "independence": "Commercial cross-check",
       "url": "https://www.rentcast.io/api"
     },

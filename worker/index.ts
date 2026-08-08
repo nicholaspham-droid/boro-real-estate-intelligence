@@ -15,6 +15,7 @@ interface Env {
   DB: D1Database;
   GOOGLE_MAPS_API_KEY?: string;
   ATTOM_API_KEY?: string;
+  RENTCAST_API_KEY?: string;
   IMAGES: {
     input(stream: ReadableStream): {
       transform(options: Record<string, unknown>): {
@@ -39,6 +40,76 @@ interface AttomProperty {
   sale?: { saleTransDate?: string; salesearchdate?: string; amount?: { saleamt?: number; saledisclosuretype?: number | string } };
   avm?: { amount?: { value?: number; low?: number; high?: number; scr?: number }; eventDate?: string; calculations?: { perSizeUnit?: number } };
   vintage?: { pubDate?: string; lastModified?: string };
+}
+
+type RentCastListing = {
+  status?: string;
+  price?: number;
+  listedDate?: string;
+  lastSeenDate?: string;
+  daysOnMarket?: number;
+  mlsName?: string;
+  mlsNumber?: string;
+};
+
+type RentCastRentEstimate = {
+  rent?: number;
+  rentRangeLow?: number;
+  rentRangeHigh?: number;
+  comparables?: unknown[];
+};
+
+function normalizeRentCastListing(listing: RentCastListing | undefined) {
+  if (!listing) return null;
+  return {
+    status: listing.status ?? "Unknown",
+    price: listing.price ?? null,
+    listedDate: listing.listedDate ?? null,
+    lastSeenDate: listing.lastSeenDate ?? null,
+    daysOnMarket: listing.daysOnMarket ?? null,
+    mlsName: listing.mlsName ?? null,
+    mlsNumber: listing.mlsNumber ?? null,
+  };
+}
+
+async function rentCastRequest<T>(apiKey: string, path: string, address: string) {
+  const endpoint = new URL(`https://api.rentcast.io/v1/${path}`);
+  endpoint.searchParams.set("address", address);
+  if (path.startsWith("listings/")) {
+    endpoint.searchParams.set("status", "Active");
+    endpoint.searchParams.set("limit", "1");
+  } else {
+    endpoint.searchParams.set("compCount", "5");
+  }
+  const response = await fetch(endpoint, { headers: { Accept: "application/json", "X-Api-Key": apiKey } });
+  const payload = await response.json() as T | { message?: string };
+  if (!response.ok) throw new Error("message" in payload && payload.message ? payload.message : `RentCast request failed (${response.status})`);
+  return payload as T;
+}
+
+async function fetchAttomProperty(apiKey: string, address1: string, address2: string) {
+  const attomUrl = new URL("https://api.gateway.attomdata.com/propertyapi/v1.0.0/attomavm/detail");
+  attomUrl.searchParams.set("address1", address1);
+  attomUrl.searchParams.set("address2", address2);
+  const upstream = await fetch(attomUrl, { headers: { Accept: "application/json", APIKey: apiKey } });
+  const payload = await upstream.json() as { property?: AttomProperty[]; status?: { msg?: string } };
+  if (!upstream.ok || !payload.property?.length) throw new Error(payload.status?.msg || `ATTOM property not found (${upstream.status})`);
+  const property = payload.property[0];
+  return {
+    attomId: property.identifier?.attomId ?? null,
+    parcelId: property.identifier?.apn ?? null,
+    address: property.address?.oneLine ?? `${address1}, ${address2}`,
+    location: { latitude: property.location?.latitude ?? null, longitude: property.location?.longitude ?? null },
+    type: property.summary?.proptype ?? property.summary?.propertyType ?? null,
+    yearBuilt: property.summary?.yearbuilt ?? property.building?.summary?.yearbuilt ?? null,
+    livingSize: property.building?.size?.livingsize ?? property.building?.size?.universalsize ?? null,
+    beds: property.building?.rooms?.beds ?? null,
+    baths: property.building?.rooms?.bathstotal ?? null,
+    assessment: { total: property.assessment?.assessed?.assdttlvalue ?? null, market: property.assessment?.market?.mktttlvalue ?? null, taxYear: property.assessment?.tax?.taxyear ?? null },
+    sale: { date: property.sale?.saleTransDate ?? property.sale?.salesearchdate ?? null, amount: property.sale?.amount?.saleamt ?? null, disclosure: property.sale?.amount?.saledisclosuretype ?? null },
+    avm: { value: property.avm?.amount?.value ?? null, low: property.avm?.amount?.low ?? null, high: property.avm?.amount?.high ?? null, confidence: property.avm?.amount?.scr ?? null, asOf: property.avm?.eventDate ?? null, perSqft: property.avm?.calculations?.perSizeUnit ?? null },
+    vintage: { published: property.vintage?.pubDate ?? null, modified: property.vintage?.lastModified ?? null },
+  };
 }
 
 type SafetyBucket = { total: number; violent: number; property: number; other: number };
@@ -287,6 +358,40 @@ const worker = {
       }, { headers: { "Cache-Control": "private, no-store" } });
     }
 
+    if (url.pathname === "/api/integrations/rentcast/status") {
+      return Response.json({
+        provider: "RentCast",
+        connected: Boolean(env.RENTCAST_API_KEY),
+        endpoint: "/api/integrations/rentcast/property?address=...",
+        capabilities: ["active sale listing", "active rental listing", "rent estimate", "rental comps"],
+        privacy: "The API key stays server-side. Owner and listing-contact fields are not returned.",
+      }, { headers: { "Cache-Control": "private, no-store" } });
+    }
+
+    if (url.pathname === "/api/integrations/rentcast/property") {
+      if (!env.RENTCAST_API_KEY) return Response.json({ error: "RentCast is not configured" }, { status: 503, headers: { "Cache-Control": "private, no-store" } });
+      const address = url.searchParams.get("address")?.trim();
+      if (!address) return Response.json({ error: "address is required" }, { status: 400 });
+      try {
+        const [saleListings, rentalListings, rentEstimate] = await Promise.all([
+          rentCastRequest<RentCastListing[]>(env.RENTCAST_API_KEY, "listings/sale", address),
+          rentCastRequest<RentCastListing[]>(env.RENTCAST_API_KEY, "listings/rental/long-term", address),
+          rentCastRequest<RentCastRentEstimate>(env.RENTCAST_API_KEY, "avm/rent/long-term", address),
+        ]);
+        return Response.json({
+          provider: "RentCast",
+          retrievedAt: new Date().toISOString(),
+          address,
+          activeSale: normalizeRentCastListing(saleListings[0]),
+          activeRental: normalizeRentCastListing(rentalListings[0]),
+          rentEstimate: { rent: rentEstimate.rent ?? null, low: rentEstimate.rentRangeLow ?? null, high: rentEstimate.rentRangeHigh ?? null, compCount: rentEstimate.comparables?.length ?? 0 },
+          boundary: "A listing is market-facing evidence, not proof of value or achievable rent. Verify source rights, status, concessions, lease terms and physical condition before underwriting.",
+        }, { headers: { "Cache-Control": "private, max-age=900" } });
+      } catch (error) {
+        return Response.json({ error: error instanceof Error ? error.message : "RentCast lookup failed" }, { status: 502, headers: { "Cache-Control": "private, no-store" } });
+      }
+    }
+
     if (url.pathname === "/api/integrations/attom/property") {
       if (!env.ATTOM_API_KEY) {
         return Response.json({ error: "ATTOM is not configured", setup: "Add ATTOM_API_KEY as a Sites secret." }, { status: 503, headers: { "Cache-Control": "private, no-store" } });
@@ -294,35 +399,37 @@ const worker = {
       const address1 = url.searchParams.get("address1")?.trim();
       const address2 = url.searchParams.get("address2")?.trim();
       if (!address1 || !address2) return Response.json({ error: "address1 and address2 are required" }, { status: 400 });
-      const attomUrl = new URL("https://api.gateway.attomdata.com/propertyapi/v1.0.0/attomavm/detail");
-      attomUrl.searchParams.set("address1", address1);
-      attomUrl.searchParams.set("address2", address2);
-      const upstream = await fetch(attomUrl, { headers: { Accept: "application/json", APIKey: env.ATTOM_API_KEY } });
-      const payload = await upstream.json() as { property?: AttomProperty[]; status?: { msg?: string } };
-      if (!upstream.ok || !payload.property?.length) {
-        return Response.json({ error: payload.status?.msg || "ATTOM property not found", upstreamStatus: upstream.status }, { status: upstream.status === 404 ? 404 : 502 });
+      try {
+        const property = await fetchAttomProperty(env.ATTOM_API_KEY, address1, address2);
+        return Response.json({ provider: "ATTOM", retrievedAt: new Date().toISOString(), property, use: "Independent vendor cross-check. Borocast does not substitute ATTOM's AVM for its public-record anchors or average correlated estimates blindly." }, { headers: { "Cache-Control": "private, no-store" } });
+      } catch (error) {
+        return Response.json({ error: error instanceof Error ? error.message : "ATTOM property not found" }, { status: 502, headers: { "Cache-Control": "private, no-store" } });
       }
-      const property = payload.property[0];
-      return Response.json({
-        provider: "ATTOM",
-        retrievedAt: new Date().toISOString(),
-        property: {
-          attomId: property.identifier?.attomId ?? null,
-          parcelId: property.identifier?.apn ?? null,
-          address: property.address?.oneLine ?? `${address1}, ${address2}`,
-          location: { latitude: property.location?.latitude ?? null, longitude: property.location?.longitude ?? null },
-          type: property.summary?.proptype ?? property.summary?.propertyType ?? null,
-          yearBuilt: property.summary?.yearbuilt ?? property.building?.summary?.yearbuilt ?? null,
-          livingSize: property.building?.size?.livingsize ?? property.building?.size?.universalsize ?? null,
-          beds: property.building?.rooms?.beds ?? null,
-          baths: property.building?.rooms?.bathstotal ?? null,
-          assessment: { total: property.assessment?.assessed?.assdttlvalue ?? null, market: property.assessment?.market?.mktttlvalue ?? null, taxYear: property.assessment?.tax?.taxyear ?? null },
-          sale: { date: property.sale?.saleTransDate ?? property.sale?.salesearchdate ?? null, amount: property.sale?.amount?.saleamt ?? null, disclosure: property.sale?.amount?.saledisclosuretype ?? null },
-          avm: { value: property.avm?.amount?.value ?? null, low: property.avm?.amount?.low ?? null, high: property.avm?.amount?.high ?? null, confidence: property.avm?.amount?.scr ?? null, asOf: property.avm?.eventDate ?? null, perSqft: property.avm?.calculations?.perSizeUnit ?? null },
-          vintage: { published: property.vintage?.pubDate ?? null, modified: property.vintage?.lastModified ?? null },
-        },
-        use: "Independent vendor cross-check. Borocast does not substitute ATTOM's AVM for its public-record anchors or average correlated estimates blindly.",
-      }, { headers: { "Cache-Control": "private, no-store" } });
+    }
+
+    if (url.pathname === "/api/integrations/attom/audit" && request.method === "POST") {
+      if (!env.ATTOM_API_KEY) return Response.json({ error: "ATTOM is not configured" }, { status: 503, headers: { "Cache-Control": "private, no-store" } });
+      const allowedMarkets = new Set(propertyValuations.markets.filter((market) => market.status === "live").map((market) => market.id));
+      let body: { marketIds?: string[]; perMarket?: number } = {};
+      try { body = await request.json() as typeof body; } catch { body = {}; }
+      const marketIds = (body.marketIds ?? Array.from(allowedMarkets)).filter((marketId) => allowedMarkets.has(marketId));
+      const perMarket = Math.max(1, Math.min(3, Math.round(body.perMarket ?? 2)));
+      const samples = marketIds.flatMap((marketId) => propertyValuations.properties.filter((property) => property.marketId === marketId).slice(0, perMarket));
+      const records = await Promise.all(samples.map(async (sample) => {
+        try {
+          const property = await fetchAttomProperty(env.ATTOM_API_KEY!, sample.address, sample.locality);
+          const attomValue = property.avm.value;
+          const deltaPct = attomValue ? Math.round((attomValue - sample.model.value) / sample.model.value * 1000) / 10 : null;
+          const rangeOverlap = property.avm.low != null && property.avm.high != null
+            ? property.avm.low <= sample.model.high && property.avm.high >= sample.model.low
+            : false;
+          return { id: sample.id, marketId: sample.marketId, address: sample.address, status: "matched" as const, borocastValue: sample.model.value, borocastRange: { low: sample.model.low, high: sample.model.high }, attomValue, attomRange: { low: property.avm.low, high: property.avm.high }, attomConfidence: property.avm.confidence, deltaPct, rangeOverlap };
+        } catch (error) {
+          return { id: sample.id, marketId: sample.marketId, address: sample.address, status: "failed" as const, borocastValue: sample.model.value, error: error instanceof Error ? error.message : "ATTOM lookup failed" };
+        }
+      }));
+      const matched = records.filter((record) => record.status === "matched").length;
+      return Response.json({ provider: "ATTOM", retrievedAt: new Date().toISOString(), marketIds, requested: records.length, matched, failed: records.length - matched, records, boundary: "This audit measures vendor availability and agreement. It does not retrain or average into the Borocast public-record model." }, { headers: { "Cache-Control": "private, no-store" } });
     }
 
     if (url.pathname === "/api/public-safety/local") {

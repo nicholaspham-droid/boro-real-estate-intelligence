@@ -56,6 +56,11 @@ test("server-renders the national Borocast workbench and verified registry", asy
   assert.match(html, /MODEL GOVERNANCE CHECK/);
   assert.match(html, /Out-of-time validation/);
   assert.match(html, /Bring an independent AVM into the evidence stack/);
+  assert.match(html, /MAP-FIRST PROPERTY EXPLORER/);
+  assert.match(html, /ATTOM MARKET AUDIT · SIX CONTROL ADDRESSES/);
+  assert.match(html, /RENTCAST · LISTING \+ RENT CHANNEL/);
+  assert.match(html, /Market Explorer/);
+  assert.match(html, /Deal Studio/);
   assert.match(html, /FEATURE AVAILABILITY · NO EMPTY MARKETS/);
   assert.match(html, /Pick the evidence/);
   assert.match(html, /Prove listing \+ vendor joins/);
@@ -86,6 +91,21 @@ test("ATTOM adapter reports readiness and keeps the property route closed withou
   assert.equal(lookup.status, 503);
   const lookupPayload = await lookup.json();
   assert.match(lookupPayload.error, /not configured/i);
+
+  const audit = await worker.fetch(new Request("http://localhost/api/integrations/attom/audit", { method: "POST" }), env, ctx);
+  assert.equal(audit.status, 503);
+});
+
+test("RentCast adapter stays server-side and closes property evidence without a secret", async () => {
+  const worker = await loadWorker();
+  const status = await worker.fetch(new Request("http://localhost/api/integrations/rentcast/status"), env, ctx);
+  assert.equal(status.status, 200);
+  const payload = await status.json();
+  assert.equal(payload.connected, false);
+  assert.match(payload.privacy, /server-side/i);
+
+  const lookup = await worker.fetch(new Request("http://localhost/api/integrations/rentcast/property?address=123%20Main%20St"), env, ctx);
+  assert.equal(lookup.status, 503);
 });
 
 test("property-data APIs expose health and market evidence", async () => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { NationalMarketMap } from "./NationalMarketMap";
 import { PriceHistoryChart, type PriceChartPoint } from "./PriceHistoryChart";
 import { DecisionStudio } from "./DecisionStudio";
@@ -8,6 +8,9 @@ import { AttomConnector } from "./AttomConnector";
 import { SafetyEvidence } from "./SafetyEvidence";
 import { FeatureAvailability } from "./AvailabilityPanel";
 import { VALUATION_MARKET_IDS, type ProductFeatureId } from "./featureAvailability";
+import { PropertyOpportunityMap } from "./PropertyOpportunityMap";
+import { AttomMarketAudit } from "./AttomMarketAudit";
+import { RentCastEvidence } from "./RentCastEvidence";
 import {
   ACS_AGGREGATION_META,
   BALANCED_WEIGHTS,
@@ -31,6 +34,26 @@ const FACTORS: Array<{ key: keyof FactorWeights; label: string; description: str
   { key: "housing", label: "Housing", description: "Income-to-value, rent capacity and vacancy" },
   { key: "pricing", label: "Price momentum", description: "FHFA YoY, acceleration and multi-year growth" },
 ];
+
+type ProductView = "overview" | "explore" | "areas" | "underwrite" | "properties" | "coverage";
+
+const PRODUCT_TABS: Array<{ id: ProductView; label: string; purpose: string; boundary: string; hash: string }> = [
+  { id: "overview", label: "Overview", purpose: "Understand the evidence workflow and where each decision belongs.", boundary: "Orientation only—no market or property conclusion is made here.", hash: "#overview" },
+  { id: "explore", label: "Market Explorer", purpose: "Compare neighborhood fundamentals, price history and tract-cluster momentum.", boundary: "Use for screening; move a candidate into property diligence before acting.", hash: "#workspace" },
+  { id: "areas", label: "Top Areas", purpose: "Inspect the ten highest-ranked local clusters under the active factor lens.", boundary: "Rank is relative and changes with weights; it is not a return forecast.", hash: "#leaders" },
+  { id: "underwrite", label: "Deal Studio", purpose: "Test an actual price, rent, expenses, financing and investment hurdles.", boundary: "Outputs are scenario math and require verified deal inputs.", hash: "#decision-studio" },
+  { id: "properties", label: "Properties", purpose: "Map qualified records, inspect model ranges and run independent vendor checks.", boundary: "Hot/watch/cool is evidence priority—not a buy, hold or sell verdict.", hash: "#valuation" },
+  { id: "coverage", label: "Data Coverage", purpose: "See feature availability, expansion waves, source quality and known gaps.", boundary: "A market appears only where the selected feature has current usable data.", hash: "#availability" },
+];
+
+function viewFromHash(hash: string): ProductView {
+  if (["#workspace"].includes(hash)) return "explore";
+  if (hash === "#leaders") return "areas";
+  if (hash === "#decision-studio") return "underwrite";
+  if (hash === "#valuation") return "properties";
+  if (["#availability", "#compare", "#quality", "#sources"].includes(hash)) return "coverage";
+  return "overview";
+}
 
 function currency(value: number | null) {
   return value === null ? "—" : new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value);
@@ -61,6 +84,7 @@ function scoreMarket(market: MarketExplorer, weights: FactorWeights) {
 }
 
 export default function Home() {
+  const [activeView, setActiveView] = useState<ProductView>("overview");
   const [selectedMarketId, setSelectedMarketId] = useState(MARKET_EXPLORERS[0].id);
   const [selectedClusterId, setSelectedClusterId] = useState(MARKET_EXPLORERS[0].neighborhoods[0].id);
   const [layer, setLayer] = useState<ExplorerLayer>("composite");
@@ -133,6 +157,20 @@ export default function Home() {
   const liveValuationMarkets = propertyValuations.markets.filter((item) => VALUATION_MARKET_IDS.includes(item.id));
   const connectedSourceMarketIds = Array.from(new Set(sourceRegistry.sources.flatMap((item) => item.marketIds)));
   const visibleSources = sourceRegistry.sources.filter((item) => item.marketIds.includes(sourceMarketId));
+  const activeTab = PRODUCT_TABS.find((item) => item.id === activeView) ?? PRODUCT_TABS[0];
+
+  useEffect(() => {
+    const syncHash = () => { setActiveView(viewFromHash(window.location.hash)); window.scrollTo({ top: 0 }); };
+    syncHash();
+    window.addEventListener("hashchange", syncHash);
+    return () => window.removeEventListener("hashchange", syncHash);
+  }, []);
+
+  function selectView(view: ProductView, hash = PRODUCT_TABS.find((item) => item.id === view)?.hash ?? "#overview") {
+    setActiveView(view);
+    window.history.replaceState(null, "", hash);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 
   function chooseMarket(id: string) {
     const next = MARKET_EXPLORERS.find((item) => item.id === id) ?? MARKET_EXPLORERS[0];
@@ -156,28 +194,30 @@ export default function Home() {
     if (featureId === "valuation" || featureId === "safety") {
       setValuationMarket(marketId);
       setSelectedPropertyId(null);
-      window.location.hash = "valuation";
+      selectView("properties", "#valuation");
       return;
     }
     if (featureId === "parcels") {
       setSourceMarketId(marketId);
-      window.location.hash = "sources";
+      selectView("coverage", "#sources");
       return;
     }
     chooseMarket(marketId);
-    window.location.hash = "workspace";
+    selectView("explore", "#workspace");
   }
 
   return (
     <main id="top">
       <header className="topbar product-topbar">
-        <a className="brand" href="#top" aria-label="Borocast home"><span>BORO</span>CAST</a>
+        <a className="brand" href="#overview" aria-label="Borocast home" onClick={() => setActiveView("overview")}><span>BORO</span>CAST</a>
         <span className="product-label">Market intelligence</span>
         <label className="global-market-picker"><span>Market</span><select value={market.id} onChange={(event) => chooseMarket(event.target.value)}>{MARKET_EXPLORERS.map((item) => <option key={item.id} value={item.id}>{item.metro.short}</option>)}</select></label>
-        <nav aria-label="Primary navigation"><a href="#overview">Product</a><a href="#workspace">Markets</a><a href="#leaders">Top areas</a><a href="#decision-studio">Decision studio</a><a href="#valuation">Valuation</a><a href="#quality">Quality</a></nav>
-        <a className="data-status" href="#availability"><i /> {MARKET_EXPLORERS.length} screening markets</a>
+        <nav className="product-tabs" aria-label="Product features">{PRODUCT_TABS.map((tab) => <button key={tab.id} aria-pressed={activeView === tab.id} className={activeView === tab.id ? "active" : ""} onClick={() => selectView(tab.id)}>{tab.label}</button>)}</nav>
       </header>
 
+      <div className="workspace-guide"><div><span>Active product feature</span><b>{activeTab.label}</b></div><p><strong>Use it to:</strong> {activeTab.purpose}</p><p><strong>Decision boundary:</strong> {activeTab.boundary}</p></div>
+
+      <div className={`product-view ${activeView === "overview" ? "active" : ""}`} aria-hidden={activeView !== "overview"}>
       <section className="product-hero">
         <div className="hero-copy">
           <p className="eyebrow">NATIONAL PUBLIC-DATA MARKET WORKBENCH</p>
@@ -205,7 +245,9 @@ export default function Home() {
         <div className="evidence-ladder"><div><p className="eyebrow">EVIDENCE LADDER</p><h3>Each layer answers a different question.</h3></div><ol><li><b>National fundamentals</b><span>Which metros deserve attention?</span></li><li><b>Local history</b><span>Which tract clusters show measured momentum?</span></li><li><b>Property context</b><span>What traded, and what local incidents were reported?</span></li><li><b>Independent AVM</b><span>Does a separate model corroborate the range?</span></li><li><b>Live deal facts</b><span>Does the actual price, rent and cost structure work?</span></li></ol></div>
         <div className="product-boundaries"><b>Decision boundaries</b><span>A cluster score is not a property forecast.</span><span>An assessment gap is not acquisition edge.</span><span>Evidence quality is not a probability of profit.</span><span>A scenario is not investment or appraisal advice.</span></div>
       </section>
+      </div>
 
+      <div className={`product-view ${activeView === "explore" ? "active" : ""}`} aria-hidden={activeView !== "explore"}>
       <section className="market-command" id="workspace">
         <div className="command-title">
           <div><p className="eyebrow">SELECTED MARKET</p><h2>{market.metro.short}<br /><em>evidence workspace.</em></h2><p>{market.metro.name}</p></div>
@@ -266,7 +308,9 @@ export default function Home() {
 
         <div className="cluster-table"><table><thead><tr><th>Rank</th><th>Local tract cluster</th><th>Composite</th><th>Demographic</th><th>Economic</th><th>Education</th><th>Housing</th><th>Pricing</th><th>Data competency</th></tr></thead><tbody>{visibleClusters.map((item) => <tr key={item.id} className={item.id === selectedCluster.id ? "active" : ""} onClick={() => setSelectedClusterId(item.id)}><td>{String(item.rank).padStart(2, "0")}</td><td><strong>{item.name}</strong><small>{item.tractCount} tracts · {compact(item.population)} people</small></td><td><b>{item.composite}</b></td><td>{item.demographic}</td><td>{item.economic}</td><td>{item.education}</td><td>{item.housing}</td><td>{item.pricing}</td><td><span>{item.confidence}%</span></td></tr>)}</tbody></table>{!visibleClusters.length && <p className="empty">No local cluster matches that search.</p>}</div>
       </section>
+      </div>
 
+      <div className={`product-view ${activeView === "areas" ? "active" : ""}`} aria-hidden={activeView !== "areas"}>
       <section className="leaders-section" id="leaders">
         <div className="section-title"><div><p className="eyebrow">LOCAL SIGNAL LEADERBOARD</p><h2>Ten areas.<br />One auditable ranking.</h2></div><p>These are the highest-scoring tract clusters under your current factor weights. The rank updates with the active lens; competency and FHFA coverage remain visible so a strong signal is never mistaken for certainty.</p></div>
         <div className="leaders-layout">
@@ -283,16 +327,19 @@ export default function Home() {
         </div>
         <p className="leaders-note">Ranking basis: weighted composite under the active lens, with competency used only as a tie-breaker. This is a screening leaderboard, not a forecast of future returns.</p>
       </section>
+      </div>
 
+      <div className={`product-view ${activeView === "underwrite" ? "active" : ""}`} aria-hidden={activeView !== "underwrite"}>
       <DecisionStudio />
+      </div>
 
-      <FeatureAvailability onOpenMarket={openAvailableMarket} />
-
+      <div className={`product-view ${activeView === "properties" ? "active" : ""}`} aria-hidden={activeView !== "properties"}>
       <section className="valuation-section" id="valuation">
         <div className="section-title"><div><p className="eyebrow">PROPERTY VALUATION LAB · MODEL V2</p><h2>Cross-check the property.<br />Keep the uncertainty.</h2></div><p>Qualified recorded sales, local assessments, building facts and FHFA tract-cluster history now resolve to individual properties in three high-intent corridors. Version 2 prevents future-sale leakage, scores comparables by geography and physical similarity, and derives the range from observed backtest error.</p></div>
         <div className="valuation-readiness">
           {liveValuationMarkets.map((item) => <button key={item.id} className={valuationMarket === item.id ? "active" : ""} onClick={() => { setValuationMarket(item.id); setSelectedPropertyId(null); }}><span>LIVE · VALIDATED</span><b>{item.label}</b><i>{item.competency}% integrated competency</i><small>{"sourceCompetency" in item ? `${item.sourceCompetency}% source · ${item.modelCompetency}% model · ${item.diagnostics.sampleSize} historical tests` : ""}</small></button>)}
         </div>
+        {valuationRows.length > 0 && <PropertyOpportunityMap marketLabel={valuationMarketMeta.label} properties={valuationRows} selectedId={selectedProperty?.id ?? null} onSelect={setSelectedPropertyId} />}
         {valuationRows.length ? <div className="valuation-workbench">
           <div className="valuation-list">
             <div className="valuation-toolbar"><div><span>Sort property watchlist</span>{([['watch','Watch score'],['confidence','Confidence'],['gap','Assessment gap'],['value','Model value']] as const).map(([id, label]) => <button key={id} className={valuationSort === id ? "selected" : ""} onClick={() => setValuationSort(id)}>{label}</button>)}</div><p>{valuationMarketMeta.label} · {valuationRows.length} records</p></div>
@@ -306,6 +353,7 @@ export default function Home() {
             <div className="valuation-boundary"><b>What the gap means</b><p>{signed(selectedProperty.model.valuationGapPct)} compares the model center with the jurisdiction’s public assessment. It can flag records for review, but it is not a discount to an asking price. A true acquisition-edge percentage remains locked until a licensed live listing is joined.</p></div>
             <div className="backtest-strip"><div><span>Historical tests</span><b>{selectedProperty.model.diagnostics.marketBacktestSample}</b></div><div><span>Median error</span><b>{selectedProperty.model.diagnostics.marketMedianAbsoluteErrorPct}%</b></div><div><span>P80 error</span><b>{selectedProperty.model.diagnostics.marketP80AbsoluteErrorPct}%</b></div><small>Out-of-time: each test sale uses only information available before that transaction.</small></div>
             <SafetyEvidence key={selectedProperty.id} marketId={selectedProperty.marketId} lat={selectedProperty.lat} lng={selectedProperty.lng} address={selectedProperty.address} locality={selectedProperty.locality} />
+            <RentCastEvidence key={`rentcast-${selectedProperty.id}`} address={selectedProperty.address} locality={selectedProperty.locality} />
             <p className="valuation-provenance"><b>{selectedProperty.sourceLabel}:</b> {selectedProperty.qualification}</p>
             <div className="valuation-links"><a href={selectedProperty.sourceUrl} target="_blank" rel="noreferrer">Open official source →</a><a href={`https://www.google.com/maps/search/?api=1&query=${selectedProperty.lat},${selectedProperty.lng}`} target="_blank" rel="noreferrer">Open in Google Maps →</a><a href={`/api/valuation/properties/${selectedProperty.id}`} target="_blank" rel="noreferrer">Open model JSON →</a></div>
           </article>}
@@ -313,9 +361,13 @@ export default function Home() {
         <div className="provider-heading"><div><p className="eyebrow">INDEPENDENT CROSS-REFERENCE STACK</p><h3>Agreement matters more than another opaque average.</h3></div><p>Public records establish the factual base. Aggregate market series check direction. Paid AVMs and MLS listings remain separate evidence channels so correlated estimates do not masquerade as independent confirmation.</p></div>
         <div className="provider-grid">{propertyValuations.providers.map((provider) => <a key={provider.id} href={provider.url} target="_blank" rel="noreferrer"><span className={`provider-status ${provider.status}`}>{provider.status.replace("-", " ")}</span><b>{provider.name}</b><small>{provider.layer}</small><p>{provider.scope}</p><i>{provider.independence}</i></a>)}</div>
         <AttomConnector />
+        <AttomMarketAudit />
         <div className="valuation-method"><span><b>Model center</b>{propertyValuations.methodology.value}</span><span><b>Validation</b>{propertyValuations.methodology.validation}</span><span><b>Uncertainty</b>{propertyValuations.methodology.range}</span><span><b>Sorting</b>{propertyValuations.methodology.watchScore}</span><span><b>Hard boundary</b>{propertyValuations.methodology.boundary}</span></div>
       </section>
+      </div>
 
+      <div className={`product-view ${activeView === "coverage" ? "active" : ""}`} aria-hidden={activeView !== "coverage"}>
+      <FeatureAvailability onOpenMarket={openAvailableMarket} />
       <section className="compare-section" id="compare">
         <div className="section-title"><div><p className="eyebrow">CROSS-MARKET COMPARISON</p><h2>Same lens.<br />Twenty markets.</h2></div><p>Each market score is the average of its local tract-cluster scores under your current factor mix. This makes the ranking comparable while keeping parcel confidence visible instead of blending missing evidence into the signal.</p></div>
         <div className="compare-controls"><div>{(["all", "largest", "fastest"] as const).map((item) => <button key={item} className={cohort === item ? "selected" : ""} onClick={() => setCohort(item)}>{item === "all" ? "All 20" : item === "largest" ? "10 largest" : "10 growth markets"}</button>)}</div><label><span>Minimum competency</span><select value={minimumCompetency} onChange={(event) => setMinimumCompetency(Number(event.target.value))}><option value="0">Show all</option><option value="75">75%+</option><option value="80">80%+</option><option value="85">85%+</option></select></label></div>
@@ -343,6 +395,7 @@ export default function Home() {
         <div className="source-market-filter"><label><span>Available parcel market</span><select value={sourceMarketId} onChange={(event) => setSourceMarketId(event.target.value)}>{connectedSourceMarketIds.map((id) => <option key={id} value={id}>{MARKET_EXPLORERS.find((item) => item.id === id)?.metro.short ?? id}</option>)}</select></label><p>Only markets backed by a verified source appear here. {visibleSources.length} current source{visibleSources.length === 1 ? "" : "s"} support this market.</p></div>
         <div className="source-grid">{visibleSources.map((source) => <a key={source.id} href={source.sourcePage} target="_blank" rel="noreferrer"><b>{source.status} · {source.adapter}</b><h3>{source.name}</h3><p>{source.publisher}. {source.limits[0]}</p><span>{(source.marketRecordCounts[sourceMarketId as keyof typeof source.marketRecordCounts] ?? source.recordCount).toLocaleString()} market records · {source.cadence}</span></a>)}</div>
       </section>
+      </div>
 
       <footer><a className="brand" href="#top"><span>BORO</span>CAST</a><p>Public-data market intelligence · ACS 2020–2024 · FHFA through {PRICING_HISTORY_META.latestPeriod}</p><span>Screening signal · not investment advice</span></footer>
     </main>
