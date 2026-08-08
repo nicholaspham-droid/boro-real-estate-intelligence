@@ -3,6 +3,210 @@
   background: #f5f2e9;
 }
 
+.availability-section {
+  padding: 86px 7vw 94px;
+  background: #e8ebdf;
+}
+
+.availability-console {
+  border: 1px solid #bcc4bb;
+  background: #f5f2e9;
+}
+
+.availability-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  border-bottom: 1px solid #c5cbc4;
+  background: white;
+}
+
+.availability-controls label {
+  display: grid;
+  gap: 8px;
+  min-height: 82px;
+  padding: 17px 20px;
+  border-right: 1px solid #d1d5d0;
+}
+
+.availability-controls span,
+.source-market-filter span {
+  color: #77838d;
+  font-size: 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .11em;
+}
+
+.availability-controls select,
+.source-market-filter select {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #06142e;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.availability-controls button {
+  min-width: 190px;
+  border: 0;
+  background: #06142e;
+  color: #d9ff55;
+  padding: 0 24px;
+  font-size: 9px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.availability-controls button:disabled {
+  background: #c9ceca;
+  color: #727d86;
+  cursor: not-allowed;
+}
+
+.availability-readout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 235px;
+}
+
+.availability-readout > div {
+  padding: 30px;
+}
+
+.availability-readout > div:first-child {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-right: 1px solid #cbd0ca;
+  background: #071a38;
+  color: white;
+}
+
+.availability-readout span {
+  color: #8799af;
+  font-size: 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .11em;
+}
+
+.availability-readout strong {
+  margin: 18px 0 8px;
+  color: #d9ff55;
+  font-size: 68px;
+  line-height: .8;
+  letter-spacing: -.06em;
+}
+
+.availability-readout strong i {
+  color: #8193aa;
+  font-size: 18px;
+  font-style: normal;
+}
+
+.availability-readout small {
+  color: #91a2b6;
+  font-size: 9px;
+}
+
+.availability-readout h3 {
+  margin: 20px 0 9px;
+  font-size: 34px;
+  letter-spacing: -.045em;
+}
+
+.availability-readout p {
+  max-width: 700px;
+  color: #65727d;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.availability-readout b {
+  display: block;
+  max-width: 700px;
+  margin-top: 22px;
+  padding: 13px 15px;
+  border-left: 3px solid #82af1c;
+  background: #e6edcf;
+  color: #526329;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.availability-market-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  padding: 18px;
+  border-top: 1px solid #cbd0ca;
+}
+
+.availability-market-list button {
+  border: 1px solid #bec5bd;
+  background: transparent;
+  padding: 8px 10px;
+  color: #63707b;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.availability-market-list button.active {
+  border-color: #06142e;
+  background: #06142e;
+  color: #d9ff55;
+}
+
+.availability-market-list p {
+  margin: 0;
+  color: #697580;
+  font-size: 11px;
+}
+
+.availability-market-list p b { color: #c44c42; }
+
+.expansion-sequence {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  margin-top: 22px;
+  border: 1px solid #bec5bd;
+  background: #bec5bd;
+}
+
+.expansion-sequence article {
+  min-height: 300px;
+  padding: 26px;
+  background: #f5f2e9;
+}
+
+.expansion-sequence article.current { background: #071a38; color: white; }
+.expansion-sequence article > span { color: #78a20f; font-size: 8px; font-weight: 900; letter-spacing: .12em; }
+.expansion-sequence article.current > span { color: #d9ff55; }
+.expansion-sequence article > strong { display: block; margin-top: 29px; color: #7fae17; font-size: 40px; letter-spacing: -.05em; }
+.expansion-sequence article h3 { margin: 8px 0 15px; font-size: 21px; }
+.expansion-sequence article p { color: #687580; font-size: 10px; font-weight: 800; line-height: 1.55; }
+.expansion-sequence article.current p { color: #b2bfd0; }
+.expansion-sequence article small { display: block; margin-top: 25px; padding-top: 17px; border-top: 1px solid #cdd2cc; color: #6c7883; font-size: 10px; line-height: 1.55; }
+.expansion-sequence article.current small { border-color: #2b405c; color: #8fa0b5; }
+
+.source-market-filter {
+  display: grid;
+  grid-template-columns: minmax(240px, .55fr) 1fr;
+  align-items: center;
+  gap: 28px;
+  margin-bottom: 16px;
+  padding: 17px 20px;
+  border: 1px solid #c7ccc7;
+  background: white;
+}
+
+.source-market-filter label { display: grid; gap: 8px; }
+.source-market-filter p { margin: 0; color: #697580; font-size: 10px; line-height: 1.5; }
+
 .source-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -86,12 +290,22 @@
 }
 
 @media (max-width: 900px) {
+  .availability-controls { grid-template-columns: 1fr 1fr; }
+  .availability-controls button { min-height: 54px; grid-column: 1 / -1; }
+  .expansion-sequence { grid-template-columns: 1fr; }
+  .expansion-sequence article { min-height: 0; }
   .source-grid { grid-template-columns: 1fr 1fr; }
   .registry-summary { grid-template-columns: 1fr 1fr; }
   .registry-summary > * { border-bottom: 1px solid #2b3c56; }
 }
 
 @media (max-width: 600px) {
+  .availability-section { padding: 64px 5vw; }
+  .availability-controls,
+  .availability-readout,
+  .source-market-filter { grid-template-columns: 1fr; }
+  .availability-controls label { border-right: 0; border-bottom: 1px solid #d1d5d0; }
+  .availability-readout > div:first-child { border-right: 0; }
   .sources { padding-inline: 5vw; }
   .source-grid { grid-template-columns: 1fr; }
   .registry-summary { grid-template-columns: 1fr; }

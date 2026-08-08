@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import propertyValuations from "../data/property-valuations.json";
+import { VALUATION_MARKET_IDS } from "./featureAvailability";
 
 const STRATEGIES = [
   { id: "balanced", label: "Balanced", detail: "Require price, income and evidence to agree", targetCap: 6.5, down: 25, vacancy: 6, maintenance: 8 },
@@ -27,7 +28,7 @@ function payment(principal: number, annualRate: number, years: number) {
 }
 
 export function DecisionStudio() {
-  const liveMarkets = propertyValuations.markets.filter((item) => item.status === "live");
+  const liveMarkets = propertyValuations.markets.filter((item) => VALUATION_MARKET_IDS.includes(item.id));
   const [marketId, setMarketId] = useState(liveMarkets[0].id);
   const marketProperties = propertyValuations.properties.filter((item) => item.marketId === marketId);
   const [propertyId, setPropertyId] = useState(marketProperties[0].id);

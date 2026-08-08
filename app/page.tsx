@@ -6,6 +6,8 @@ import { PriceHistoryChart, type PriceChartPoint } from "./PriceHistoryChart";
 import { DecisionStudio } from "./DecisionStudio";
 import { AttomConnector } from "./AttomConnector";
 import { SafetyEvidence } from "./SafetyEvidence";
+import { FeatureAvailability } from "./AvailabilityPanel";
+import { VALUATION_MARKET_IDS, type ProductFeatureId } from "./featureAvailability";
 import {
   ACS_AGGREGATION_META,
   BALANCED_WEIGHTS,
@@ -73,6 +75,7 @@ export default function Home() {
   const [valuationMarket, setValuationMarket] = useState("chicago");
   const [valuationSort, setValuationSort] = useState<"watch" | "confidence" | "gap" | "value">("watch");
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null);
+  const [sourceMarketId, setSourceMarketId] = useState(sourceRegistry.sources[0].marketIds[0]);
 
   const baseMarket = MARKET_EXPLORERS.find((item) => item.id === selectedMarketId) ?? MARKET_EXPLORERS[0];
   const scoredClusters = useMemo(() => baseMarket.neighborhoods
@@ -127,6 +130,9 @@ export default function Home() {
         : valuationSort === "value" ? b.model.value - a.model.value
           : b.model.watchScore - a.model.watchScore), [valuationMarket, valuationSort]);
   const selectedProperty = valuationRows.find((item) => item.id === selectedPropertyId) ?? valuationRows[0] ?? null;
+  const liveValuationMarkets = propertyValuations.markets.filter((item) => VALUATION_MARKET_IDS.includes(item.id));
+  const connectedSourceMarketIds = Array.from(new Set(sourceRegistry.sources.flatMap((item) => item.marketIds)));
+  const visibleSources = sourceRegistry.sources.filter((item) => item.marketIds.includes(sourceMarketId));
 
   function chooseMarket(id: string) {
     const next = MARKET_EXPLORERS.find((item) => item.id === id) ?? MARKET_EXPLORERS[0];
@@ -146,6 +152,22 @@ export default function Home() {
     setWeights((current) => ({ ...current, [key]: value }));
   }
 
+  function openAvailableMarket(marketId: string, featureId: ProductFeatureId) {
+    if (featureId === "valuation" || featureId === "safety") {
+      setValuationMarket(marketId);
+      setSelectedPropertyId(null);
+      window.location.hash = "valuation";
+      return;
+    }
+    if (featureId === "parcels") {
+      setSourceMarketId(marketId);
+      window.location.hash = "sources";
+      return;
+    }
+    chooseMarket(marketId);
+    window.location.hash = "workspace";
+  }
+
   return (
     <main id="top">
       <header className="topbar product-topbar">
@@ -153,7 +175,7 @@ export default function Home() {
         <span className="product-label">Market intelligence</span>
         <label className="global-market-picker"><span>Market</span><select value={market.id} onChange={(event) => chooseMarket(event.target.value)}>{MARKET_EXPLORERS.map((item) => <option key={item.id} value={item.id}>{item.metro.short}</option>)}</select></label>
         <nav aria-label="Primary navigation"><a href="#overview">Product</a><a href="#workspace">Markets</a><a href="#leaders">Top areas</a><a href="#decision-studio">Decision studio</a><a href="#valuation">Valuation</a><a href="#quality">Quality</a></nav>
-        <a className="data-status" href="#quality"><i /> {MARKET_EXPLORERS.length} markets live</a>
+        <a className="data-status" href="#availability"><i /> {MARKET_EXPLORERS.length} screening markets</a>
       </header>
 
       <section className="product-hero">
@@ -264,10 +286,12 @@ export default function Home() {
 
       <DecisionStudio />
 
+      <FeatureAvailability onOpenMarket={openAvailableMarket} />
+
       <section className="valuation-section" id="valuation">
         <div className="section-title"><div><p className="eyebrow">PROPERTY VALUATION LAB · MODEL V2</p><h2>Cross-check the property.<br />Keep the uncertainty.</h2></div><p>Qualified recorded sales, local assessments, building facts and FHFA tract-cluster history now resolve to individual properties in three high-intent corridors. Version 2 prevents future-sale leakage, scores comparables by geography and physical similarity, and derives the range from observed backtest error.</p></div>
         <div className="valuation-readiness">
-          {propertyValuations.markets.map((item) => <button key={item.id} className={valuationMarket === item.id ? "active" : ""} onClick={() => { setValuationMarket(item.id); setSelectedPropertyId(null); }}><span>{item.status === "live" ? "LIVE · VALIDATED" : "DATA GAP"}</span><b>{item.label}</b><i>{item.competency}% integrated competency</i><small>{item.status === "live" && "sourceCompetency" in item ? `${item.sourceCompetency}% source · ${item.modelCompetency}% model · ${item.diagnostics.sampleSize} historical tests` : item.gap}</small></button>)}
+          {liveValuationMarkets.map((item) => <button key={item.id} className={valuationMarket === item.id ? "active" : ""} onClick={() => { setValuationMarket(item.id); setSelectedPropertyId(null); }}><span>LIVE · VALIDATED</span><b>{item.label}</b><i>{item.competency}% integrated competency</i><small>{"sourceCompetency" in item ? `${item.sourceCompetency}% source · ${item.modelCompetency}% model · ${item.diagnostics.sampleSize} historical tests` : ""}</small></button>)}
         </div>
         {valuationRows.length ? <div className="valuation-workbench">
           <div className="valuation-list">
@@ -316,7 +340,8 @@ export default function Home() {
       <section className="sources" id="sources">
         <div className="section-title"><div><p className="eyebrow">LOCAL PROPERTY DATA PIPELINE</p><h2>Government sources<br />ready for deeper joins.</h2></div><p>The local registry remains the route from market conditions to property-level evidence. These verified endpoints are next in line for tract and parcel aggregation.</p></div>
         <div className="registry-summary"><div><strong>{sourceRegistry.sources.length}</strong><span>verified endpoints</span></div><div><strong>{sourceRegistry.sources.reduce((sum, item) => sum + item.recordCount, 0).toLocaleString()}</strong><span>represented records</span></div><div><strong>{new Set(sourceRegistry.sources.flatMap((item) => item.marketIds)).size}</strong><span>markets with a local connection</span></div><a href="/api/property-data/sources" target="_blank">Open machine-readable registry →</a></div>
-        <div className="source-grid">{sourceRegistry.sources.slice(0, 9).map((source) => <a key={source.id} href={source.sourcePage} target="_blank" rel="noreferrer"><b>{source.status} · {source.adapter}</b><h3>{source.name}</h3><p>{source.publisher}. {source.limits[0]}</p><span>{source.recordCount.toLocaleString()} records · {source.cadence}</span></a>)}</div>
+        <div className="source-market-filter"><label><span>Available parcel market</span><select value={sourceMarketId} onChange={(event) => setSourceMarketId(event.target.value)}>{connectedSourceMarketIds.map((id) => <option key={id} value={id}>{MARKET_EXPLORERS.find((item) => item.id === id)?.metro.short ?? id}</option>)}</select></label><p>Only markets backed by a verified source appear here. {visibleSources.length} current source{visibleSources.length === 1 ? "" : "s"} support this market.</p></div>
+        <div className="source-grid">{visibleSources.map((source) => <a key={source.id} href={source.sourcePage} target="_blank" rel="noreferrer"><b>{source.status} · {source.adapter}</b><h3>{source.name}</h3><p>{source.publisher}. {source.limits[0]}</p><span>{(source.marketRecordCounts[sourceMarketId as keyof typeof source.marketRecordCounts] ?? source.recordCount).toLocaleString()} market records · {source.cadence}</span></a>)}</div>
       </section>
 
       <footer><a className="brand" href="#top"><span>BORO</span>CAST</a><p>Public-data market intelligence · ACS 2020–2024 · FHFA through {PRICING_HISTORY_META.latestPeriod}</p><span>Screening signal · not investment advice</span></footer>

@@ -24,7 +24,7 @@ test("server-renders the national Borocast workbench and verified registry", asy
   assert.match(html, /PRODUCT OVERVIEW · FROM SIGNAL TO MEMO/);
   assert.match(html, /One workflow/);
   assert.match(html, /EVIDENCE LADDER/);
-  assert.match(html, /Florida Statewide Parcels 2025/);
+  assert.match(html, /NYC PLUTO 26v1/);
   assert.match(html, /CROSS-MARKET COMPARISON/);
   assert.match(html, /Tracts \+ property evidence/);
   assert.match(html, /FHFA TRACT-CLUSTER HPI/);
@@ -56,6 +56,10 @@ test("server-renders the national Borocast workbench and verified registry", asy
   assert.match(html, /MODEL GOVERNANCE CHECK/);
   assert.match(html, /Out-of-time validation/);
   assert.match(html, /Bring an independent AVM into the evidence stack/);
+  assert.match(html, /FEATURE AVAILABILITY · NO EMPTY MARKETS/);
+  assert.match(html, /Pick the evidence/);
+  assert.match(html, /Prove listing \+ vendor joins/);
+  assert.match(html, /Available parcel market/);
   assert.match(html, /LOCAL PUBLIC-SAFETY EVIDENCE/);
   assert.match(html, /Load local safety context/);
   assert.match(html, /true acquisition-edge percentage remains locked/i);
