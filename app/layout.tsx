@@ -3,11 +3,11 @@ import "./globals.css";
 import "./sources.css";
 
 export const metadata: Metadata = {
-  title: "Borocast — NYC Property Outlook",
-  description: "A transparent, data-driven ranking of projected NYC neighborhood property value signals.",
+  title: "Borocast — U.S. Market Intelligence",
+  description: "Public-data market intelligence across 20 U.S. metros, with tract-level demographic, economic, education and housing evidence.",
   icons: { icon: "/favicon.svg", shortcut: "/favicon.svg" },
-  openGraph: { title: "Borocast — NYC Property Outlook", description: "Five-year value signals across New York City neighborhoods.", images: [{ url: "/og.png", width: 1792, height: 1024 }] },
-  twitter: { card: "summary_large_image", title: "Borocast — NYC Property Outlook", description: "Five-year value signals across New York City neighborhoods.", images: ["/og.png"] },
+  openGraph: { title: "Borocast — U.S. Market Intelligence", description: "Slice and compare public-data evidence across 20 U.S. metros.", images: [{ url: "/og-national.png", width: 1659, height: 948 }] },
+  twitter: { card: "summary_large_image", title: "Borocast — U.S. Market Intelligence", description: "Slice and compare public-data evidence across 20 U.S. metros.", images: ["/og-national.png"] },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

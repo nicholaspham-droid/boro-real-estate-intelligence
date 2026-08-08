@@ -1,0 +1,3348 @@
+{
+  "generatedAt": "2026-08-08T00:49:48.709Z",
+  "vintage": "2024",
+  "release": "acs2024_5yr",
+  "methodology": {
+    "geography": "Primary-county census tracts grouped into five reproducible directional market clusters",
+    "attributes": "2020-2024 ACS 5-year detailed tables mirrored by Census Reporter",
+    "geometry": "U.S. Census Bureau TIGERweb ACS 2024 Census Tracts",
+    "scoreScope": "Cross-sectional factor percentile, not a property-value forecast"
+  },
+  "tables": [
+    "B01003",
+    "B01002",
+    "B15003",
+    "B23025",
+    "B19013",
+    "B17001",
+    "B25002",
+    "B25077",
+    "B25064"
+  ],
+  "marketCount": 20,
+  "clusterCount": 97,
+  "markets": [
+    {
+      "id": "new-york",
+      "label": "New York",
+      "center": {
+        "lat": 40.74,
+        "lng": -73.92
+      },
+      "zoom": 9,
+      "countyCount": 9,
+      "tractCount": 2942,
+      "clusters": [
+        {
+          "id": "new-york-central",
+          "name": "Central Core",
+          "tractCount": 824,
+          "population": 3377442,
+          "lat": 40.735204666386636,
+          "lng": -73.93241484352642,
+          "medianAge": 37.2,
+          "bachelorsPct": 51.51433742875627,
+          "unemploymentPct": 7.405422108898346,
+          "medianIncome": 92042,
+          "povertyPct": 16.527445193916016,
+          "vacancyPct": 10.49692946562759,
+          "medianHomeValue": 886300,
+          "medianRent": 2147,
+          "coverage": 100,
+          "reliability": 75,
+          "sampleGeoids": [
+            "36005000100",
+            "36005001901",
+            "36005001902",
+            "36005002300"
+          ],
+          "factors": {
+            "demographic": 71,
+            "economic": 34,
+            "education": 87,
+            "housing": 9
+          },
+          "acsCompetency": 91
+        },
+        {
+          "id": "new-york-north",
+          "name": "North Arc",
+          "tractCount": 565,
+          "population": 2544319,
+          "lat": 40.87513015474869,
+          "lng": -73.94642804033221,
+          "medianAge": 38.7,
+          "bachelorsPct": 35.783016556709136,
+          "unemploymentPct": 9.802978550298263,
+          "medianIncome": 67024,
+          "povertyPct": 19.783719304451484,
+          "vacancyPct": 4.794774103386933,
+          "medianHomeValue": 513100,
+          "medianRent": 1671,
+          "coverage": 100,
+          "reliability": 73,
+          "sampleGeoids": [
+            "36005000200",
+            "36005000400",
+            "36005001600",
+            "36005002001"
+          ],
+          "factors": {
+            "demographic": 54,
+            "economic": 10,
+            "education": 58,
+            "housing": 19
+          },
+          "acsCompetency": 91
+        },
+        {
+          "id": "new-york-east",
+          "name": "East Corridor",
+          "tractCount": 329,
+          "population": 1041359,
+          "lat": 40.71916952050156,
+          "lng": -73.78386887591115,
+          "medianAge": 42.1,
+          "bachelorsPct": 33.70456180960779,
+          "unemploymentPct": 7.582544972044272,
+          "medianIncome": 93194,
+          "povertyPct": 11.795019067634545,
+          "vacancyPct": 5.272175896104703,
+          "medianHomeValue": 689900,
+          "medianRent": 2000,
+          "coverage": 100,
+          "reliability": 77,
+          "sampleGeoids": [
+            "36005011800",
+            "36005013000",
+            "36005013200",
+            "36005013800"
+          ],
+          "factors": {
+            "demographic": 20,
+            "economic": 43,
+            "education": 46,
+            "housing": 24
+          },
+          "acsCompetency": 92
+        },
+        {
+          "id": "new-york-south",
+          "name": "South Arc",
+          "tractCount": 604,
+          "population": 2024005,
+          "lat": 40.62373339710131,
+          "lng": -73.96194585099833,
+          "medianAge": 40,
+          "bachelorsPct": 36.51368136154493,
+          "unemploymentPct": 7.8788485446217855,
+          "medianIncome": 76719,
+          "povertyPct": 17.17584050067022,
+          "vacancyPct": 8.643038525956555,
+          "medianHomeValue": 811300,
+          "medianRent": 1776,
+          "coverage": 100,
+          "reliability": 75,
+          "sampleGeoids": [
+            "36047000200",
+            "36047001801",
+            "36047002000",
+            "36047002200"
+          ],
+          "factors": {
+            "demographic": 39,
+            "economic": 21,
+            "education": 59,
+            "housing": 10
+          },
+          "acsCompetency": 91
+        },
+        {
+          "id": "new-york-west",
+          "name": "West Corridor",
+          "tractCount": 620,
+          "population": 2619034,
+          "lat": 40.71746183531786,
+          "lng": -74.175900620706,
+          "medianAge": 38.2,
+          "bachelorsPct": 41.407770932119845,
+          "unemploymentPct": 7.0208572475784745,
+          "medianIncome": 92885,
+          "povertyPct": 13.010093728483096,
+          "vacancyPct": 5.6141777509472455,
+          "medianHomeValue": 496700,
+          "medianRent": 1743,
+          "coverage": 100,
+          "reliability": 78,
+          "sampleGeoids": [
+            "36047004500",
+            "36047004700",
+            "36047004900",
+            "36047005100"
+          ],
+          "factors": {
+            "demographic": 60,
+            "economic": 42,
+            "education": 71,
+            "housing": 36
+          },
+          "acsCompetency": 92
+        }
+      ],
+      "acsCompetency": 91,
+      "coverage": 100,
+      "reliability": 75
+    },
+    {
+      "id": "los-angeles",
+      "label": "Los Angeles",
+      "center": {
+        "lat": 34.06,
+        "lng": -118.28
+      },
+      "zoom": 9,
+      "countyCount": 2,
+      "tractCount": 3081,
+      "clusters": [
+        {
+          "id": "los-angeles-central",
+          "name": "Central Core",
+          "tractCount": 863,
+          "population": 3101634,
+          "lat": 34.043860391812814,
+          "lng": -118.27893828807655,
+          "medianAge": 36.7,
+          "bachelorsPct": 34.12041860607932,
+          "unemploymentPct": 8.420037503888464,
+          "medianIncome": 73095,
+          "povertyPct": 17.76198165293955,
+          "vacancyPct": 6.957662354966319,
+          "medianHomeValue": 755000,
+          "medianRent": 1765,
+          "coverage": 100,
+          "reliability": 77,
+          "sampleGeoids": [
+            "06037124300",
+            "06037125200",
+            "06037125310",
+            "06037125321"
+          ],
+          "factors": {
+            "demographic": 74,
+            "economic": 16,
+            "education": 48,
+            "housing": 13
+          },
+          "acsCompetency": 92
+        },
+        {
+          "id": "los-angeles-north",
+          "name": "North Arc",
+          "tractCount": 370,
+          "population": 1530425,
+          "lat": 34.376342252838256,
+          "lng": -118.3436779523008,
+          "medianAge": 37.5,
+          "bachelorsPct": 28.089739814952797,
+          "unemploymentPct": 7.388764276033305,
+          "medianIncome": 91790,
+          "povertyPct": 12.880376379262456,
+          "vacancyPct": 4.402692289263293,
+          "medianHomeValue": 679000,
+          "medianRent": 2002,
+          "coverage": 100,
+          "reliability": 79,
+          "sampleGeoids": [
+            "06037101110",
+            "06037101122",
+            "06037101220",
+            "06037101221"
+          ],
+          "factors": {
+            "demographic": 65,
+            "economic": 40,
+            "education": 29,
+            "housing": 26
+          },
+          "acsCompetency": 93
+        },
+        {
+          "id": "los-angeles-east",
+          "name": "East Corridor",
+          "tractCount": 791,
+          "population": 3847326,
+          "lat": 33.919146500231584,
+          "lng": -117.90584062917976,
+          "medianAge": 39.3,
+          "bachelorsPct": 36.81805299793533,
+          "unemploymentPct": 5.524754492754837,
+          "medianIncome": 102905,
+          "povertyPct": 10.323394407726923,
+          "vacancyPct": 4.153644032926118,
+          "medianHomeValue": 797000,
+          "medianRent": 2224,
+          "coverage": 100,
+          "reliability": 83,
+          "sampleGeoids": [
+            "06037400205",
+            "06037400206",
+            "06037400207",
+            "06037400208"
+          ],
+          "factors": {
+            "demographic": 47,
+            "economic": 61,
+            "education": 60,
+            "housing": 25
+          },
+          "acsCompetency": 94
+        },
+        {
+          "id": "los-angeles-south",
+          "name": "South Arc",
+          "tractCount": 751,
+          "population": 3344066,
+          "lat": 33.77918793921833,
+          "lng": -118.10143066431712,
+          "medianAge": 39.3,
+          "bachelorsPct": 38.02297805513926,
+          "unemploymentPct": 6.284219618139622,
+          "medianIncome": 101975,
+          "povertyPct": 11.178511596455024,
+          "vacancyPct": 5.264248914220682,
+          "medianHomeValue": 812500,
+          "medianRent": 2152,
+          "coverage": 100,
+          "reliability": 82,
+          "sampleGeoids": [
+            "06037241002",
+            "06037277200",
+            "06037278001",
+            "06037291110"
+          ],
+          "factors": {
+            "demographic": 47,
+            "economic": 53,
+            "education": 64,
+            "housing": 23
+          },
+          "acsCompetency": 94
+        },
+        {
+          "id": "los-angeles-west",
+          "name": "West Corridor",
+          "tractCount": 306,
+          "population": 1150800,
+          "lat": 34.13921591575425,
+          "lng": -118.52815176103582,
+          "medianAge": 40.4,
+          "bachelorsPct": 54.41569602781466,
+          "unemploymentPct": 7.542670753471776,
+          "medianIncome": 113594,
+          "povertyPct": 11.762424217994159,
+          "vacancyPct": 7.351397159596328,
+          "medianHomeValue": 1001500,
+          "medianRent": 2396,
+          "coverage": 100,
+          "reliability": 81,
+          "sampleGeoids": [
+            "06037108102",
+            "06037108202",
+            "06037108203",
+            "06037108204"
+          ],
+          "factors": {
+            "demographic": 33,
+            "economic": 53,
+            "education": 93,
+            "housing": 20
+          },
+          "acsCompetency": 93
+        }
+      ],
+      "acsCompetency": 93,
+      "coverage": 100,
+      "reliability": 81
+    },
+    {
+      "id": "chicago",
+      "label": "Chicago",
+      "center": {
+        "lat": 41.87,
+        "lng": -87.65
+      },
+      "zoom": 9,
+      "countyCount": 5,
+      "tractCount": 1981,
+      "clusters": [
+        {
+          "id": "chicago-central",
+          "name": "Central Core",
+          "tractCount": 555,
+          "population": 1841321,
+          "lat": 41.876598078173195,
+          "lng": -87.6865802302804,
+          "medianAge": 34.4,
+          "bachelorsPct": 45.624745063110716,
+          "unemploymentPct": 7.968412770785706,
+          "medianIncome": 77904,
+          "povertyPct": 16.593613476877074,
+          "vacancyPct": 8.468282279143569,
+          "medianHomeValue": 351100,
+          "medianRent": 1372,
+          "coverage": 100,
+          "reliability": 76,
+          "sampleGeoids": [
+            "17031030703",
+            "17031031000",
+            "17031031100",
+            "17031031200"
+          ],
+          "factors": {
+            "demographic": 91,
+            "economic": 23,
+            "education": 80,
+            "housing": 42
+          },
+          "acsCompetency": 92
+        },
+        {
+          "id": "chicago-north",
+          "name": "North Arc",
+          "tractCount": 345,
+          "population": 1565378,
+          "lat": 42.1608866683638,
+          "lng": -87.85465214714915,
+          "medianAge": 40.8,
+          "bachelorsPct": 51.54946400081274,
+          "unemploymentPct": 5.270483042701554,
+          "medianIncome": 101111,
+          "povertyPct": 9.5968156915274,
+          "vacancyPct": 5.259304172003126,
+          "medianHomeValue": 364700,
+          "medianRent": 1541,
+          "coverage": 100,
+          "reliability": 82,
+          "sampleGeoids": [
+            "17031010100",
+            "17031010201",
+            "17031010202",
+            "17031010300"
+          ],
+          "factors": {
+            "demographic": 26,
+            "economic": 62,
+            "education": 88,
+            "housing": 74
+          },
+          "acsCompetency": 94
+        },
+        {
+          "id": "chicago-south",
+          "name": "South Arc",
+          "tractCount": 398,
+          "population": 1550522,
+          "lat": 41.62743096063779,
+          "lng": -87.72918847997639,
+          "medianAge": 39.8,
+          "bachelorsPct": 28.291706095587802,
+          "unemploymentPct": 9.509877193685671,
+          "medianIncome": 73271,
+          "povertyPct": 15.051642168912917,
+          "vacancyPct": 7.972484467995411,
+          "medianHomeValue": 225700,
+          "medianRent": 1252,
+          "coverage": 100,
+          "reliability": 76,
+          "sampleGeoids": [
+            "17031430101",
+            "17031430102",
+            "17031430200",
+            "17031430300"
+          ],
+          "factors": {
+            "demographic": 41,
+            "economic": 21,
+            "education": 31,
+            "housing": 78
+          },
+          "acsCompetency": 92
+        },
+        {
+          "id": "chicago-west",
+          "name": "West Corridor",
+          "tractCount": 683,
+          "population": 3087833,
+          "lat": 41.87717584027373,
+          "lng": -88.07446569170037,
+          "medianAge": 40.2,
+          "bachelorsPct": 43.71275969990426,
+          "unemploymentPct": 4.747853361794328,
+          "medianIncome": 103971,
+          "povertyPct": 7.2504888614458185,
+          "vacancyPct": 4.070326856294945,
+          "medianHomeValue": 340800,
+          "medianRent": 1573,
+          "coverage": 100,
+          "reliability": 82,
+          "sampleGeoids": [
+            "17031100400",
+            "17031100500",
+            "17031100600",
+            "17031100700"
+          ],
+          "factors": {
+            "demographic": 37,
+            "economic": 78,
+            "education": 78,
+            "housing": 84
+          },
+          "acsCompetency": 94
+        }
+      ],
+      "acsCompetency": 93,
+      "coverage": 100,
+      "reliability": 79
+    },
+    {
+      "id": "dallas-fort-worth",
+      "label": "Dallas–Fort Worth",
+      "center": {
+        "lat": 32.79,
+        "lng": -96.8
+      },
+      "zoom": 9,
+      "countyCount": 4,
+      "tractCount": 1503,
+      "clusters": [
+        {
+          "id": "dallas-fort-worth-central",
+          "name": "Central Core",
+          "tractCount": 421,
+          "population": 1624253,
+          "lat": 32.80724874640833,
+          "lng": -96.78778563696672,
+          "medianAge": 33.5,
+          "bachelorsPct": 32.85074984966511,
+          "unemploymentPct": 5.0555144726295955,
+          "medianIncome": 67094,
+          "povertyPct": 15.893112275682153,
+          "vacancyPct": 8.06049424370275,
+          "medianHomeValue": 246900,
+          "medianRent": 1418,
+          "coverage": 100,
+          "reliability": 74,
+          "sampleGeoids": [
+            "48113000100",
+            "48113000201",
+            "48113000202",
+            "48113000300"
+          ],
+          "factors": {
+            "demographic": 96,
+            "economic": 30,
+            "education": 39,
+            "housing": 50
+          },
+          "acsCompetency": 91
+        },
+        {
+          "id": "dallas-fort-worth-north",
+          "name": "North Arc",
+          "tractCount": 454,
+          "population": 2266832,
+          "lat": 33.106654122471404,
+          "lng": -96.82353145698494,
+          "medianAge": 37.3,
+          "bachelorsPct": 53.058586691323356,
+          "unemploymentPct": 4.061184050345808,
+          "medianIncome": 119677,
+          "povertyPct": 7.19198398181513,
+          "vacancyPct": 4.309548010213407,
+          "medianHomeValue": 435900,
+          "medianRent": 1977,
+          "coverage": 100,
+          "reliability": 83,
+          "sampleGeoids": [
+            "48113013605",
+            "48113013611",
+            "48113013617",
+            "48113013618"
+          ],
+          "factors": {
+            "demographic": 70,
+            "economic": 88,
+            "education": 91,
+            "housing": 71
+          },
+          "acsCompetency": 94
+        },
+        {
+          "id": "dallas-fort-worth-east",
+          "name": "East Corridor",
+          "tractCount": 65,
+          "population": 353691,
+          "lat": 32.860257913263254,
+          "lng": -96.56042609636661,
+          "medianAge": 34.8,
+          "bachelorsPct": 26.640923766145143,
+          "unemploymentPct": 4.965936819110396,
+          "medianIncome": 93750,
+          "povertyPct": 9.785228727595149,
+          "vacancyPct": 5.579056337560491,
+          "medianHomeValue": 294500,
+          "medianRent": 1726,
+          "coverage": 100,
+          "reliability": 78,
+          "sampleGeoids": [
+            "48113017005",
+            "48113017006",
+            "48113017007",
+            "48113017008"
+          ],
+          "factors": {
+            "demographic": 89,
+            "economic": 64,
+            "education": 23,
+            "housing": 78
+          },
+          "acsCompetency": 92
+        },
+        {
+          "id": "dallas-fort-worth-south",
+          "name": "South Arc",
+          "tractCount": 47,
+          "population": 218520,
+          "lat": 32.59954469041735,
+          "lng": -96.88020575187628,
+          "medianAge": 36.9,
+          "bachelorsPct": 31.231322065477887,
+          "unemploymentPct": 6.886269982316193,
+          "medianIncome": 86673,
+          "povertyPct": 11.79327495838044,
+          "vacancyPct": 4.008293340080149,
+          "medianHomeValue": 282300,
+          "medianRent": 1914,
+          "coverage": 100,
+          "reliability": 77,
+          "sampleGeoids": [
+            "48113016511",
+            "48113016513",
+            "48113016517",
+            "48113016519"
+          ],
+          "factors": {
+            "demographic": 72,
+            "economic": 40,
+            "education": 36,
+            "housing": 68
+          },
+          "acsCompetency": 92
+        },
+        {
+          "id": "dallas-fort-worth-west",
+          "name": "West Corridor",
+          "tractCount": 516,
+          "population": 2468171,
+          "lat": 32.77940403511347,
+          "lng": -97.22821613599709,
+          "medianAge": 35.4,
+          "bachelorsPct": 35.19372015963556,
+          "unemploymentPct": 4.769297433230157,
+          "medianIncome": 87090,
+          "povertyPct": 11.054708639030213,
+          "vacancyPct": 6.455747962558706,
+          "medianHomeValue": 311200,
+          "medianRent": 1683,
+          "coverage": 100,
+          "reliability": 80,
+          "sampleGeoids": [
+            "48113014124",
+            "48113014126",
+            "48113014139",
+            "48113014140"
+          ],
+          "factors": {
+            "demographic": 82,
+            "economic": 57,
+            "education": 55,
+            "housing": 63
+          },
+          "acsCompetency": 93
+        }
+      ],
+      "acsCompetency": 93,
+      "coverage": 100,
+      "reliability": 79
+    },
+    {
+      "id": "houston",
+      "label": "Houston",
+      "center": {
+        "lat": 29.76,
+        "lng": -95.39
+      },
+      "zoom": 9,
+      "countyCount": 4,
+      "tractCount": 1453,
+      "clusters": [
+        {
+          "id": "houston-central",
+          "name": "Central Core",
+          "tractCount": 407,
+          "population": 1364979,
+          "lat": 29.756879839946254,
+          "lng": -95.41014729746766,
+          "medianAge": 35.4,
+          "bachelorsPct": 38.94463970957411,
+          "unemploymentPct": 7.191732965817897,
+          "medianIncome": 62096,
+          "povertyPct": 20.204264708936318,
+          "vacancyPct": 10.10042465337589,
+          "medianHomeValue": 248800,
+          "medianRent": 1300,
+          "coverage": 100,
+          "reliability": 72,
+          "sampleGeoids": [
+            "48201100001",
+            "48201210400",
+            "48201210500",
+            "48201210600"
+          ],
+          "factors": {
+            "demographic": 82,
+            "economic": 8,
+            "education": 66,
+            "housing": 39
+          },
+          "acsCompetency": 90
+        },
+        {
+          "id": "houston-north",
+          "name": "North Arc",
+          "tractCount": 368,
+          "population": 1918073,
+          "lat": 30.079789847023555,
+          "lng": -95.4370433742095,
+          "medianAge": 35.1,
+          "bachelorsPct": 33.58539801551848,
+          "unemploymentPct": 5.651198678052751,
+          "medianIncome": 89772,
+          "povertyPct": 12.558260384882404,
+          "vacancyPct": 5.8511956023789535,
+          "medianHomeValue": 276100,
+          "medianRent": 1560,
+          "coverage": 100,
+          "reliability": 76,
+          "sampleGeoids": [
+            "48201222200",
+            "48201222300",
+            "48201222401",
+            "48201222402"
+          ],
+          "factors": {
+            "demographic": 87,
+            "economic": 46,
+            "education": 45,
+            "housing": 81
+          },
+          "acsCompetency": 92
+        },
+        {
+          "id": "houston-east",
+          "name": "East Corridor",
+          "tractCount": 164,
+          "population": 753532,
+          "lat": 29.720962754003786,
+          "lng": -95.1329870396347,
+          "medianAge": 33.6,
+          "bachelorsPct": 20.3668301322341,
+          "unemploymentPct": 8.098159957002775,
+          "medianIncome": 66084,
+          "povertyPct": 16.727758304668885,
+          "vacancyPct": 7.934598456198877,
+          "medianHomeValue": 217400,
+          "medianRent": 1328,
+          "coverage": 100,
+          "reliability": 74,
+          "sampleGeoids": [
+            "48201231100",
+            "48201231200",
+            "48201232304",
+            "48201232305"
+          ],
+          "factors": {
+            "demographic": 95,
+            "economic": 12,
+            "education": 4,
+            "housing": 65
+          },
+          "acsCompetency": 91
+        },
+        {
+          "id": "houston-south",
+          "name": "South Arc",
+          "tractCount": 164,
+          "population": 862955,
+          "lat": 29.47508267650107,
+          "lng": -95.41004253825518,
+          "medianAge": 36.6,
+          "bachelorsPct": 34.015594262712824,
+          "unemploymentPct": 5.51890731017411,
+          "medianIncome": 93550,
+          "povertyPct": 9.532901983580906,
+          "vacancyPct": 7.212962489926275,
+          "medianHomeValue": 268900,
+          "medianRent": 1555,
+          "coverage": 100,
+          "reliability": 77,
+          "sampleGeoids": [
+            "48201330301",
+            "48201330302",
+            "48201330303",
+            "48201330400"
+          ],
+          "factors": {
+            "demographic": 75,
+            "economic": 59,
+            "education": 47,
+            "housing": 83
+          },
+          "acsCompetency": 92
+        },
+        {
+          "id": "houston-west",
+          "name": "West Corridor",
+          "tractCount": 350,
+          "population": 1908183,
+          "lat": 29.75780311843782,
+          "lng": -95.6873549040631,
+          "medianAge": 36,
+          "bachelorsPct": 42.92598427963769,
+          "unemploymentPct": 5.953977757634417,
+          "medianIncome": 93657,
+          "povertyPct": 11.694051968691664,
+          "vacancyPct": 5.7728577435871795,
+          "medianHomeValue": 304300,
+          "medianRent": 1737,
+          "coverage": 100,
+          "reliability": 79,
+          "sampleGeoids": [
+            "48201422405",
+            "48201422406",
+            "48201422900",
+            "48201423002"
+          ],
+          "factors": {
+            "demographic": 79,
+            "economic": 50,
+            "education": 74,
+            "housing": 74
+          },
+          "acsCompetency": 93
+        }
+      ],
+      "acsCompetency": 92,
+      "coverage": 100,
+      "reliability": 76
+    },
+    {
+      "id": "atlanta",
+      "label": "Atlanta",
+      "center": {
+        "lat": 33.77,
+        "lng": -84.38
+      },
+      "zoom": 9,
+      "countyCount": 5,
+      "tractCount": 1003,
+      "clusters": [
+        {
+          "id": "atlanta-central",
+          "name": "Central Core",
+          "tractCount": 281,
+          "population": 892479,
+          "lat": 33.78097280468223,
+          "lng": -84.36841481950836,
+          "medianAge": 36.2,
+          "bachelorsPct": 56.78746734413949,
+          "unemploymentPct": 6.090392131548718,
+          "medianIncome": 90128,
+          "povertyPct": 15.703072153587469,
+          "vacancyPct": 11.930534746088453,
+          "medianHomeValue": 409900,
+          "medianRent": 1733,
+          "coverage": 100,
+          "reliability": 75,
+          "sampleGeoids": [
+            "13121000100",
+            "13121000201",
+            "13121000202",
+            "13121000400"
+          ],
+          "factors": {
+            "demographic": 76,
+            "economic": 39,
+            "education": 96,
+            "housing": 34
+          },
+          "acsCompetency": 91
+        },
+        {
+          "id": "atlanta-north",
+          "name": "North Arc",
+          "tractCount": 284,
+          "population": 1113143,
+          "lat": 34.003677447776255,
+          "lng": -84.35388279843653,
+          "medianAge": 39.3,
+          "bachelorsPct": 58.606396554041446,
+          "unemploymentPct": 3.9867871380048694,
+          "medianIncome": 113495,
+          "povertyPct": 8.253190491167643,
+          "vacancyPct": 5.110381800864207,
+          "medianHomeValue": 456900,
+          "medianRent": 1871,
+          "coverage": 100,
+          "reliability": 80,
+          "sampleGeoids": [
+            "13121010106",
+            "13121010107",
+            "13121010108",
+            "13121010117"
+          ],
+          "factors": {
+            "demographic": 47,
+            "economic": 84,
+            "education": 97,
+            "housing": 57
+          },
+          "acsCompetency": 93
+        },
+        {
+          "id": "atlanta-east",
+          "name": "East Corridor",
+          "tractCount": 247,
+          "population": 1079637,
+          "lat": 33.88335816190995,
+          "lng": -84.06924615157685,
+          "medianAge": 36.1,
+          "bachelorsPct": 35.22324175198368,
+          "unemploymentPct": 5.548396467908844,
+          "medianIncome": 85823,
+          "povertyPct": 12.02540170345838,
+          "vacancyPct": 5.966948975654918,
+          "medianHomeValue": 337800,
+          "medianRent": 1824,
+          "coverage": 100,
+          "reliability": 77,
+          "sampleGeoids": [
+            "13135050113",
+            "13135050215",
+            "13135050225",
+            "13135050226"
+          ],
+          "factors": {
+            "demographic": 77,
+            "economic": 44,
+            "education": 56,
+            "housing": 45
+          },
+          "acsCompetency": 92
+        },
+        {
+          "id": "atlanta-south",
+          "name": "South Arc",
+          "tractCount": 101,
+          "population": 428200,
+          "lat": 33.561954027440436,
+          "lng": -84.40927701786552,
+          "medianAge": 34,
+          "bachelorsPct": 25.055738168139225,
+          "unemploymentPct": 6.929810546619135,
+          "medianIncome": 61969,
+          "povertyPct": 17.15833238389627,
+          "vacancyPct": 8.34342873621472,
+          "medianHomeValue": 226300,
+          "medianRent": 1494,
+          "coverage": 100,
+          "reliability": 73,
+          "sampleGeoids": [
+            "13121010401",
+            "13121010508",
+            "13121010517",
+            "13121010518"
+          ],
+          "factors": {
+            "demographic": 94,
+            "economic": 11,
+            "education": 19,
+            "housing": 46
+          },
+          "acsCompetency": 91
+        },
+        {
+          "id": "atlanta-west",
+          "name": "West Corridor",
+          "tractCount": 90,
+          "population": 382449,
+          "lat": 33.838232178800304,
+          "lng": -84.61194596835134,
+          "medianAge": 38.6,
+          "bachelorsPct": 43.11481671217059,
+          "unemploymentPct": 5.42795760556491,
+          "medianIncome": 101200,
+          "povertyPct": 8.998635251847352,
+          "vacancyPct": 6.274145108920417,
+          "medianHomeValue": 351800,
+          "medianRent": 1626,
+          "coverage": 100,
+          "reliability": 77,
+          "sampleGeoids": [
+            "13121007709",
+            "13121007710",
+            "13121007711",
+            "13121007805"
+          ],
+          "factors": {
+            "demographic": 55,
+            "economic": 65,
+            "education": 75,
+            "housing": 74
+          },
+          "acsCompetency": 92
+        }
+      ],
+      "acsCompetency": 92,
+      "coverage": 100,
+      "reliability": 77
+    },
+    {
+      "id": "washington",
+      "label": "Washington",
+      "center": {
+        "lat": 38.91,
+        "lng": -77.02
+      },
+      "zoom": 9,
+      "countyCount": 6,
+      "tractCount": 1038,
+      "clusters": [
+        {
+          "id": "washington-central",
+          "name": "Central Core",
+          "tractCount": 291,
+          "population": 976773,
+          "lat": 38.91052014649258,
+          "lng": -77.02027502065474,
+          "medianAge": 35.3,
+          "bachelorsPct": 62.68796038937461,
+          "unemploymentPct": 6.064528567956614,
+          "medianIncome": 113021,
+          "povertyPct": 13.984090270201166,
+          "vacancyPct": 8.722160226581794,
+          "medianHomeValue": 675000,
+          "medianRent": 1972,
+          "coverage": 100,
+          "reliability": 79,
+          "sampleGeoids": [
+            "11001000101",
+            "11001000102",
+            "11001000201",
+            "11001000202"
+          ],
+          "factors": {
+            "demographic": 85,
+            "economic": 52,
+            "education": 98,
+            "housing": 33
+          },
+          "acsCompetency": 93
+        },
+        {
+          "id": "washington-north",
+          "name": "North Arc",
+          "tractCount": 241,
+          "population": 1131393,
+          "lat": 39.087924122210424,
+          "lng": -77.08800687099884,
+          "medianAge": 38.9,
+          "bachelorsPct": 54.59886332834547,
+          "unemploymentPct": 5.272414560696793,
+          "medianIncome": 120345,
+          "povertyPct": 9.742249948409782,
+          "vacancyPct": 4.007510743696984,
+          "medianHomeValue": 545500,
+          "medianRent": 2117,
+          "coverage": 100,
+          "reliability": 83,
+          "sampleGeoids": [
+            "24031700101",
+            "24031700103",
+            "24031700104",
+            "24031700105"
+          ],
+          "factors": {
+            "demographic": 52,
+            "economic": 70,
+            "education": 94,
+            "housing": 50
+          },
+          "acsCompetency": 94
+        },
+        {
+          "id": "washington-east",
+          "name": "East Corridor",
+          "tractCount": 105,
+          "population": 478602,
+          "lat": 38.911125138528455,
+          "lng": -76.83896014966511,
+          "medianAge": 40.4,
+          "bachelorsPct": 38.19377385071647,
+          "unemploymentPct": 6.475576223210354,
+          "medianIncome": 111759,
+          "povertyPct": 9.252593511109579,
+          "vacancyPct": 4.268168825063457,
+          "medianHomeValue": 406300,
+          "medianRent": 1848,
+          "coverage": 100,
+          "reliability": 81,
+          "sampleGeoids": [
+            "24033800206",
+            "24033800401",
+            "24033800402",
+            "24033800403"
+          ],
+          "factors": {
+            "demographic": 33,
+            "economic": 62,
+            "education": 65,
+            "housing": 73
+          },
+          "acsCompetency": 93
+        },
+        {
+          "id": "washington-south",
+          "name": "South Arc",
+          "tractCount": 155,
+          "population": 604497,
+          "lat": 38.77235605701931,
+          "lng": -77.06156075472666,
+          "medianAge": 40.3,
+          "bachelorsPct": 51.77000515198229,
+          "unemploymentPct": 5.586521523454546,
+          "medianIncome": 134150,
+          "povertyPct": 7.519545893071286,
+          "vacancyPct": 5.022819294894919,
+          "medianHomeValue": 531500,
+          "medianRent": 2244,
+          "coverage": 100,
+          "reliability": 81,
+          "sampleGeoids": [
+            "11001009802",
+            "11001009810",
+            "11001009811",
+            "11001010900"
+          ],
+          "factors": {
+            "demographic": 35,
+            "economic": 75,
+            "education": 90,
+            "housing": 58
+          },
+          "acsCompetency": 93
+        },
+        {
+          "id": "washington-west",
+          "name": "West Corridor",
+          "tractCount": 246,
+          "population": 1056782,
+          "lat": 38.88284280348264,
+          "lng": -77.27426150213569,
+          "medianAge": 40.9,
+          "bachelorsPct": 67.83643562878636,
+          "unemploymentPct": 3.9915890755135797,
+          "medianIncome": 170962,
+          "povertyPct": 5.8294396882457065,
+          "vacancyPct": 3.2745442543475054,
+          "medianHomeValue": 757500,
+          "medianRent": 2412,
+          "coverage": 100,
+          "reliability": 85,
+          "sampleGeoids": [
+            "51059430101",
+            "51059430102",
+            "51059430201",
+            "51059430202"
+          ],
+          "factors": {
+            "demographic": 25,
+            "economic": 93,
+            "education": 99,
+            "housing": 61
+          },
+          "acsCompetency": 95
+        }
+      ],
+      "acsCompetency": 94,
+      "coverage": 100,
+      "reliability": 82
+    },
+    {
+      "id": "miami",
+      "label": "Miami",
+      "center": {
+        "lat": 25.79,
+        "lng": -80.2
+      },
+      "zoom": 9,
+      "countyCount": 3,
+      "tractCount": 1476,
+      "clusters": [
+        {
+          "id": "miami-central",
+          "name": "Central Core",
+          "tractCount": 414,
+          "population": 1542739,
+          "lat": 25.819320702756613,
+          "lng": -80.24504883758694,
+          "medianAge": 41.8,
+          "bachelorsPct": 35.01188514296079,
+          "unemploymentPct": 4.954000434617751,
+          "medianIncome": 64735,
+          "povertyPct": 16.540665248465206,
+          "vacancyPct": 10.4238377927444,
+          "medianHomeValue": 422700,
+          "medianRent": 1770,
+          "coverage": 100,
+          "reliability": 75,
+          "sampleGeoids": [
+            "12086000107",
+            "12086000109",
+            "12086000118",
+            "12086000120"
+          ],
+          "factors": {
+            "demographic": 22,
+            "economic": 26,
+            "education": 53,
+            "housing": 12
+          },
+          "acsCompetency": 91
+        },
+        {
+          "id": "miami-north",
+          "name": "North Arc",
+          "tractCount": 842,
+          "population": 3749945,
+          "lat": 26.31990662781722,
+          "lng": -80.19456418380807,
+          "medianAge": 40.8,
+          "bachelorsPct": 37.59176550769284,
+          "unemploymentPct": 5.468838417803673,
+          "medianIncome": 80568,
+          "povertyPct": 11.860442847691493,
+          "vacancyPct": 10.852665209850775,
+          "medianHomeValue": 406300,
+          "medianRent": 1949,
+          "coverage": 100,
+          "reliability": 79,
+          "sampleGeoids": [
+            "12086000115",
+            "12086000121",
+            "12086000122",
+            "12086000123"
+          ],
+          "factors": {
+            "demographic": 26,
+            "economic": 44,
+            "education": 63,
+            "housing": 18
+          },
+          "acsCompetency": 93
+        },
+        {
+          "id": "miami-south",
+          "name": "South Arc",
+          "tractCount": 83,
+          "population": 406245,
+          "lat": 25.53658850238157,
+          "lng": -80.40034336299527,
+          "medianAge": 36,
+          "bachelorsPct": 26.76895409860933,
+          "unemploymentPct": 4.913115354891985,
+          "medianIncome": 77406,
+          "povertyPct": 16.188230478104227,
+          "vacancyPct": 5.024586168411526,
+          "medianHomeValue": 426000,
+          "medianRent": 1750,
+          "coverage": 100,
+          "reliability": 76,
+          "sampleGeoids": [
+            "12086008102",
+            "12086008202",
+            "12086008205",
+            "12086008206"
+          ],
+          "factors": {
+            "demographic": 79,
+            "economic": 39,
+            "education": 25,
+            "housing": 26
+          },
+          "acsCompetency": 92
+        },
+        {
+          "id": "miami-west",
+          "name": "West Corridor",
+          "tractCount": 137,
+          "population": 550331,
+          "lat": 25.7172215077835,
+          "lng": -80.4110280658367,
+          "medianAge": 42.9,
+          "bachelorsPct": 36.88857715735619,
+          "unemploymentPct": 3.35994070906017,
+          "medianIncome": 90409,
+          "povertyPct": 10.87542012140158,
+          "vacancyPct": 3.4492968550963288,
+          "medianHomeValue": 475600,
+          "medianRent": 2310,
+          "coverage": 100,
+          "reliability": 77,
+          "sampleGeoids": [
+            "12086008312",
+            "12086008415",
+            "12086008416",
+            "12086008418"
+          ],
+          "factors": {
+            "demographic": 16,
+            "economic": 68,
+            "education": 62,
+            "housing": 27
+          },
+          "acsCompetency": 92
+        }
+      ],
+      "acsCompetency": 92,
+      "coverage": 100,
+      "reliability": 78
+    },
+    {
+      "id": "philadelphia",
+      "label": "Philadelphia",
+      "center": {
+        "lat": 39.97,
+        "lng": -75.17
+      },
+      "zoom": 9,
+      "countyCount": 6,
+      "tractCount": 1154,
+      "clusters": [
+        {
+          "id": "philadelphia-central",
+          "name": "Central Core",
+          "tractCount": 324,
+          "population": 1249031,
+          "lat": 39.97423518595613,
+          "lng": -75.17312431012517,
+          "medianAge": 34.5,
+          "bachelorsPct": 35.49426929837959,
+          "unemploymentPct": 9.271133616270383,
+          "medianIncome": 51950,
+          "povertyPct": 23.71094508944119,
+          "vacancyPct": 10.214762008571954,
+          "medianHomeValue": 195000,
+          "medianRent": 1339,
+          "coverage": 100,
+          "reliability": 72,
+          "sampleGeoids": [
+            "42101000101",
+            "42101000102",
+            "42101000200",
+            "42101000300"
+          ],
+          "factors": {
+            "demographic": 90,
+            "economic": 2,
+            "education": 57,
+            "housing": 39
+          },
+          "acsCompetency": 90
+        },
+        {
+          "id": "philadelphia-north",
+          "name": "North Arc",
+          "tractCount": 317,
+          "population": 1351405,
+          "lat": 40.19333116981955,
+          "lng": -75.18430635212978,
+          "medianAge": 42.9,
+          "bachelorsPct": 47.41349094689549,
+          "unemploymentPct": 4.702776354701732,
+          "medianIncome": 114107,
+          "povertyPct": 7.321123874353413,
+          "vacancyPct": 3.812084707977985,
+          "medianHomeValue": 417700,
+          "medianRent": 1544,
+          "coverage": 100,
+          "reliability": 82,
+          "sampleGeoids": [
+            "42101021600",
+            "42101021700",
+            "42101021800",
+            "42101021900"
+          ],
+          "factors": {
+            "demographic": 16,
+            "economic": 83,
+            "education": 84,
+            "housing": 79
+          },
+          "acsCompetency": 94
+        },
+        {
+          "id": "philadelphia-east",
+          "name": "East Corridor",
+          "tractCount": 146,
+          "population": 662934,
+          "lat": 40.02794186216122,
+          "lng": -74.97157055951271,
+          "medianAge": 39.8,
+          "bachelorsPct": 34.16873866751659,
+          "unemploymentPct": 6.79580978704657,
+          "medianIncome": 87817,
+          "povertyPct": 12.668758872131866,
+          "vacancyPct": 3.928406450601459,
+          "medianHomeValue": 310600,
+          "medianRent": 1455,
+          "coverage": 100,
+          "reliability": 80,
+          "sampleGeoids": [
+            "42101018400",
+            "42101029800",
+            "42101029900",
+            "42101030000"
+          ],
+          "factors": {
+            "demographic": 41,
+            "economic": 40,
+            "education": 51,
+            "housing": 76
+          },
+          "acsCompetency": 93
+        },
+        {
+          "id": "philadelphia-south",
+          "name": "South Arc",
+          "tractCount": 61,
+          "population": 238770,
+          "lat": 39.81344228713825,
+          "lng": -75.04054505716796,
+          "medianAge": 39,
+          "bachelorsPct": 30.43820806125021,
+          "unemploymentPct": 6.364104959061324,
+          "medianIncome": 88942,
+          "povertyPct": 11.139642638489695,
+          "vacancyPct": 4.303419618130099,
+          "medianHomeValue": 254000,
+          "medianRent": 1410,
+          "coverage": 100,
+          "reliability": 81,
+          "sampleGeoids": [
+            "42101005400",
+            "42101005500",
+            "42101005600",
+            "42045402900"
+          ],
+          "factors": {
+            "demographic": 51,
+            "economic": 45,
+            "education": 34,
+            "housing": 91
+          },
+          "acsCompetency": 93
+        },
+        {
+          "id": "philadelphia-west",
+          "name": "West Corridor",
+          "tractCount": 306,
+          "population": 1246782,
+          "lat": 39.98807317434002,
+          "lng": -75.51705525625165,
+          "medianAge": 40.8,
+          "bachelorsPct": 51.557340093995535,
+          "unemploymentPct": 5.006392262673283,
+          "medianIncome": 120273,
+          "povertyPct": 7.23145920656576,
+          "vacancyPct": 4.231298137118285,
+          "medianHomeValue": 442200,
+          "medianRent": 1599,
+          "coverage": 100,
+          "reliability": 82,
+          "sampleGeoids": [
+            "42091203402",
+            "42091203403",
+            "42091204103",
+            "42091204200"
+          ],
+          "factors": {
+            "demographic": 26,
+            "economic": 80,
+            "education": 89,
+            "housing": 77
+          },
+          "acsCompetency": 94
+        }
+      ],
+      "acsCompetency": 93,
+      "coverage": 100,
+      "reliability": 79
+    },
+    {
+      "id": "phoenix",
+      "label": "Phoenix",
+      "center": {
+        "lat": 33.47,
+        "lng": -112.08
+      },
+      "zoom": 9,
+      "countyCount": 2,
+      "tractCount": 1088,
+      "clusters": [
+        {
+          "id": "phoenix-central",
+          "name": "Central Core",
+          "tractCount": 305,
+          "population": 1315288,
+          "lat": 33.48515988543958,
+          "lng": -112.09483061128056,
+          "medianAge": 32.7,
+          "bachelorsPct": 27.741083005563702,
+          "unemploymentPct": 5.702038855301668,
+          "medianIncome": 72573,
+          "povertyPct": 17.402797997647212,
+          "vacancyPct": 6.856365173969033,
+          "medianHomeValue": 343000,
+          "medianRent": 1518,
+          "coverage": 100,
+          "reliability": 76,
+          "sampleGeoids": [
+            "04013082008",
+            "04013082009",
+            "04013082010",
+            "04013082018"
+          ],
+          "factors": {
+            "demographic": 98,
+            "economic": 24,
+            "education": 28,
+            "housing": 34
+          },
+          "acsCompetency": 92
+        },
+        {
+          "id": "phoenix-north",
+          "name": "North Arc",
+          "tractCount": 181,
+          "population": 833569,
+          "lat": 33.68404100998237,
+          "lng": -112.10302990460296,
+          "medianAge": 40.5,
+          "bachelorsPct": 43.55960598815883,
+          "unemploymentPct": 4.145633064807818,
+          "medianIncome": 106708,
+          "povertyPct": 7.783014645786986,
+          "vacancyPct": 6.384667014667557,
+          "medianHomeValue": 526200,
+          "medianRent": 1945,
+          "coverage": 100,
+          "reliability": 83,
+          "sampleGeoids": [
+            "04013010103",
+            "04013030401",
+            "04013030402",
+            "04013040532"
+          ],
+          "factors": {
+            "demographic": 30,
+            "economic": 81,
+            "education": 77,
+            "housing": 39
+          },
+          "acsCompetency": 94
+        },
+        {
+          "id": "phoenix-east",
+          "name": "East Corridor",
+          "tractCount": 350,
+          "population": 1597261,
+          "lat": 33.35353880004583,
+          "lng": -111.71768075323949,
+          "medianAge": 37.4,
+          "bachelorsPct": 38.988838812532215,
+          "unemploymentPct": 4.332201863085358,
+          "medianIncome": 101198,
+          "povertyPct": 8.838908122511352,
+          "vacancyPct": 8.089793955975766,
+          "medianHomeValue": 457300,
+          "medianRent": 1867,
+          "coverage": 100,
+          "reliability": 81,
+          "sampleGeoids": [
+            "04013010102",
+            "04013010104",
+            "04013216806",
+            "04013216807"
+          ],
+          "factors": {
+            "demographic": 67,
+            "economic": 75,
+            "education": 67,
+            "housing": 41
+          },
+          "acsCompetency": 93
+        },
+        {
+          "id": "phoenix-south",
+          "name": "South Arc",
+          "tractCount": 95,
+          "population": 462668,
+          "lat": 33.12929603333276,
+          "lng": -111.89161517697357,
+          "medianAge": 38.4,
+          "bachelorsPct": 36.82131410340025,
+          "unemploymentPct": 5.388986444822081,
+          "medianIncome": 95068,
+          "povertyPct": 10.403279168231764,
+          "vacancyPct": 7.676187787905842,
+          "medianHomeValue": 400000,
+          "medianRent": 1871,
+          "coverage": 100,
+          "reliability": 80,
+          "sampleGeoids": [
+            "04013116611",
+            "04013116618",
+            "04013116619",
+            "04013116708"
+          ],
+          "factors": {
+            "demographic": 57,
+            "economic": 58,
+            "education": 61,
+            "housing": 42
+          },
+          "acsCompetency": 93
+        },
+        {
+          "id": "phoenix-west",
+          "name": "West Corridor",
+          "tractCount": 157,
+          "population": 819903,
+          "lat": 33.53061843596134,
+          "lng": -112.39180802180259,
+          "medianAge": 36.1,
+          "bachelorsPct": 25.882516775575148,
+          "unemploymentPct": 4.288183180071668,
+          "medianIncome": 92786,
+          "povertyPct": 9.13479162969987,
+          "vacancyPct": 6.764717151880369,
+          "medianHomeValue": 402600,
+          "medianRent": 1938,
+          "coverage": 100,
+          "reliability": 81,
+          "sampleGeoids": [
+            "04013040502",
+            "04013040506",
+            "04013040507",
+            "04013040512"
+          ],
+          "factors": {
+            "demographic": 77,
+            "economic": 70,
+            "education": 21,
+            "housing": 40
+          },
+          "acsCompetency": 93
+        }
+      ],
+      "acsCompetency": 93,
+      "coverage": 100,
+      "reliability": 80
+    },
+    {
+      "id": "ocala",
+      "label": "Ocala",
+      "center": {
+        "lat": 29.18,
+        "lng": -82.14
+      },
+      "zoom": 10,
+      "countyCount": 1,
+      "tractCount": 91,
+      "clusters": [
+        {
+          "id": "ocala-central",
+          "name": "Central Core",
+          "tractCount": 26,
+          "population": 120090,
+          "lat": 29.185966893996174,
+          "lng": -82.12870010117412,
+          "medianAge": 40.5,
+          "bachelorsPct": 27.710020244947977,
+          "unemploymentPct": 4.102561433859879,
+          "medianIncome": 61779,
+          "povertyPct": 17.167994472812204,
+          "vacancyPct": 10.676482734273007,
+          "medianHomeValue": 244200,
+          "medianRent": 1218,
+          "coverage": 100,
+          "reliability": 76,
+          "sampleGeoids": [
+            "12083000302",
+            "12083001208",
+            "12083001301",
+            "12083001401"
+          ],
+          "factors": {
+            "demographic": 30,
+            "economic": 30,
+            "education": 27,
+            "housing": 42
+          },
+          "acsCompetency": 92
+        },
+        {
+          "id": "ocala-north",
+          "name": "North Arc",
+          "tractCount": 9,
+          "population": 27801,
+          "lat": 29.370916533577933,
+          "lng": -82.15127971475846,
+          "medianAge": 44.4,
+          "bachelorsPct": 17.271040237380372,
+          "unemploymentPct": 4.3456333854961295,
+          "medianIncome": 60057,
+          "povertyPct": 18.48779995335076,
+          "vacancyPct": 18.41963481794107,
+          "medianHomeValue": 234200,
+          "medianRent": 0,
+          "coverage": 100,
+          "reliability": 55,
+          "sampleGeoids": [
+            "12083000101",
+            "12083000102",
+            "12083000201",
+            "12083000202"
+          ],
+          "factors": {
+            "demographic": 13,
+            "economic": 25,
+            "education": 2,
+            "housing": 31
+          },
+          "acsCompetency": 84
+        },
+        {
+          "id": "ocala-east",
+          "name": "East Corridor",
+          "tractCount": 18,
+          "population": 73966,
+          "lat": 29.13393868196198,
+          "lng": -81.95498906795012,
+          "medianAge": 40.7,
+          "bachelorsPct": 16.326632716271458,
+          "unemploymentPct": 4.969766616095471,
+          "medianIncome": 57992,
+          "povertyPct": 15.761166308031637,
+          "vacancyPct": 13.4685151585463,
+          "medianHomeValue": 199100,
+          "medianRent": 1308,
+          "coverage": 100,
+          "reliability": 72,
+          "sampleGeoids": [
+            "12083000501",
+            "12083000502",
+            "12083000601",
+            "12083000604"
+          ],
+          "factors": {
+            "demographic": 29,
+            "economic": 25,
+            "education": 1,
+            "housing": 50
+          },
+          "acsCompetency": 90
+        },
+        {
+          "id": "ocala-south",
+          "name": "South Arc",
+          "tractCount": 26,
+          "population": 119146,
+          "lat": 29.026160710808583,
+          "lng": -82.11958657529418,
+          "medianAge": 45.1,
+          "bachelorsPct": 21.513677033676075,
+          "unemploymentPct": 5.285221375490594,
+          "medianIncome": 66330,
+          "povertyPct": 10.22276675131808,
+          "vacancyPct": 10.114223014401816,
+          "medianHomeValue": 258500,
+          "medianRent": 1481,
+          "coverage": 100,
+          "reliability": 78,
+          "sampleGeoids": [
+            "12083000706",
+            "12083000707",
+            "12083000803",
+            "12083000804"
+          ],
+          "factors": {
+            "demographic": 11,
+            "economic": 39,
+            "education": 5,
+            "housing": 41
+          },
+          "acsCompetency": 92
+        },
+        {
+          "id": "ocala-west",
+          "name": "West Corridor",
+          "tractCount": 12,
+          "population": 59075,
+          "lat": 29.124043351671606,
+          "lng": -82.32845610664411,
+          "medianAge": 50.2,
+          "bachelorsPct": 27.01430449091851,
+          "unemploymentPct": 6.504855907324963,
+          "medianIncome": 58743,
+          "povertyPct": 13.84153426262934,
+          "vacancyPct": 10.279932497628474,
+          "medianHomeValue": 264600,
+          "medianRent": 1297,
+          "coverage": 100,
+          "reliability": 77,
+          "sampleGeoids": [
+            "12083002505",
+            "12083002602",
+            "12083002604",
+            "12083002605"
+          ],
+          "factors": {
+            "demographic": 7,
+            "economic": 17,
+            "education": 26,
+            "housing": 30
+          },
+          "acsCompetency": 92
+        }
+      ],
+      "acsCompetency": 91,
+      "coverage": 100,
+      "reliability": 75
+    },
+    {
+      "id": "myrtle-beach",
+      "label": "Myrtle Beach",
+      "center": {
+        "lat": 33.72,
+        "lng": -78.89
+      },
+      "zoom": 9,
+      "countyCount": 2,
+      "tractCount": 120,
+      "clusters": [
+        {
+          "id": "myrtle-beach-central",
+          "name": "Central Core",
+          "tractCount": 34,
+          "population": 177264,
+          "lat": 33.71960889859193,
+          "lng": -78.93920673289557,
+          "medianAge": 44.1,
+          "bachelorsPct": 31.375228495901403,
+          "unemploymentPct": 5.0021045384525635,
+          "medianIncome": 73827,
+          "povertyPct": 13.801458112963363,
+          "vacancyPct": 16.487964861490795,
+          "medianHomeValue": 317800,
+          "medianRent": 1422,
+          "coverage": 100,
+          "reliability": 80,
+          "sampleGeoids": [
+            "45051050102",
+            "45051050200",
+            "45051050303",
+            "45051050401"
+          ],
+          "factors": {
+            "demographic": 14,
+            "economic": 39,
+            "education": 37,
+            "housing": 36
+          },
+          "acsCompetency": 93
+        },
+        {
+          "id": "myrtle-beach-north",
+          "name": "North Arc",
+          "tractCount": 17,
+          "population": 75095,
+          "lat": 33.96321788135029,
+          "lng": -78.94020207204208,
+          "medianAge": 44.6,
+          "bachelorsPct": 17.324184342717388,
+          "unemploymentPct": 5.562073949109826,
+          "medianIncome": 65046,
+          "povertyPct": 14.355150983230285,
+          "vacancyPct": 11.208657375714617,
+          "medianHomeValue": 227600,
+          "medianRent": 897,
+          "coverage": 100,
+          "reliability": 75,
+          "sampleGeoids": [
+            "45051010100",
+            "45051020100",
+            "45051020201",
+            "45051020202"
+          ],
+          "factors": {
+            "demographic": 12,
+            "economic": 24,
+            "education": 3,
+            "housing": 72
+          },
+          "acsCompetency": 91
+        },
+        {
+          "id": "myrtle-beach-east",
+          "name": "East Corridor",
+          "tractCount": 52,
+          "population": 196290,
+          "lat": 34.00463781776963,
+          "lng": -78.31807700978145,
+          "medianAge": 60.4,
+          "bachelorsPct": 33.38464184756084,
+          "unemploymentPct": 4.605064594964922,
+          "medianIncome": 74539,
+          "povertyPct": 9.174703109300712,
+          "vacancyPct": 26.255852188251918,
+          "medianHomeValue": 333500,
+          "medianRent": 1390,
+          "coverage": 100,
+          "reliability": 80,
+          "sampleGeoids": [
+            "45051040102",
+            "45051040103",
+            "45051040104",
+            "45051040105"
+          ],
+          "factors": {
+            "demographic": 1,
+            "economic": 56,
+            "education": 44,
+            "housing": 34
+          },
+          "acsCompetency": 93
+        },
+        {
+          "id": "myrtle-beach-south",
+          "name": "South Arc",
+          "tractCount": 5,
+          "population": 15753,
+          "lat": 33.59486221989462,
+          "lng": -79.00256905033962,
+          "medianAge": 58.2,
+          "bachelorsPct": 24.091878356998013,
+          "unemploymentPct": 6.060754435241384,
+          "medianIncome": 64138,
+          "povertyPct": 17.656937683622825,
+          "vacancyPct": 33.50047630852888,
+          "medianHomeValue": 251300,
+          "medianRent": 1412,
+          "coverage": 100,
+          "reliability": 82,
+          "sampleGeoids": [
+            "45051051202",
+            "45051051301",
+            "45051051302",
+            "45051051405"
+          ],
+          "factors": {
+            "demographic": 3,
+            "economic": 15,
+            "education": 14,
+            "housing": 35
+          },
+          "acsCompetency": 94
+        },
+        {
+          "id": "myrtle-beach-west",
+          "name": "West Corridor",
+          "tractCount": 12,
+          "population": 71182,
+          "lat": 33.737993323452564,
+          "lng": -79.09624550167176,
+          "medianAge": 48.3,
+          "bachelorsPct": 21.60225418987005,
+          "unemploymentPct": 4.404628750293129,
+          "medianIncome": 67188,
+          "povertyPct": 13.397267494865796,
+          "vacancyPct": 7.866434505533879,
+          "medianHomeValue": 244400,
+          "medianRent": 1155,
+          "coverage": 100,
+          "reliability": 80,
+          "sampleGeoids": [
+            "45051051603",
+            "45051051605",
+            "45051051608",
+            "45051051609"
+          ],
+          "factors": {
+            "demographic": 9,
+            "economic": 41,
+            "education": 6,
+            "housing": 65
+          },
+          "acsCompetency": 93
+        }
+      ],
+      "acsCompetency": 93,
+      "coverage": 100,
+      "reliability": 79
+    },
+    {
+      "id": "spartanburg",
+      "label": "Spartanburg",
+      "center": {
+        "lat": 34.97,
+        "lng": -81.95
+      },
+      "zoom": 10,
+      "countyCount": 1,
+      "tractCount": 87,
+      "clusters": [
+        {
+          "id": "spartanburg-central",
+          "name": "Central Core",
+          "tractCount": 25,
+          "population": 75940,
+          "lat": 34.96203614037398,
+          "lng": -81.9420363398736,
+          "medianAge": 34.1,
+          "bachelorsPct": 22.30529579960065,
+          "unemploymentPct": 6.749029911368775,
+          "medianIncome": 49019,
+          "povertyPct": 25.081771555445947,
+          "vacancyPct": 11.932164383116287,
+          "medianHomeValue": 156400,
+          "medianRent": 1087,
+          "coverage": 100,
+          "reliability": 73,
+          "sampleGeoids": [
+            "45083020301",
+            "45083020400",
+            "45083020500",
+            "45083020601"
+          ],
+          "factors": {
+            "demographic": 93,
+            "economic": 6,
+            "education": 9,
+            "housing": 59
+          },
+          "acsCompetency": 91
+        },
+        {
+          "id": "spartanburg-north",
+          "name": "North Arc",
+          "tractCount": 15,
+          "population": 72667,
+          "lat": 35.08310651189674,
+          "lng": -81.9927204033468,
+          "medianAge": 38.1,
+          "bachelorsPct": 21.861343602435515,
+          "unemploymentPct": 3.444484097012527,
+          "medianIncome": 68596,
+          "povertyPct": 13.852104134904915,
+          "vacancyPct": 5.57758221845237,
+          "medianHomeValue": 251700,
+          "medianRent": 1024,
+          "coverage": 100,
+          "reliability": 77,
+          "sampleGeoids": [
+            "45083021803",
+            "45083022303",
+            "45083022304",
+            "45083022306"
+          ],
+          "factors": {
+            "demographic": 61,
+            "economic": 46,
+            "education": 7,
+            "housing": 71
+          },
+          "acsCompetency": 92
+        },
+        {
+          "id": "spartanburg-east",
+          "name": "East Corridor",
+          "tractCount": 9,
+          "population": 25007,
+          "lat": 34.95054259407366,
+          "lng": -81.82534514735875,
+          "medianAge": 42.8,
+          "bachelorsPct": 24.138723022738287,
+          "unemploymentPct": 4.8706635895992765,
+          "medianIncome": 52841,
+          "povertyPct": 18.61767681173866,
+          "vacancyPct": 10.486274078836747,
+          "medianHomeValue": 171400,
+          "medianRent": 941,
+          "coverage": 100,
+          "reliability": 77,
+          "sampleGeoids": [
+            "45083021401",
+            "45083022004",
+            "45083022101",
+            "45083022102"
+          ],
+          "factors": {
+            "demographic": 19,
+            "economic": 20,
+            "education": 15,
+            "housing": 70
+          },
+          "acsCompetency": 92
+        },
+        {
+          "id": "spartanburg-south",
+          "name": "South Arc",
+          "tractCount": 14,
+          "population": 58233,
+          "lat": 34.82816692511119,
+          "lng": -81.97439893187712,
+          "medianAge": 40.1,
+          "bachelorsPct": 24.86957149525467,
+          "unemploymentPct": 5.082347971435409,
+          "medianIncome": 72837,
+          "povertyPct": 9.316614237235044,
+          "vacancyPct": 8.201042733722097,
+          "medianHomeValue": 235700,
+          "medianRent": 1045,
+          "coverage": 100,
+          "reliability": 76,
+          "sampleGeoids": [
+            "45083022003",
+            "45083022005",
+            "45083022006",
+            "45083022007"
+          ],
+          "factors": {
+            "demographic": 38,
+            "economic": 48,
+            "education": 18,
+            "housing": 82
+          },
+          "acsCompetency": 92
+        },
+        {
+          "id": "spartanburg-west",
+          "name": "West Corridor",
+          "tractCount": 24,
+          "population": 116005,
+          "lat": 34.954961176242406,
+          "lng": -82.120949593121,
+          "medianAge": 37.5,
+          "bachelorsPct": 28.271188454188827,
+          "unemploymentPct": 3.0729080432080815,
+          "medianIncome": 78056,
+          "povertyPct": 10.585773628026311,
+          "vacancyPct": 7.1736836917456035,
+          "medianHomeValue": 259100,
+          "medianRent": 1193,
+          "coverage": 100,
+          "reliability": 77,
+          "sampleGeoids": [
+            "45083021902",
+            "45083021903",
+            "45083022701",
+            "45083022702"
+          ],
+          "factors": {
+            "demographic": 65,
+            "economic": 63,
+            "education": 30,
+            "housing": 76
+          },
+          "acsCompetency": 92
+        }
+      ],
+      "acsCompetency": 92,
+      "coverage": 100,
+      "reliability": 76
+    },
+    {
+      "id": "lakeland",
+      "label": "Lakeland",
+      "center": {
+        "lat": 28.05,
+        "lng": -81.95
+      },
+      "zoom": 10,
+      "countyCount": 1,
+      "tractCount": 173,
+      "clusters": [
+        {
+          "id": "lakeland-central",
+          "name": "Central Core",
+          "tractCount": 49,
+          "population": 203071,
+          "lat": 28.044599558774998,
+          "lng": -81.95644232608299,
+          "medianAge": 40.3,
+          "bachelorsPct": 25.763328071118917,
+          "unemploymentPct": 4.58972944366338,
+          "medianIncome": 66250,
+          "povertyPct": 14.818821031455657,
+          "vacancyPct": 12.076495822874657,
+          "medianHomeValue": 248300,
+          "medianRent": 1350,
+          "coverage": 100,
+          "reliability": 77,
+          "sampleGeoids": [
+            "12105010300",
+            "12105010401",
+            "12105010402",
+            "12105010501"
+          ],
+          "factors": {
+            "demographic": 35,
+            "economic": 36,
+            "education": 20,
+            "housing": 47
+          },
+          "acsCompetency": 92
+        },
+        {
+          "id": "lakeland-north",
+          "name": "North Arc",
+          "tractCount": 18,
+          "population": 72243,
+          "lat": 28.215511911880732,
+          "lng": -81.87819864208298,
+          "medianAge": 38.4,
+          "bachelorsPct": 22.95433477840154,
+          "unemploymentPct": 6.172261011308271,
+          "medianIncome": 76375,
+          "povertyPct": 11.90829049277983,
+          "vacancyPct": 14.201022863085573,
+          "medianHomeValue": 295400,
+          "medianRent": 1709,
+          "coverage": 100,
+          "reliability": 81,
+          "sampleGeoids": [
+            "12105011605",
+            "12105012125",
+            "12105012128",
+            "12105012130"
+          ],
+          "factors": {
+            "demographic": 57,
+            "economic": 35,
+            "education": 11,
+            "housing": 38
+          },
+          "acsCompetency": 93
+        },
+        {
+          "id": "lakeland-east",
+          "name": "East Corridor",
+          "tractCount": 80,
+          "population": 409301,
+          "lat": 28.05607012418734,
+          "lng": -81.64729264221198,
+          "medianAge": 38.3,
+          "bachelorsPct": 21.91853029540907,
+          "unemploymentPct": 5.1743180092965435,
+          "medianIncome": 65226,
+          "povertyPct": 14.950319363057455,
+          "vacancyPct": 16.551099009639522,
+          "medianHomeValue": 266600,
+          "medianRent": 1289,
+          "coverage": 100,
+          "reliability": 77,
+          "sampleGeoids": [
+            "12105011604",
+            "12105012404",
+            "12105012405",
+            "12105012408"
+          ],
+          "factors": {
+            "demographic": 59,
+            "economic": 27,
+            "education": 8,
+            "housing": 36
+          },
+          "acsCompetency": 92
+        },
+        {
+          "id": "lakeland-south",
+          "name": "South Arc",
+          "tractCount": 26,
+          "population": 106079,
+          "lat": 27.904111029044394,
+          "lng": -81.90601704437259,
+          "medianAge": 37.8,
+          "bachelorsPct": 23.840774800236755,
+          "unemploymentPct": 3.719816729646303,
+          "medianIncome": 78859,
+          "povertyPct": 14.14714953382863,
+          "vacancyPct": 9.035483434690978,
+          "medianHomeValue": 283800,
+          "medianRent": 1326,
+          "coverage": 100,
+          "reliability": 77,
+          "sampleGeoids": [
+            "12105011832",
+            "12105011835",
+            "12105011837",
+            "12105011838"
+          ],
+          "factors": {
+            "demographic": 63,
+            "economic": 53,
+            "education": 13,
+            "housing": 65
+          },
+          "acsCompetency": 92
+        }
+      ],
+      "acsCompetency": 92,
+      "coverage": 100,
+      "reliability": 77
+    },
+    {
+      "id": "punta-gorda",
+      "label": "Punta Gorda",
+      "center": {
+        "lat": 26.94,
+        "lng": -82.05
+      },
+      "zoom": 10,
+      "countyCount": 1,
+      "tractCount": 46,
+      "clusters": [
+        {
+          "id": "punta-gorda-central",
+          "name": "Central Core",
+          "tractCount": 13,
+          "population": 53720,
+          "lat": 26.94761100428146,
+          "lng": -82.06114111317945,
+          "medianAge": 56.9,
+          "bachelorsPct": 30.201671268575705,
+          "unemploymentPct": 5.225071925429414,
+          "medianIncome": 72080,
+          "povertyPct": 11.610351817227505,
+          "vacancyPct": 19.911387170684556,
+          "medianHomeValue": 270800,
+          "medianRent": 1505,
+          "coverage": 100,
+          "reliability": 79,
+          "sampleGeoids": [
+            "12015010301",
+            "12015010302",
+            "12015010401",
+            "12015010402"
+          ],
+          "factors": {
+            "demographic": 4,
+            "economic": 39,
+            "education": 33,
+            "housing": 44
+          },
+          "acsCompetency": 93
+        },
+        {
+          "id": "punta-gorda-north",
+          "name": "North Arc",
+          "tractCount": 8,
+          "population": 40135,
+          "lat": 27.007475385573684,
+          "lng": -82.05875284415099,
+          "medianAge": 56.6,
+          "bachelorsPct": 22.954171805046595,
+          "unemploymentPct": 6.072550382441218,
+          "medianIncome": 66389,
+          "povertyPct": 6.874852983623021,
+          "vacancyPct": 14.602918417571201,
+          "medianHomeValue": 333600,
+          "medianRent": 1584,
+          "coverage": 100,
+          "reliability": 82,
+          "sampleGeoids": [
+            "12015020101",
+            "12015020103",
+            "12015020104",
+            "12015020203"
+          ],
+          "factors": {
+            "demographic": 5,
+            "economic": 44,
+            "education": 10,
+            "housing": 17
+          },
+          "acsCompetency": 94
+        },
+        {
+          "id": "punta-gorda-east",
+          "name": "East Corridor",
+          "tractCount": 2,
+          "population": 13196,
+          "lat": 26.929620794180057,
+          "lng": -81.84681317065778,
+          "medianAge": 45.9,
+          "bachelorsPct": 28.657603610114013,
+          "unemploymentPct": 5.096050373979433,
+          "medianIncome": 126087,
+          "povertyPct": 7.713155375967612,
+          "vacancyPct": 20.965529840805512,
+          "medianHomeValue": 475400,
+          "medianRent": 1867,
+          "coverage": 100,
+          "reliability": 84,
+          "sampleGeoids": [
+            "12015010100",
+            "12015010200"
+          ],
+          "factors": {
+            "demographic": 10,
+            "economic": 79,
+            "education": 32,
+            "housing": 57
+          },
+          "acsCompetency": 94
+        },
+        {
+          "id": "punta-gorda-south",
+          "name": "South Arc",
+          "tractCount": 3,
+          "population": 9564,
+          "lat": 26.834685142199916,
+          "lng": -82.00582918235048,
+          "medianAge": 62.5,
+          "bachelorsPct": 23.183890364371134,
+          "unemploymentPct": 5.718389353020735,
+          "medianIncome": 65927,
+          "povertyPct": 10.34086156419908,
+          "vacancyPct": 25.20220071543751,
+          "medianHomeValue": 328400,
+          "medianRent": 1052,
+          "coverage": 100,
+          "reliability": 70,
+          "sampleGeoids": [
+            "12015010504",
+            "12015010505",
+            "12015010506"
+          ],
+          "factors": {
+            "demographic": 0,
+            "economic": 32,
+            "education": 12,
+            "housing": 35
+          },
+          "acsCompetency": 90
+        },
+        {
+          "id": "punta-gorda-west",
+          "name": "West Corridor",
+          "tractCount": 20,
+          "population": 84449,
+          "lat": 26.943300818837404,
+          "lng": -82.2190656177101,
+          "medianAge": 60,
+          "bachelorsPct": 26.16595797456236,
+          "unemploymentPct": 4.806388498084935,
+          "medianIncome": 68750,
+          "povertyPct": 8.405415145222731,
+          "vacancyPct": 23.814713092106494,
+          "medianHomeValue": 328200,
+          "medianRent": 1363,
+          "coverage": 100,
+          "reliability": 77,
+          "sampleGeoids": [
+            "12015020301",
+            "12015020302",
+            "12015020303",
+            "12015020401"
+          ],
+          "factors": {
+            "demographic": 2,
+            "economic": 52,
+            "education": 22,
+            "housing": 27
+          },
+          "acsCompetency": 92
+        }
+      ],
+      "acsCompetency": 93,
+      "coverage": 100,
+      "reliability": 79
+    },
+    {
+      "id": "huntsville",
+      "label": "Huntsville",
+      "center": {
+        "lat": 34.72,
+        "lng": -86.6
+      },
+      "zoom": 10,
+      "countyCount": 2,
+      "tractCount": 118,
+      "clusters": [
+        {
+          "id": "huntsville-central",
+          "name": "Central Core",
+          "tractCount": 34,
+          "population": 109583,
+          "lat": 34.73116414909247,
+          "lng": -86.59933765593203,
+          "medianAge": 38.5,
+          "bachelorsPct": 35.050101842482434,
+          "unemploymentPct": 5.637323882775107,
+          "medianIncome": 47440,
+          "povertyPct": 18.290703362019993,
+          "vacancyPct": 10.494708710694177,
+          "medianHomeValue": 157100,
+          "medianRent": 1065,
+          "coverage": 100,
+          "reliability": 76,
+          "sampleGeoids": [
+            "01089000301",
+            "01089000302",
+            "01089000501",
+            "01089000502"
+          ],
+          "factors": {
+            "demographic": 56,
+            "economic": 12,
+            "education": 54,
+            "housing": 54
+          },
+          "acsCompetency": 92
+        },
+        {
+          "id": "huntsville-north",
+          "name": "North Arc",
+          "tractCount": 20,
+          "population": 99405,
+          "lat": 34.86636819777677,
+          "lng": -86.62213963633621,
+          "medianAge": 40,
+          "bachelorsPct": 34.88974282218655,
+          "unemploymentPct": 3.6258315914561883,
+          "medianIncome": 86266,
+          "povertyPct": 9.551890803260774,
+          "vacancyPct": 8.229091103823773,
+          "medianHomeValue": 254300,
+          "medianRent": 1118,
+          "coverage": 100,
+          "reliability": 78,
+          "sampleGeoids": [
+            "01089000203",
+            "01089000403",
+            "01089010102",
+            "01089010302"
+          ],
+          "factors": {
+            "demographic": 39,
+            "economic": 67,
+            "education": 52,
+            "housing": 89
+          },
+          "acsCompetency": 92
+        },
+        {
+          "id": "huntsville-east",
+          "name": "East Corridor",
+          "tractCount": 9,
+          "population": 45483,
+          "lat": 34.70432617241607,
+          "lng": -86.44189516522655,
+          "medianAge": 43.1,
+          "bachelorsPct": 46.765269756761576,
+          "unemploymentPct": 2.7458091999026726,
+          "medianIncome": 100719,
+          "povertyPct": 6.478663485760456,
+          "vacancyPct": 5.010136079437926,
+          "medianHomeValue": 303100,
+          "medianRent": 1098,
+          "coverage": 100,
+          "reliability": 81,
+          "sampleGeoids": [
+            "01089010101",
+            "01089010200",
+            "01089010802",
+            "01089010902"
+          ],
+          "factors": {
+            "demographic": 15,
+            "economic": 88,
+            "education": 82,
+            "housing": 95
+          },
+          "acsCompetency": 93
+        },
+        {
+          "id": "huntsville-south",
+          "name": "South Arc",
+          "tractCount": 12,
+          "population": 44238,
+          "lat": 34.618825853338755,
+          "lng": -86.55137371716624,
+          "medianAge": 41.5,
+          "bachelorsPct": 54.9014612085592,
+          "unemploymentPct": 2.9893931530954228,
+          "medianIncome": 105201,
+          "povertyPct": 6.92367206708794,
+          "vacancyPct": 5.634218557645468,
+          "medianHomeValue": 302700,
+          "medianRent": 1325,
+          "coverage": 100,
+          "reliability": 81,
+          "sampleGeoids": [
+            "01089002721",
+            "01089002722",
+            "01089002801",
+            "01089002803"
+          ],
+          "factors": {
+            "demographic": 24,
+            "economic": 90,
+            "education": 95,
+            "housing": 94
+          },
+          "acsCompetency": 93
+        },
+        {
+          "id": "huntsville-west",
+          "name": "West Corridor",
+          "tractCount": 43,
+          "population": 218242,
+          "lat": 34.75830609415237,
+          "lng": -86.83304536867331,
+          "medianAge": 38.8,
+          "bachelorsPct": 46.20290006278175,
+          "unemploymentPct": 2.9702606023618414,
+          "medianIncome": 94395,
+          "povertyPct": 8.223415884227594,
+          "vacancyPct": 6.052529290908097,
+          "medianHomeValue": 328500,
+          "medianRent": 1427,
+          "coverage": 100,
+          "reliability": 80,
+          "sampleGeoids": [
+            "01089001401",
+            "01089001403",
+            "01089010503",
+            "01089010612"
+          ],
+          "factors": {
+            "demographic": 53,
+            "economic": 81,
+            "education": 81,
+            "housing": 76
+          },
+          "acsCompetency": 93
+        }
+      ],
+      "acsCompetency": 93,
+      "coverage": 100,
+      "reliability": 79
+    },
+    {
+      "id": "wilmington",
+      "label": "Wilmington",
+      "center": {
+        "lat": 34.23,
+        "lng": -77.9
+      },
+      "zoom": 10,
+      "countyCount": 3,
+      "tractCount": 111,
+      "clusters": [
+        {
+          "id": "wilmington-central",
+          "name": "Central Core",
+          "tractCount": 32,
+          "population": 123187,
+          "lat": 34.22025002719443,
+          "lng": -77.89102464261653,
+          "medianAge": 37.4,
+          "bachelorsPct": 42.524992710937866,
+          "unemploymentPct": 4.333104573946465,
+          "medianIncome": 66250,
+          "povertyPct": 15.879587754915663,
+          "vacancyPct": 8.501178628124357,
+          "medianHomeValue": 309600,
+          "medianRent": 1399,
+          "coverage": 100,
+          "reliability": 79,
+          "sampleGeoids": [
+            "37129010100",
+            "37129010200",
+            "37129010300",
+            "37129010400"
+          ],
+          "factors": {
+            "demographic": 67,
+            "economic": 36,
+            "education": 73,
+            "housing": 30
+          },
+          "acsCompetency": 93
+        },
+        {
+          "id": "wilmington-north",
+          "name": "North Arc",
+          "tractCount": 13,
+          "population": 57608,
+          "lat": 34.437014779197334,
+          "lng": -77.91347740417997,
+          "medianAge": 39.5,
+          "bachelorsPct": 24.56079688123901,
+          "unemploymentPct": 5.878662077236072,
+          "medianIncome": 66118,
+          "povertyPct": 13.639093772200539,
+          "vacancyPct": 10.859646642204059,
+          "medianHomeValue": 225600,
+          "medianRent": 902,
+          "coverage": 100,
+          "reliability": 76,
+          "sampleGeoids": [
+            "37129011503",
+            "37129011504",
+            "37129011608",
+            "37129011610"
+          ],
+          "factors": {
+            "demographic": 44,
+            "economic": 26,
+            "education": 16,
+            "housing": 75
+          },
+          "acsCompetency": 92
+        },
+        {
+          "id": "wilmington-east",
+          "name": "East Corridor",
+          "tractCount": 10,
+          "population": 62398,
+          "lat": 34.32431425927113,
+          "lng": -77.73092755777428,
+          "medianAge": 41.8,
+          "bachelorsPct": 51.34671858904793,
+          "unemploymentPct": 5.129639934578537,
+          "medianIncome": 111705,
+          "povertyPct": 5.397583133169588,
+          "vacancyPct": 11.97392307567694,
+          "medianHomeValue": 454900,
+          "medianRent": 2007,
+          "coverage": 100,
+          "reliability": 84,
+          "sampleGeoids": [
+            "37129011611",
+            "37129011612",
+            "37129011703",
+            "37129011705"
+          ],
+          "factors": {
+            "demographic": 22,
+            "economic": 78,
+            "education": 86,
+            "housing": 43
+          },
+          "acsCompetency": 94
+        },
+        {
+          "id": "wilmington-south",
+          "name": "South Arc",
+          "tractCount": 24,
+          "population": 91045,
+          "lat": 34.05276822889779,
+          "lng": -77.97483546652752,
+          "medianAge": 48.9,
+          "bachelorsPct": 44.76965288877071,
+          "unemploymentPct": 4.917399741596808,
+          "medianIncome": 87688,
+          "povertyPct": 8.138332570091892,
+          "vacancyPct": 20.335593133768178,
+          "medianHomeValue": 428200,
+          "medianRent": 1425,
+          "coverage": 100,
+          "reliability": 80,
+          "sampleGeoids": [
+            "37129011800",
+            "37129012008",
+            "37129012103",
+            "37129012106"
+          ],
+          "factors": {
+            "demographic": 8,
+            "economic": 64,
+            "education": 79,
+            "housing": 37
+          },
+          "acsCompetency": 93
+        },
+        {
+          "id": "wilmington-west",
+          "name": "West Corridor",
+          "tractCount": 32,
+          "population": 119109,
+          "lat": 34.079691272699804,
+          "lng": -78.25288031466975,
+          "medianAge": 55.4,
+          "bachelorsPct": 31.165944659394736,
+          "unemploymentPct": 4.234959811329706,
+          "medianIncome": 76357,
+          "povertyPct": 9.788861053783581,
+          "vacancyPct": 19.084272500544177,
+          "medianHomeValue": 313400,
+          "medianRent": 1429,
+          "coverage": 100,
+          "reliability": 79,
+          "sampleGeoids": [
+            "37019020101",
+            "37019020102",
+            "37019020105",
+            "37019020106"
+          ],
+          "factors": {
+            "demographic": 6,
+            "economic": 56,
+            "education": 35,
+            "housing": 38
+          },
+          "acsCompetency": 93
+        }
+      ],
+      "acsCompetency": 93,
+      "coverage": 100,
+      "reliability": 80
+    },
+    {
+      "id": "st-george",
+      "label": "St. George",
+      "center": {
+        "lat": 37.08,
+        "lng": -113.58
+      },
+      "zoom": 10,
+      "countyCount": 1,
+      "tractCount": 35,
+      "clusters": [
+        {
+          "id": "st-george-central",
+          "name": "Central Core",
+          "tractCount": 10,
+          "population": 49925,
+          "lat": 37.095022473710564,
+          "lng": -113.57157160240361,
+          "medianAge": 42.1,
+          "bachelorsPct": 33.090692144511195,
+          "unemploymentPct": 2.697830123631328,
+          "medianIncome": 73682,
+          "povertyPct": 13.272115745488842,
+          "vacancyPct": 10.595747144899192,
+          "medianHomeValue": 455300,
+          "medianRent": 1472,
+          "coverage": 100,
+          "reliability": 83,
+          "sampleGeoids": [
+            "49053270601",
+            "49053271102",
+            "49053271200",
+            "49053271300"
+          ],
+          "factors": {
+            "demographic": 20,
+            "economic": 54,
+            "education": 40,
+            "housing": 23
+          },
+          "acsCompetency": 94
+        },
+        {
+          "id": "st-george-north",
+          "name": "North Arc",
+          "tractCount": 8,
+          "population": 45043,
+          "lat": 37.21472936083298,
+          "lng": -113.56966790844304,
+          "medianAge": 40.5,
+          "bachelorsPct": 33.35475322700731,
+          "unemploymentPct": 4.422756119534489,
+          "medianIncome": 69375,
+          "povertyPct": 9.501197366894871,
+          "vacancyPct": 14.094352855012064,
+          "medianHomeValue": 552000,
+          "medianRent": 1576,
+          "coverage": 100,
+          "reliability": 79,
+          "sampleGeoids": [
+            "49053270101",
+            "49053270200",
+            "49053270301",
+            "49053270402"
+          ],
+          "factors": {
+            "demographic": 30,
+            "economic": 52,
+            "education": 43,
+            "housing": 10
+          },
+          "acsCompetency": 93
+        },
+        {
+          "id": "st-george-east",
+          "name": "East Corridor",
+          "tractCount": 11,
+          "population": 60051,
+          "lat": 37.135814998917596,
+          "lng": -113.39030551780986,
+          "medianAge": 37.6,
+          "bachelorsPct": 33.196380529016714,
+          "unemploymentPct": 3.1724290251225518,
+          "medianIncome": 75357,
+          "povertyPct": 9.453065656628556,
+          "vacancyPct": 12.405676323808594,
+          "medianHomeValue": 437100,
+          "medianRent": 1453,
+          "coverage": 100,
+          "reliability": 83,
+          "sampleGeoids": [
+            "49053270102",
+            "49053270803",
+            "49053270804",
+            "49053270805"
+          ],
+          "factors": {
+            "demographic": 64,
+            "economic": 64,
+            "education": 42,
+            "housing": 25
+          },
+          "acsCompetency": 94
+        },
+        {
+          "id": "st-george-south",
+          "name": "South Arc",
+          "tractCount": 2,
+          "population": 25905,
+          "lat": 37.03739959467284,
+          "lng": -113.56271670526925,
+          "medianAge": 29.1,
+          "bachelorsPct": 43.50916424040123,
+          "unemploymentPct": 3.7359579239806973,
+          "medianIncome": 112252,
+          "povertyPct": 4.5245350083620375,
+          "vacancyPct": 15.831028743310405,
+          "medianHomeValue": 692200,
+          "medianRent": 2005,
+          "coverage": 100,
+          "reliability": 86,
+          "sampleGeoids": [
+            "49053271600",
+            "49053271702"
+          ],
+          "factors": {
+            "demographic": 99,
+            "economic": 91,
+            "education": 76,
+            "housing": 27
+          },
+          "acsCompetency": 95
+        },
+        {
+          "id": "st-george-west",
+          "name": "West Corridor",
+          "tractCount": 4,
+          "population": 15507,
+          "lat": 37.16335250209583,
+          "lng": -113.70031609273231,
+          "medianAge": 34.4,
+          "bachelorsPct": 41.87600162524206,
+          "unemploymentPct": 4.8205150134755375,
+          "medianIncome": 74375,
+          "povertyPct": 10.769329980009028,
+          "vacancyPct": 24.209386244404264,
+          "medianHomeValue": 519600,
+          "medianRent": 1893,
+          "coverage": 100,
+          "reliability": 83,
+          "sampleGeoids": [
+            "49053270302",
+            "49053270401",
+            "49053270501",
+            "49053270602"
+          ],
+          "factors": {
+            "demographic": 91,
+            "economic": 49,
+            "education": 72,
+            "housing": 8
+          },
+          "acsCompetency": 94
+        }
+      ],
+      "acsCompetency": 94,
+      "coverage": 100,
+      "reliability": 82
+    },
+    {
+      "id": "northwest-arkansas",
+      "label": "Northwest Arkansas",
+      "center": {
+        "lat": 36.26,
+        "lng": -94.16
+      },
+      "zoom": 9,
+      "countyCount": 2,
+      "tractCount": 111,
+      "clusters": [
+        {
+          "id": "northwest-arkansas-central",
+          "name": "Central Core",
+          "tractCount": 32,
+          "population": 170611,
+          "lat": 36.265161552303184,
+          "lng": -94.15537061678322,
+          "medianAge": 32.8,
+          "bachelorsPct": 33.18376244580976,
+          "unemploymentPct": 3.4566513799839025,
+          "medianIncome": 85938,
+          "povertyPct": 10.798234551227877,
+          "vacancyPct": 7.37209163024221,
+          "medianHomeValue": 259300,
+          "medianRent": 1249,
+          "coverage": 100,
+          "reliability": 81,
+          "sampleGeoids": [
+            "05007020203",
+            "05007020205",
+            "05007020206",
+            "05007020301"
+          ],
+          "factors": {
+            "demographic": 97,
+            "economic": 64,
+            "education": 41,
+            "housing": 86
+          },
+          "acsCompetency": 93
+        },
+        {
+          "id": "northwest-arkansas-north",
+          "name": "North Arc",
+          "tractCount": 21,
+          "population": 107285,
+          "lat": 36.411946504171134,
+          "lng": -94.20368679312114,
+          "medianAge": 37.9,
+          "bachelorsPct": 40.716581348285786,
+          "unemploymentPct": 3.244241232253443,
+          "medianIncome": 102074,
+          "povertyPct": 5.7550577673945265,
+          "vacancyPct": 6.975428267511121,
+          "medianHomeValue": 329400,
+          "medianRent": 1313,
+          "coverage": 100,
+          "reliability": 81,
+          "sampleGeoids": [
+            "05007020102",
+            "05007020103",
+            "05007020104",
+            "05007020201"
+          ],
+          "factors": {
+            "demographic": 62,
+            "economic": 88,
+            "education": 70,
+            "housing": 88
+          },
+          "acsCompetency": 93
+        },
+        {
+          "id": "northwest-arkansas-east",
+          "name": "East Corridor",
+          "tractCount": 4,
+          "population": 12767,
+          "lat": 36.23226189394533,
+          "lng": -93.9807886778413,
+          "medianAge": 39.5,
+          "bachelorsPct": 26.7129819702314,
+          "unemploymentPct": 4.717242625479216,
+          "medianIncome": 80428,
+          "povertyPct": 6.748035573540776,
+          "vacancyPct": 16.62124197795418,
+          "medianHomeValue": 312500,
+          "medianRent": 1123,
+          "coverage": 100,
+          "reliability": 78,
+          "sampleGeoids": [
+            "05007021405",
+            "05007021409",
+            "05143010101",
+            "05143010109"
+          ],
+          "factors": {
+            "demographic": 44,
+            "economic": 66,
+            "education": 24,
+            "housing": 59
+          },
+          "acsCompetency": 92
+        },
+        {
+          "id": "northwest-arkansas-south",
+          "name": "South Arc",
+          "tractCount": 40,
+          "population": 196280,
+          "lat": 36.06601256368454,
+          "lng": -94.18210866899325,
+          "medianAge": 35.3,
+          "bachelorsPct": 39.42238394459683,
+          "unemploymentPct": 3.1941854245420296,
+          "medianIncome": 78427,
+          "povertyPct": 15.939369686094626,
+          "vacancyPct": 8.249577432805907,
+          "medianHomeValue": 309500,
+          "medianRent": 1146,
+          "coverage": 100,
+          "reliability": 79,
+          "sampleGeoids": [
+            "05143010107",
+            "05143010108",
+            "05143010110",
+            "05143010111"
+          ],
+          "factors": {
+            "demographic": 85,
+            "economic": 52,
+            "education": 69,
+            "housing": 58
+          },
+          "acsCompetency": 93
+        },
+        {
+          "id": "northwest-arkansas-west",
+          "name": "West Corridor",
+          "tractCount": 14,
+          "population": 73454,
+          "lat": 36.27163519277371,
+          "lng": -94.42820837462901,
+          "medianAge": 35.5,
+          "bachelorsPct": 32.72059945421246,
+          "unemploymentPct": 2.8757426471127197,
+          "medianIncome": 77578,
+          "povertyPct": 8.058738396827792,
+          "vacancyPct": 8.436354772311137,
+          "medianHomeValue": 257400,
+          "medianRent": 1104,
+          "coverage": 100,
+          "reliability": 81,
+          "sampleGeoids": [
+            "05007020905",
+            "05007020906",
+            "05007021001",
+            "05007021003"
+          ],
+          "factors": {
+            "demographic": 81,
+            "economic": 71,
+            "education": 38,
+            "housing": 77
+          },
+          "acsCompetency": 93
+        }
+      ],
+      "acsCompetency": 93,
+      "coverage": 100,
+      "reliability": 80
+    },
+    {
+      "id": "raleigh",
+      "label": "Raleigh",
+      "center": {
+        "lat": 35.79,
+        "lng": -78.64
+      },
+      "zoom": 9,
+      "countyCount": 3,
+      "tractCount": 348,
+      "clusters": [
+        {
+          "id": "raleigh-central",
+          "name": "Central Core",
+          "tractCount": 98,
+          "population": 470651,
+          "lat": 35.79969895973876,
+          "lng": -78.64168461142118,
+          "medianAge": 35.1,
+          "bachelorsPct": 51.06119004691901,
+          "unemploymentPct": 4.65147540716626,
+          "medianIncome": 83750,
+          "povertyPct": 13.14360268904394,
+          "vacancyPct": 8.818898774056489,
+          "medianHomeValue": 389900,
+          "medianRent": 1559,
+          "coverage": 100,
+          "reliability": 82,
+          "sampleGeoids": [
+            "37183050100",
+            "37183050300",
+            "37183050400",
+            "37183050500"
+          ],
+          "factors": {
+            "demographic": 87,
+            "economic": 51,
+            "education": 85,
+            "housing": 37
+          },
+          "acsCompetency": 94
+        },
+        {
+          "id": "raleigh-north",
+          "name": "North Arc",
+          "tractCount": 62,
+          "population": 333738,
+          "lat": 35.97912696351629,
+          "lng": -78.71224918873487,
+          "medianAge": 39.5,
+          "bachelorsPct": 54.40234872145171,
+          "unemploymentPct": 4.111252335517914,
+          "medianIncome": 109462,
+          "povertyPct": 7.441093818098896,
+          "vacancyPct": 6.214544910543489,
+          "medianHomeValue": 423300,
+          "medianRent": 1494,
+          "coverage": 100,
+          "reliability": 80,
+          "sampleGeoids": [
+            "37183053613",
+            "37183053711",
+            "37183053712",
+            "37183053717"
+          ],
+          "factors": {
+            "demographic": 44,
+            "economic": 83,
+            "education": 92,
+            "housing": 69
+          },
+          "acsCompetency": 93
+        },
+        {
+          "id": "raleigh-east",
+          "name": "East Corridor",
+          "tractCount": 36,
+          "population": 203107,
+          "lat": 35.718302786216135,
+          "lng": -78.37770031781278,
+          "medianAge": 37.4,
+          "bachelorsPct": 34.14896064872829,
+          "unemploymentPct": 4.144285252749413,
+          "medianIncome": 86667,
+          "povertyPct": 9.839472069119937,
+          "vacancyPct": 4.5537416908300985,
+          "medianHomeValue": 338500,
+          "medianRent": 1526,
+          "coverage": 100,
+          "reliability": 81,
+          "sampleGeoids": [
+            "37183052807",
+            "37183054108",
+            "37183054109",
+            "37183054111"
+          ],
+          "factors": {
+            "demographic": 67,
+            "economic": 63,
+            "education": 49,
+            "housing": 60
+          },
+          "acsCompetency": 93
+        },
+        {
+          "id": "raleigh-south",
+          "name": "South Arc",
+          "tractCount": 57,
+          "population": 255327,
+          "lat": 35.56939912367279,
+          "lng": -78.60755076979719,
+          "medianAge": 39.6,
+          "bachelorsPct": 39.1256726712734,
+          "unemploymentPct": 3.849958452577687,
+          "medianIncome": 101429,
+          "povertyPct": 8.196862019748224,
+          "vacancyPct": 5.3656808650130685,
+          "medianHomeValue": 369100,
+          "medianRent": 1350,
+          "coverage": 100,
+          "reliability": 77,
+          "sampleGeoids": [
+            "37183052809",
+            "37183052813",
+            "37183052814",
+            "37183052901"
+          ],
+          "factors": {
+            "demographic": 43,
+            "economic": 80,
+            "education": 68,
+            "housing": 77
+          },
+          "acsCompetency": 92
+        },
+        {
+          "id": "raleigh-west",
+          "name": "West Corridor",
+          "tractCount": 95,
+          "population": 482441,
+          "lat": 35.836519936012905,
+          "lng": -78.88070071967354,
+          "medianAge": 36.9,
+          "bachelorsPct": 68.53733616640793,
+          "unemploymentPct": 3.521772234396712,
+          "medianIncome": 124773,
+          "povertyPct": 6.971112256278465,
+          "vacancyPct": 5.80253257204089,
+          "medianHomeValue": 499700,
+          "medianRent": 1784,
+          "coverage": 100,
+          "reliability": 84,
+          "sampleGeoids": [
+            "37183053004",
+            "37183053005",
+            "37183053203",
+            "37183053204"
+          ],
+          "factors": {
+            "demographic": 72,
+            "economic": 92,
+            "education": 100,
+            "housing": 61
+          },
+          "acsCompetency": 94
+        }
+      ],
+      "acsCompetency": 93,
+      "coverage": 100,
+      "reliability": 81
+    }
+  ]
+}

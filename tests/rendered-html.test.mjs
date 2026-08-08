@@ -13,19 +13,19 @@ const env = {
 
 const ctx = { waitUntil() {}, passThroughOnException() {} };
 
-test("server-renders Borocast and the verified registry", async () => {
+test("server-renders the national Borocast workbench and verified registry", async () => {
   const worker = await loadWorker();
   const response = await worker.fetch(new Request("http://localhost/", { headers: { accept: "text/html" } }), env, ctx);
   assert.equal(response.status, 200);
   const html = await response.text();
   assert.match(html, /BORO/);
-  assert.match(html, /Government feeds/);
-  assert.match(html, /FIRST-WAVE LIVE ENDPOINTS/);
+  assert.match(html, /NATIONAL PUBLIC-DATA MARKET WORKBENCH/);
+  assert.match(html, /Find the edge/);
   assert.match(html, /Florida Statewide Parcels 2025/);
-  assert.match(html, /20-MARKET NEIGHBORHOOD EXPLORER/);
-  assert.match(html, /local edge map/);
+  assert.match(html, /CROSS-MARKET COMPARISON/);
+  assert.match(html, /Real tract aggregations/);
   assert.match(html, /Northwest Arkansas/);
-  assert.match(html, /Coverage note:/);
+  assert.match(html, /No national PLUTO equivalent/);
 });
 
 test("property-data APIs expose health and market evidence", async () => {
@@ -36,6 +36,9 @@ test("property-data APIs expose health and market evidence", async () => {
   assert.equal(healthPayload.sourceCount, 6);
   assert.equal(healthPayload.connectedMarketCount, 10);
   assert.deepEqual(healthPayload.adapters.sort(), ["arcgis", "carto", "socrata"]);
+  assert.equal(healthPayload.acs.marketCount, 20);
+  assert.equal(healthPayload.acs.clusterCount, 97);
+  assert.equal(healthPayload.acs.tractCount, 17959);
 
   const market = await worker.fetch(new Request("http://localhost/api/property-data/markets/miami"), env, ctx);
   assert.equal(market.status, 200);
@@ -45,6 +48,18 @@ test("property-data APIs expose health and market evidence", async () => {
 
   const missing = await worker.fetch(new Request("http://localhost/api/property-data/markets/not-a-market"), env, ctx);
   assert.equal(missing.status, 404);
+});
+
+test("market-intelligence API exposes measured ACS cluster evidence", async () => {
+  const worker = await loadWorker();
+  const response = await worker.fetch(new Request("http://localhost/api/market-intelligence/acs/new-york"), env, ctx);
+  assert.equal(response.status, 200);
+  const payload = await response.json();
+  assert.equal(payload.vintage, "2024");
+  assert.equal(payload.market.tractCount, 2942);
+  assert.equal(payload.market.clusters.length, 5);
+  assert.equal(payload.market.clusters[0].coverage, 100);
+  assert.ok(payload.market.clusters[0].sampleGeoids.length > 0);
 });
 
 test("hosted samples omit owner and mailing fields", async () => {

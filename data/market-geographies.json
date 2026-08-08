@@ -1,0 +1,26 @@
+{
+  "vintage": "2024",
+  "release": "acs2024_5yr",
+  "markets": [
+    { "id": "new-york", "label": "New York", "center": [40.74, -73.92], "zoom": 9, "counties": [["36", "005"], ["36", "047"], ["36", "061"], ["36", "081"], ["36", "085"], ["34", "003"], ["34", "013"], ["34", "017"], ["34", "039"]] },
+    { "id": "los-angeles", "label": "Los Angeles", "center": [34.06, -118.28], "zoom": 9, "counties": [["06", "037"], ["06", "059"]] },
+    { "id": "chicago", "label": "Chicago", "center": [41.87, -87.65], "zoom": 9, "counties": [["17", "031"], ["17", "043"], ["17", "097"], ["17", "197"], ["17", "089"]] },
+    { "id": "dallas-fort-worth", "label": "Dallas–Fort Worth", "center": [32.79, -96.8], "zoom": 9, "counties": [["48", "113"], ["48", "439"], ["48", "085"], ["48", "121"]] },
+    { "id": "houston", "label": "Houston", "center": [29.76, -95.39], "zoom": 9, "counties": [["48", "201"], ["48", "157"], ["48", "339"], ["48", "039"]] },
+    { "id": "atlanta", "label": "Atlanta", "center": [33.77, -84.38], "zoom": 9, "counties": [["13", "121"], ["13", "067"], ["13", "135"], ["13", "089"], ["13", "063"]] },
+    { "id": "washington", "label": "Washington", "center": [38.91, -77.02], "zoom": 9, "counties": [["11", "001"], ["51", "059"], ["51", "013"], ["51", "510"], ["24", "031"], ["24", "033"]] },
+    { "id": "miami", "label": "Miami", "center": [25.79, -80.2], "zoom": 9, "counties": [["12", "086"], ["12", "011"], ["12", "099"]] },
+    { "id": "philadelphia", "label": "Philadelphia", "center": [39.97, -75.17], "zoom": 9, "counties": [["42", "101"], ["42", "017"], ["42", "091"], ["42", "029"], ["42", "045"], ["34", "007"]] },
+    { "id": "phoenix", "label": "Phoenix", "center": [33.47, -112.08], "zoom": 9, "counties": [["04", "013"], ["04", "021"]] },
+    { "id": "ocala", "label": "Ocala", "center": [29.18, -82.14], "zoom": 10, "counties": [["12", "083"]] },
+    { "id": "myrtle-beach", "label": "Myrtle Beach", "center": [33.72, -78.89], "zoom": 9, "counties": [["45", "051"], ["37", "019"]] },
+    { "id": "spartanburg", "label": "Spartanburg", "center": [34.97, -81.95], "zoom": 10, "counties": [["45", "083"]] },
+    { "id": "lakeland", "label": "Lakeland", "center": [28.05, -81.95], "zoom": 10, "counties": [["12", "105"]] },
+    { "id": "punta-gorda", "label": "Punta Gorda", "center": [26.94, -82.05], "zoom": 10, "counties": [["12", "015"]] },
+    { "id": "huntsville", "label": "Huntsville", "center": [34.72, -86.6], "zoom": 10, "counties": [["01", "089"], ["01", "083"]] },
+    { "id": "wilmington", "label": "Wilmington", "center": [34.23, -77.9], "zoom": 10, "counties": [["37", "129"], ["37", "019"], ["37", "141"]] },
+    { "id": "st-george", "label": "St. George", "center": [37.08, -113.58], "zoom": 10, "counties": [["49", "053"]] },
+    { "id": "northwest-arkansas", "label": "Northwest Arkansas", "center": [36.26, -94.16], "zoom": 9, "counties": [["05", "007"], ["05", "143"]] },
+    { "id": "raleigh", "label": "Raleigh", "center": [35.79, -78.64], "zoom": 9, "counties": [["37", "183"], ["37", "101"], ["37", "063"]] }
+  ]
+}

@@ -96,7 +96,7 @@ export function NationalMarketMap({ market, neighborhoods, layer, selectedId, on
       });
       const select = () => onSelectRef.current(neighborhood.id);
       const show = () => {
-        infoRef.current?.setContent(`<div class="map-tooltip"><b>${neighborhood.name}</b><span>${value}/100 ${layer} · ${neighborhood.confidence}% confidence</span></div>`);
+        infoRef.current?.setContent(`<div class="map-tooltip"><b>${neighborhood.name}</b><span>${value}/100 ${layer} · ${neighborhood.tractCount} tracts · ${neighborhood.confidence}% integrated competency</span></div>`);
         infoRef.current?.open({ map, anchor: marker });
       };
       circle.addListener("click", select);
@@ -116,10 +116,10 @@ export function NationalMarketMap({ market, neighborhoods, layer, selectedId, on
 
   return (
     <div className="national-map-wrap">
-      <div ref={containerRef} className="national-google-map" aria-label={`Interactive Google map of ${market.metro.short} neighborhood signals`} />
+      <div ref={containerRef} className="national-google-map" aria-label={`Interactive Google map of ${market.metro.short} census-tract clusters`} />
       {!ready && !error && <div className="map-loading"><i /> Loading {market.metro.short} on Google Maps…</div>}
       {error && <div className="map-error"><strong>Map unavailable</strong><span>{error}</span></div>}
-      {ready && <div className="map-live-badge"><i /> Google Maps · {market.neighborhoods.length} local units</div>}
+      {ready && <div className="map-live-badge"><i /> Google Maps · {market.tractCount.toLocaleString()} ACS tracts</div>}
     </div>
   );
 }

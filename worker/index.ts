@@ -5,6 +5,7 @@ import sourceRegistry from "../data/source-registry.json";
 import marketCompetency from "../data/market-competency.json";
 import firstWaveSamples from "../data/snapshots/first-wave-samples.json";
 import liveAudit from "../data/snapshots/live-audit-2026-08-07.json";
+import acsAggregations from "../data/acs-market-aggregations.json";
 
 interface Env {
   ASSETS: Fetcher;
@@ -47,6 +48,12 @@ const worker = {
         connectedMarketCount: marketCompetency.markets.length,
         representedRecords: sourceRegistry.sources.reduce((total, source) => total + source.recordCount, 0),
         adapters: [...new Set(sourceRegistry.sources.map((source) => source.adapter))],
+        acs: {
+          release: acsAggregations.release,
+          marketCount: acsAggregations.marketCount,
+          clusterCount: acsAggregations.clusterCount,
+          tractCount: acsAggregations.markets.reduce((total, market) => total + market.tractCount, 0),
+        },
       }, { headers: snapshotHeaders });
     }
 
@@ -80,6 +87,18 @@ const worker = {
 
     if (url.pathname === "/api/property-data/samples") {
       return Response.json(firstWaveSamples, { headers: snapshotHeaders });
+    }
+
+    if (url.pathname === "/api/market-intelligence/acs") {
+      return Response.json(acsAggregations, { headers: snapshotHeaders });
+    }
+
+    if (url.pathname.startsWith("/api/market-intelligence/acs/")) {
+      const marketId = decodeURIComponent(url.pathname.slice("/api/market-intelligence/acs/".length));
+      const market = acsAggregations.markets.find((candidate) => candidate.id === marketId);
+      return market
+        ? Response.json({ generatedAt: acsAggregations.generatedAt, vintage: acsAggregations.vintage, methodology: acsAggregations.methodology, market }, { headers: snapshotHeaders })
+        : Response.json({ error: "Unknown market" }, { status: 404, headers: snapshotHeaders });
     }
 
     if (url.pathname === "/api/maps-config") {
