@@ -21,6 +21,45 @@ function median(values) {
   return sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
 }
 
+function quantile(values, percentile) {
+  const sorted = values.filter((value) => Number.isFinite(value)).sort((a, b) => a - b);
+  if (!sorted.length) return null;
+  const index = (sorted.length - 1) * percentile;
+  const lower = Math.floor(index);
+  const upper = Math.ceil(index);
+  return sorted[lower] + (sorted[upper] - sorted[lower]) * (index - lower);
+}
+
+function weightedMedian(items) {
+  const sorted = items.filter((item) => Number.isFinite(item.value) && item.weight > 0).sort((a, b) => a.value - b.value);
+  const total = sorted.reduce((sum, item) => sum + item.weight, 0);
+  let cursor = 0;
+  for (const item of sorted) {
+    cursor += item.weight;
+    if (cursor >= total / 2) return item.value;
+  }
+  return sorted.at(-1)?.value ?? null;
+}
+
+function milesBetween(a, b) {
+  if (![a.lat, a.lng, b.lat, b.lng].every((value) => Number.isFinite(value))) return null;
+  const radius = 3958.8;
+  const lat1 = a.lat * Math.PI / 180;
+  const lat2 = b.lat * Math.PI / 180;
+  const deltaLat = (b.lat - a.lat) * Math.PI / 180;
+  const deltaLng = (b.lng - a.lng) * Math.PI / 180;
+  const value = Math.sin(deltaLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(deltaLng / 2) ** 2;
+  return radius * 2 * Math.atan2(Math.sqrt(value), Math.sqrt(1 - value));
+}
+
+function typeGroup(label = "") {
+  const value = label.toLowerCase();
+  if (value.includes("condo")) return "condo";
+  if (value.includes("multi") || value.includes("apartment") || value.includes("apt") || value.includes("2 family") || value.includes("3 family")) return "multifamily";
+  if (value.includes("single") || value.includes("singlfam") || value.includes("row")) return "single-family";
+  return "residential-other";
+}
+
 function centroid(rings) {
   const points = rings?.flat() ?? [];
   if (!points.length) return { lat: null, lng: null };
@@ -187,73 +226,162 @@ function clusterMeta(clusterId) {
   return { market, cluster, price, score };
 }
 
-function hpiAdjustedSale(record, price) {
-  const year = Math.min(price.latestYear, Number(record.saleDate.slice(0, 4)));
-  const atSale = price.history.find((item) => item.year === year)?.index ?? price.latestIndex;
-  return record.salePrice * price.latestIndex / atSale;
+function hpiAdjustedSale(record, price, targetDate = TODAY) {
+  const saleYear = Math.min(price.latestYear, Number(record.saleDate.slice(0, 4)));
+  const targetYear = Math.min(price.latestYear, targetDate.getUTCFullYear());
+  const atSale = price.history.find((item) => item.year === saleYear)?.index ?? price.latestIndex;
+  const atTarget = price.history.find((item) => item.year === targetYear)?.index ?? price.latestIndex;
+  return record.salePrice * atTarget / atSale;
+}
+
+function calibrationFor(records) {
+  const ratios = records.map((row) => row.salePrice / row.assessedValue).filter((ratio) => ratio >= 0.35 && ratio <= 2.75);
+  return clamp(median(ratios) ?? 1, 0.65, 1.75);
+}
+
+function comparableEvidence(subject, candidates, price, targetDate) {
+  const targetTime = targetDate.getTime();
+  const targetType = typeGroup(subject.propertyType);
+  const scored = candidates
+    .filter((candidate) => candidate.id !== subject.id && new Date(candidate.saleDate).getTime() <= targetTime)
+    .map((candidate) => {
+      const distance = milesBetween(subject, candidate);
+      const sqftRatio = candidate.sqft / subject.sqft;
+      const ageDifference = subject.yearBuilt && candidate.yearBuilt ? Math.abs(subject.yearBuilt - candidate.yearBuilt) : 25;
+      const monthsOld = Math.max(0, (targetTime - new Date(candidate.saleDate).getTime()) / (1000 * 60 * 60 * 24 * 30.44));
+      const sameType = typeGroup(candidate.propertyType) === targetType;
+      const score = (sameType ? 32 : 0)
+        + clamp(30 - Math.abs(1 - sqftRatio) * 75, 0, 30)
+        + clamp(18 - (distance ?? 15) * 2.5, 0, 18)
+        + clamp(12 - ageDifference * 0.3, 0, 12)
+        + clamp(8 - monthsOld / 9, 0, 8);
+      return { candidate, distance, sqftRatio, monthsOld, sameType, score };
+    })
+    .filter((item) => item.sqftRatio >= 0.55 && item.sqftRatio <= 1.8 && (item.distance === null || item.distance <= 20))
+    .sort((a, b) => b.score - a.score);
+  const preferred = scored.filter((item) => item.sameType && item.score >= 42);
+  const selected = (preferred.length >= 3 ? preferred : scored).slice(0, 12);
+  const ppsf = weightedMedian(selected.map((item) => ({
+    value: hpiAdjustedSale(item.candidate, price, targetDate) / item.candidate.sqft,
+    weight: Math.max(0.1, item.score / 100),
+  })));
+  return {
+    count: selected.length,
+    ppsf,
+    nearestMiles: selected.length ? Math.min(...selected.map((item) => item.distance ?? 20)) : null,
+    medianMiles: median(selected.map((item) => item.distance).filter((value) => value !== null)),
+    sameTypePct: selected.length ? selected.filter((item) => item.sameType).length / selected.length * 100 : 0,
+    ids: selected.map((item) => item.candidate.id),
+  };
+}
+
+function backtestMarket(usable, price) {
+  const tests = [];
+  for (const subject of [...usable].sort((a, b) => a.saleDate.localeCompare(b.saleDate))) {
+    const targetDate = new Date(`${subject.saleDate}T00:00:00Z`);
+    const prior = usable.filter((candidate) => candidate.id !== subject.id && candidate.saleDate < subject.saleDate);
+    const comps = comparableEvidence(subject, prior, price, targetDate);
+    if (!comps.ppsf || comps.count < 3 || prior.length < 6) continue;
+    const calibration = calibrationFor(prior);
+    const compValue = subject.sqft * comps.ppsf;
+    const assessmentValue = subject.assessedValue * calibration;
+    const predicted = compValue * 0.72 + assessmentValue * 0.28;
+    const ratio = predicted / subject.salePrice;
+    tests.push({ id: subject.id, predicted, actual: subject.salePrice, ratio, absoluteErrorPct: Math.abs(ratio - 1) * 100, compCount: comps.count });
+  }
+  const ratios = tests.map((item) => item.ratio);
+  const medianRatio = median(ratios) ?? 1;
+  const cod = medianRatio ? tests.reduce((sum, item) => sum + Math.abs(item.ratio - medianRatio), 0) / Math.max(1, tests.length) / medianRatio * 100 : null;
+  return {
+    method: "Out-of-time backtest: each sale is estimated only from earlier sales, a locally calibrated assessment, physical similarity and distance",
+    sampleSize: tests.length,
+    medianAbsoluteErrorPct: round(median(tests.map((item) => item.absoluteErrorPct)) ?? 30, 1),
+    p80AbsoluteErrorPct: round(quantile(tests.map((item) => item.absoluteErrorPct), 0.8) ?? 30, 1),
+    medianRatio: round(medianRatio, 3),
+    biasPct: round((medianRatio - 1) * 100, 1),
+    coefficientOfDispersion: round(cod ?? 30, 1),
+    within10Pct: round(tests.filter((item) => item.absoluteErrorPct <= 10).length / Math.max(1, tests.length) * 100, 1),
+    within20Pct: round(tests.filter((item) => item.absoluteErrorPct <= 20).length / Math.max(1, tests.length) * 100, 1),
+  };
 }
 
 function modelMarket(records, clusterId) {
   const meta = clusterMeta(clusterId);
   const usable = records.filter((row) => row.salePrice && row.assessedValue && row.sqft && row.sqft > 0);
-  const calibration = clamp(median(usable.map((row) => row.salePrice / row.assessedValue)) ?? 1, 0.65, 1.75);
-  const marketPpsf = median(usable.map((row) => row.salePrice / row.sqft));
-  return usable.map((record) => {
-    const similar = usable.filter((candidate) => candidate.id !== record.id && candidate.sqft / record.sqft >= 0.72 && candidate.sqft / record.sqft <= 1.38 && (!record.zip || candidate.zip === record.zip));
-    const broader = similar.length >= 3 ? similar : usable.filter((candidate) => candidate.id !== record.id && candidate.sqft / record.sqft >= 0.65 && candidate.sqft / record.sqft <= 1.55);
-    const compPpsf = median(broader.map((candidate) => candidate.salePrice / candidate.sqft)) ?? marketPpsf;
+  const calibration = calibrationFor(usable);
+  const diagnostics = backtestMarket(usable, meta.price);
+  const modelQuality = clamp(100 - diagnostics.medianAbsoluteErrorPct * 2.2 - Math.abs(diagnostics.biasPct) * 1.2 - Math.max(0, 18 - diagnostics.sampleSize) * 0.5, 35, 92);
+  diagnostics.modelCompetency = Math.round(modelQuality);
+  const modeled = usable.map((record) => {
+    const comps = comparableEvidence(record, usable, meta.price, TODAY);
+    if (!comps.ppsf || comps.count < 2) return null;
     const saleAnchor = hpiAdjustedSale(record, meta.price);
     const assessmentAnchor = record.assessedValue * calibration;
-    const compAnchor = record.sqft * compPpsf;
-    const estimate = saleAnchor * 0.45 + assessmentAnchor * 0.25 + compAnchor * 0.30;
+    const compAnchor = record.sqft * comps.ppsf;
+    const ageMonths = Math.max(0, (TODAY - new Date(record.saleDate)) / (1000 * 60 * 60 * 24 * 30.44));
+    const saleWeight = ageMonths <= 24 ? 0.35 : ageMonths <= 60 ? 0.25 : 0.15;
+    const assessmentWeight = 0.20;
+    const compWeight = 1 - saleWeight - assessmentWeight;
+    const estimate = saleAnchor * saleWeight + assessmentAnchor * assessmentWeight + compAnchor * compWeight;
     const anchors = [saleAnchor, assessmentAnchor, compAnchor];
     const spread = Math.max(...anchors) - Math.min(...anchors);
-    const ageMonths = Math.max(0, (TODAY - new Date(record.saleDate)) / (1000 * 60 * 60 * 24 * 30.44));
-    const recency = clamp(16 - ageMonths / 3, 2, 16);
+    const recency = clamp(100 - ageMonths * 1.6, 20, 100);
     const completeness = [record.sqft, record.yearBuilt, record.assessedValue, record.lat, record.lng, record.zip].filter(Boolean).length / 6;
-    const agreement = clamp(12 - spread / estimate * 24, 0, 12);
-    const confidence = clamp(Math.round(46 + recency + Math.min(10, broader.length * 1.5) + completeness * 8 + agreement + meta.price.pricingCompetency * 0.05), 45, 95);
-    const margin = clamp(0.07 + spread / estimate * 0.4 + (100 - confidence) / 500, 0.09, 0.28);
+    const compQuality = clamp(comps.count / 8 * 50 + comps.sameTypePct * 0.3 + (20 - (comps.medianMiles ?? 20)) * 1.0, 0, 100);
+    const agreement = clamp(100 - spread / estimate * 120, 0, 100);
+    const confidence = clamp(Math.round(modelQuality * 0.35 + recency * 0.15 + completeness * 100 * 0.15 + compQuality * 0.20 + agreement * 0.10 + meta.price.pricingCompetency * 0.05), 35, 94);
+    const empiricalMargin = diagnostics.sampleSize >= 8 ? diagnostics.p80AbsoluteErrorPct / 100 : 0.22;
+    const margin = clamp(Math.max(empiricalMargin, spread / estimate * 0.28, (100 - confidence) / 300), 0.08, 0.60);
     const valuationGapPct = (estimate / record.assessedValue - 1) * 100;
-    const gapSignal = clamp(50 + valuationGapPct * 1.25, 0, 100);
+    const gapSignal = clamp(50 + valuationGapPct, 0, 100);
     const liquidity = clamp(100 - ageMonths * 1.4, 20, 100);
-    const watchScore = Math.round(meta.score * 0.45 + confidence * 0.25 + gapSignal * 0.20 + liquidity * 0.10);
+    const watchScore = Math.round(meta.score * 0.45 + confidence * 0.30 + gapSignal * 0.15 + liquidity * 0.10);
     return {
       ...record,
       clusterName: `${meta.market.label} · ${meta.cluster.name}`,
       model: {
         value: round(estimate, -3), low: round(estimate * (1 - margin), -3), high: round(estimate * (1 + margin), -3), confidence,
-        watchScore, valuationGapPct: round(valuationGapPct, 1), compCount: broader.length,
+        watchScore, valuationGapPct: round(valuationGapPct, 1), compCount: comps.count,
         anchors: { hpiAdjustedSale: round(saleAnchor, -3), assessmentCalibrated: round(assessmentAnchor, -3), comparablePpsf: round(compAnchor, -3) },
-        calibrationRatio: round(calibration, 3), comparablePpsf: round(compPpsf, 0), clusterEdgeScore: meta.score,
+        weights: { hpiAdjustedSale: saleWeight, assessmentCalibrated: assessmentWeight, comparableSales: compWeight },
+        calibrationRatio: round(calibration, 3), comparablePpsf: round(comps.ppsf, 0), clusterEdgeScore: meta.score,
+        comparableQuality: { nearestMiles: round(comps.nearestMiles ?? 0, 1), medianMiles: round(comps.medianMiles ?? 0, 1), sameTypePct: round(comps.sameTypePct, 0), recordIds: comps.ids },
+        diagnostics: { modelVersion: "2.0", marketBacktestSample: diagnostics.sampleSize, marketMedianAbsoluteErrorPct: diagnostics.medianAbsoluteErrorPct, marketP80AbsoluteErrorPct: diagnostics.p80AbsoluteErrorPct },
       },
       listing: null,
       vendorEstimates: [],
     };
-  }).sort((a, b) => b.model.watchScore - a.model.watchScore).slice(0, 18);
+  }).filter(Boolean).sort((a, b) => b.model.watchScore - a.model.watchScore).slice(0, 18);
+  return { records: modeled, diagnostics };
 }
 
 const raw = await Promise.all([fetchCookCounty(), fetchPhiladelphia(), fetchWakeCounty()]);
+const modeledMarkets = [
+  modelMarket(raw[0], "chicago-west"),
+  modelMarket(raw[1], "philadelphia-west"),
+  modelMarket(raw[2], "raleigh-west"),
+];
 const properties = [
-  ...modelMarket(raw[0], "chicago-west"),
-  ...modelMarket(raw[1], "philadelphia-west"),
-  ...modelMarket(raw[2], "raleigh-west"),
+  ...modeledMarkets[0].records,
+  ...modeledMarkets[1].records,
+  ...modeledMarkets[2].records,
 ];
 
 const output = {
   generatedAt: new Date().toISOString(),
   asOf: "2026-08-07",
   methodology: {
-    label: "Public-record valuation watch model v1",
-    value: "45% FHFA-adjusted recorded sale + 25% locally calibrated public assessment + 30% size-matched recorded-sale comps",
-    range: "Anchor disagreement, evidence completeness and model confidence determine the displayed range",
-    watchScore: "45% cluster edge + 25% valuation confidence + 20% assessment gap signal + 10% sale recency",
+    label: "Public-record valuation watch model v2",
+    value: "Recency-weighted prior sale + 20% locally calibrated assessment + 45–65% geographically and physically matched comparable sales",
+    range: "The larger of the market's out-of-time 80th-percentile error, anchor disagreement, or evidence-quality penalty",
+    watchScore: "45% cluster edge + 30% evidence quality + 15% assessment gap signal + 10% sale recency",
+    validation: "Out-of-time backtesting uses only sales recorded before each test transaction; no later comparable is allowed into that test",
     boundary: "The assessment gap is not acquisition edge. A true price edge requires an asking price or licensed live listing joined to the record.",
   },
   markets: [
-    { id: "chicago", clusterId: "chicago-west", label: "Chicago · West Corridor", status: "live", propertyCount: properties.filter((row) => row.marketId === "chicago").length, competency: 91 },
-    { id: "philadelphia", clusterId: "philadelphia-west", label: "Philadelphia · West Corridor", status: "live", propertyCount: properties.filter((row) => row.marketId === "philadelphia").length, competency: 90 },
-    { id: "raleigh", clusterId: "raleigh-west", label: "Raleigh · West Corridor", status: "live", propertyCount: properties.filter((row) => row.marketId === "raleigh").length, competency: 82 },
+    { id: "chicago", clusterId: "chicago-west", label: "Chicago · West Corridor", status: "live", propertyCount: properties.filter((row) => row.marketId === "chicago").length, sourceCompetency: 91, modelCompetency: modeledMarkets[0].diagnostics.modelCompetency, competency: Math.round(91 * 0.55 + modeledMarkets[0].diagnostics.modelCompetency * 0.45), diagnostics: modeledMarkets[0].diagnostics },
+    { id: "philadelphia", clusterId: "philadelphia-west", label: "Philadelphia · West Corridor", status: "live", propertyCount: properties.filter((row) => row.marketId === "philadelphia").length, sourceCompetency: 90, modelCompetency: modeledMarkets[1].diagnostics.modelCompetency, competency: Math.round(90 * 0.55 + modeledMarkets[1].diagnostics.modelCompetency * 0.45), diagnostics: modeledMarkets[1].diagnostics },
+    { id: "raleigh", clusterId: "raleigh-west", label: "Raleigh · West Corridor", status: "live", propertyCount: properties.filter((row) => row.marketId === "raleigh").length, sourceCompetency: 82, modelCompetency: modeledMarkets[2].diagnostics.modelCompetency, competency: Math.round(82 * 0.55 + modeledMarkets[2].diagnostics.modelCompetency * 0.45), diagnostics: modeledMarkets[2].diagnostics },
     { id: "northwest-arkansas", clusterId: "northwest-arkansas-north", label: "Northwest Arkansas · North Arc", status: "gap", propertyCount: 0, competency: 38, gap: "Parcel geometry is available, but a verified reusable county sale-price feed is not yet connected." },
   ],
   providers: [

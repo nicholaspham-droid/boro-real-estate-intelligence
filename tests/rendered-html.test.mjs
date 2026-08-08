@@ -21,12 +21,18 @@ test("server-renders the national Borocast workbench and verified registry", asy
   assert.match(html, /BORO/);
   assert.match(html, /NATIONAL PUBLIC-DATA MARKET WORKBENCH/);
   assert.match(html, /Find the edge/);
+  assert.match(html, /PRODUCT OVERVIEW · FROM SIGNAL TO MEMO/);
+  assert.match(html, /One workflow/);
+  assert.match(html, /EVIDENCE LADDER/);
   assert.match(html, /Florida Statewide Parcels 2025/);
   assert.match(html, /CROSS-MARKET COMPARISON/);
   assert.match(html, /Tracts \+ property evidence/);
   assert.match(html, /FHFA TRACT-CLUSTER HPI/);
   assert.match(html, /Local cluster/);
   assert.match(html, /Metro benchmark/);
+  assert.match(html, />Heat</);
+  assert.match(html, />Clusters</);
+  assert.match(html, />Properties</);
   assert.match(html, />5Y</);
   assert.match(html, />10Y</);
   assert.match(html, />Full</);
@@ -38,15 +44,44 @@ test("server-renders the national Borocast workbench and verified registry", asy
   assert.match(html, /Northwest Arkansas/);
   assert.match(html, /WHY IT STANDS OUT/);
   assert.match(html, /Open this area in the market workspace/);
-  assert.match(html, /PROPERTY VALUATION LAB/);
+  assert.match(html, /PROPERTY VALUATION LAB · MODEL V2/);
   assert.match(html, /Cross-check the property/);
   assert.match(html, /Chicago · West Corridor/);
   assert.match(html, /Public-record model range/);
   assert.match(html, /INDEPENDENT CROSS-REFERENCE STACK/);
   assert.match(html, /RentCast/);
   assert.match(html, /ATTOM/);
+  assert.match(html, /DECISION STUDIO · EDITABLE UNDERWRITING/);
+  assert.match(html, /Advance only when at least four gates pass and none fail/);
+  assert.match(html, /MODEL GOVERNANCE CHECK/);
+  assert.match(html, /Out-of-time validation/);
+  assert.match(html, /Bring an independent AVM into the evidence stack/);
+  assert.match(html, /LOCAL PUBLIC-SAFETY EVIDENCE/);
+  assert.match(html, /Load local safety context/);
   assert.match(html, /true acquisition-edge percentage remains locked/i);
   assert.match(html, /No national PLUTO equivalent/);
+});
+
+test("public-safety API validates geography before contacting a local agency feed", async () => {
+  const worker = await loadWorker();
+  const response = await worker.fetch(new Request("http://localhost/api/public-safety/local?market=chicago"), env, ctx);
+  assert.equal(response.status, 400);
+  const payload = await response.json();
+  assert.match(payload.error, /lat and lng/i);
+});
+
+test("ATTOM adapter reports readiness and keeps the property route closed without a secret", async () => {
+  const worker = await loadWorker();
+  const status = await worker.fetch(new Request("http://localhost/api/integrations/attom/status"), env, ctx);
+  assert.equal(status.status, 200);
+  const payload = await status.json();
+  assert.equal(payload.connected, false);
+  assert.match(payload.privacy, /server-side/i);
+
+  const lookup = await worker.fetch(new Request("http://localhost/api/integrations/attom/property?address1=123%20Main%20St&address2=Raleigh%2C%20NC"), env, ctx);
+  assert.equal(lookup.status, 503);
+  const lookupPayload = await lookup.json();
+  assert.match(lookupPayload.error, /not configured/i);
 });
 
 test("property-data APIs expose health and market evidence", async () => {
