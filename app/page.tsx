@@ -17,6 +17,7 @@ import {
   type MarketExplorer,
 } from "./marketNeighborhoods";
 import sourceRegistry from "../data/source-registry.json";
+import propertyValuations from "../data/property-valuations.json";
 
 const FACTORS: Array<{ key: keyof FactorWeights; label: string; description: string }> = [
   { key: "demographic", label: "Demographic", description: "Age profile and local population depth" },
@@ -66,6 +67,9 @@ export default function Home() {
   const [priceScope, setPriceScope] = useState<"cluster" | "metro">("cluster");
   const [historyRange, setHistoryRange] = useState<5 | 10 | "full">(10);
   const [selectedLeaderKey, setSelectedLeaderKey] = useState<string | null>(null);
+  const [valuationMarket, setValuationMarket] = useState("chicago");
+  const [valuationSort, setValuationSort] = useState<"watch" | "confidence" | "gap" | "value">("watch");
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null);
 
   const baseMarket = MARKET_EXPLORERS.find((item) => item.id === selectedMarketId) ?? MARKET_EXPLORERS[0];
   const scoredClusters = useMemo(() => baseMarket.neighborhoods
@@ -112,6 +116,14 @@ export default function Home() {
     .sort((a, b) => b.value - a.value);
   const leaderPricing = selectedLeader.cluster.localPricing;
   const leaderLatest = leaderPricing?.history.at(-1);
+  const valuationMarketMeta = propertyValuations.markets.find((item) => item.id === valuationMarket) ?? propertyValuations.markets[0];
+  const valuationRows = useMemo(() => propertyValuations.properties
+    .filter((item) => item.marketId === valuationMarket)
+    .sort((a, b) => valuationSort === "confidence" ? b.model.confidence - a.model.confidence
+      : valuationSort === "gap" ? b.model.valuationGapPct - a.model.valuationGapPct
+        : valuationSort === "value" ? b.model.value - a.model.value
+          : b.model.watchScore - a.model.watchScore), [valuationMarket, valuationSort]);
+  const selectedProperty = valuationRows.find((item) => item.id === selectedPropertyId) ?? valuationRows[0] ?? null;
 
   function chooseMarket(id: string) {
     const next = MARKET_EXPLORERS.find((item) => item.id === id) ?? MARKET_EXPLORERS[0];
@@ -137,7 +149,7 @@ export default function Home() {
         <a className="brand" href="#top" aria-label="Borocast home"><span>BORO</span>CAST</a>
         <span className="product-label">Market intelligence</span>
         <label className="global-market-picker"><span>Market</span><select value={market.id} onChange={(event) => chooseMarket(event.target.value)}>{MARKET_EXPLORERS.map((item) => <option key={item.id} value={item.id}>{item.metro.short}</option>)}</select></label>
-        <nav aria-label="Primary navigation"><a href="#workspace">Workspace</a><a href="#leaders">Top areas</a><a href="#compare">Compare</a><a href="#quality">Data quality</a><a href="#sources">Sources</a></nav>
+        <nav aria-label="Primary navigation"><a href="#workspace">Workspace</a><a href="#leaders">Top areas</a><a href="#valuation">Valuation lab</a><a href="#compare">Compare</a><a href="#quality">Data quality</a><a href="#sources">Sources</a></nav>
         <a className="data-status" href="#quality"><i /> {MARKET_EXPLORERS.length} markets live</a>
       </header>
 
@@ -234,6 +246,31 @@ export default function Home() {
         <p className="leaders-note">Ranking basis: weighted composite under the active lens, with competency used only as a tie-breaker. This is a screening leaderboard, not a forecast of future returns.</p>
       </section>
 
+      <section className="valuation-section" id="valuation">
+        <div className="section-title"><div><p className="eyebrow">PROPERTY VALUATION LAB · PUBLIC RECORDS V1</p><h2>Cross-check the property.<br />Keep the uncertainty.</h2></div><p>Qualified recorded sales, local assessments, building facts and FHFA tract-cluster history now resolve to individual properties in three high-intent corridors. Values are a reproducible watch model—not an appraisal, offer recommendation or live-listing edge.</p></div>
+        <div className="valuation-readiness">
+          {propertyValuations.markets.map((item) => <button key={item.id} className={valuationMarket === item.id ? "active" : ""} onClick={() => { setValuationMarket(item.id); setSelectedPropertyId(null); }}><span>{item.status === "live" ? "LIVE" : "DATA GAP"}</span><b>{item.label}</b><i>{item.competency}% data competency</i><small>{item.propertyCount ? `${item.propertyCount} qualified records` : item.gap}</small></button>)}
+        </div>
+        {valuationRows.length ? <div className="valuation-workbench">
+          <div className="valuation-list">
+            <div className="valuation-toolbar"><div><span>Sort property watchlist</span>{([['watch','Watch score'],['confidence','Confidence'],['gap','Assessment gap'],['value','Model value']] as const).map(([id, label]) => <button key={id} className={valuationSort === id ? "selected" : ""} onClick={() => setValuationSort(id)}>{label}</button>)}</div><p>{valuationMarketMeta.label} · {valuationRows.length} records</p></div>
+            <div className="valuation-table"><table><thead><tr><th>Property</th><th>Recorded sale</th><th>Model range</th><th>Assessment gap</th><th>Confidence</th><th>Watch</th></tr></thead><tbody>{valuationRows.map((item) => <tr key={item.id} className={selectedProperty?.id === item.id ? "active" : ""} onClick={() => setSelectedPropertyId(item.id)}><td><b>{item.address}</b><small>{item.locality} · {item.propertyType}</small></td><td>{currency(item.salePrice)}<small>{item.saleDate}</small></td><td><b>{currency(item.model.value)}</b><small>{currency(item.model.low)}–{currency(item.model.high)}</small></td><td className={item.model.valuationGapPct < 0 ? "negative" : "positive"}>{signed(item.model.valuationGapPct)}</td><td><span className="confidence-pill">{item.model.confidence}%</span></td><td><strong>{item.model.watchScore}</strong></td></tr>)}</tbody></table></div>
+          </div>
+          {selectedProperty && <article className="valuation-detail">
+            <div className="valuation-detail-head"><div><p className="eyebrow">SELECTED PUBLIC RECORD</p><h3>{selectedProperty.address}</h3><span>{selectedProperty.locality} · {selectedProperty.propertyType}</span></div><div><strong>{selectedProperty.model.watchScore}</strong><small>watch score</small></div></div>
+            <div className="valuation-range"><span>Public-record model range</span><b>{currency(selectedProperty.model.low)} <i>to</i> {currency(selectedProperty.model.high)}</b><small>Center {currency(selectedProperty.model.value)} · {selectedProperty.model.confidence}% confidence</small></div>
+            <div className="valuation-anchor-grid"><div><span>HPI-adjusted sale</span><b>{currency(selectedProperty.model.anchors.hpiAdjustedSale)}</b><small>Recorded {selectedProperty.saleDate}</small></div><div><span>Calibrated assessment</span><b>{currency(selectedProperty.model.anchors.assessmentCalibrated)}</b><small>{selectedProperty.model.calibrationRatio}× local calibration</small></div><div><span>Comparable-sales anchor</span><b>{currency(selectedProperty.model.anchors.comparablePpsf)}</b><small>{selectedProperty.model.compCount} size-matched records · {currency(selectedProperty.model.comparablePpsf)}/sf</small></div></div>
+            <dl><div><dt>Recorded sale</dt><dd>{currency(selectedProperty.salePrice)}</dd></div><div><dt>Public assessment</dt><dd>{currency(selectedProperty.assessedValue)}</dd></div><div><dt>Living area</dt><dd>{selectedProperty.sqft?.toLocaleString()} sf</dd></div><div><dt>Year built</dt><dd>{selectedProperty.yearBuilt || "—"}</dd></div><div><dt>Beds / baths</dt><dd>{selectedProperty.beds ?? "—"} / {selectedProperty.baths ?? "—"}</dd></div><div><dt>Cluster edge</dt><dd>{selectedProperty.model.clusterEdgeScore}/100</dd></div></dl>
+            <div className="valuation-boundary"><b>What the gap means</b><p>{signed(selectedProperty.model.valuationGapPct)} compares the model center with the jurisdiction’s public assessment. It can flag records for review, but it is not a discount to an asking price. A true acquisition-edge percentage remains locked until a licensed live listing is joined.</p></div>
+            <p className="valuation-provenance"><b>{selectedProperty.sourceLabel}:</b> {selectedProperty.qualification}</p>
+            <div className="valuation-links"><a href={selectedProperty.sourceUrl} target="_blank" rel="noreferrer">Open official source →</a><a href={`https://www.google.com/maps/search/?api=1&query=${selectedProperty.lat},${selectedProperty.lng}`} target="_blank" rel="noreferrer">Open in Google Maps →</a><a href={`/api/valuation/properties/${selectedProperty.id}`} target="_blank" rel="noreferrer">Open model JSON →</a></div>
+          </article>}
+        </div> : <article className="valuation-gap-card"><p className="eyebrow">PRINCIPAL GAP</p><h3>{valuationMarketMeta.label}</h3><p>{valuationMarketMeta.gap}</p><b>The market remains in the neighborhood leaderboard, but property sorting is intentionally disabled until a reusable sale-price source or licensed vendor connection is verified.</b></article>}
+        <div className="provider-heading"><div><p className="eyebrow">INDEPENDENT CROSS-REFERENCE STACK</p><h3>Agreement matters more than another opaque average.</h3></div><p>Public records establish the factual base. Aggregate market series check direction. Paid AVMs and MLS listings remain separate evidence channels so correlated estimates do not masquerade as independent confirmation.</p></div>
+        <div className="provider-grid">{propertyValuations.providers.map((provider) => <a key={provider.id} href={provider.url} target="_blank" rel="noreferrer"><span className={`provider-status ${provider.status}`}>{provider.status.replace("-", " ")}</span><b>{provider.name}</b><small>{provider.layer}</small><p>{provider.scope}</p><i>{provider.independence}</i></a>)}</div>
+        <div className="valuation-method"><span><b>Model center</b>{propertyValuations.methodology.value}</span><span><b>Uncertainty</b>{propertyValuations.methodology.range}</span><span><b>Sorting</b>{propertyValuations.methodology.watchScore}</span><span><b>Hard boundary</b>{propertyValuations.methodology.boundary}</span></div>
+      </section>
+
       <section className="compare-section" id="compare">
         <div className="section-title"><div><p className="eyebrow">CROSS-MARKET COMPARISON</p><h2>Same lens.<br />Twenty markets.</h2></div><p>Each market score is the average of its local tract-cluster scores under your current factor mix. This makes the ranking comparable while keeping parcel confidence visible instead of blending missing evidence into the signal.</p></div>
         <div className="compare-controls"><div>{(["all", "largest", "fastest"] as const).map((item) => <button key={item} className={cohort === item ? "selected" : ""} onClick={() => setCohort(item)}>{item === "all" ? "All 20" : item === "largest" ? "10 largest" : "10 growth markets"}</button>)}</div><label><span>Minimum competency</span><select value={minimumCompetency} onChange={(event) => setMinimumCompetency(Number(event.target.value))}><option value="0">Show all</option><option value="75">75%+</option><option value="80">80%+</option><option value="85">85%+</option></select></label></div>
@@ -243,11 +280,11 @@ export default function Home() {
       <section className="quality-section" id="quality">
         <div className="section-title"><div><p className="eyebrow">DATA COMPETENCY, NOT FALSE PRECISION</p><h2>What is measured.<br />What is still missing.</h2></div><p>The national layer now combines observed ACS conditions with measured FHFA price history. It does not pretend either source can replace property records.</p></div>
         <div className="quality-grid">
-          <article className="quality-now"><span>Measured now</span><h3>Tracts + price history</h3><ul><li><b>{LOCAL_PRICING_META.targetTractCount.toLocaleString()}</b> ACS tracts across primary-market counties</li><li><b>{LOCAL_PRICING_META.clusterCount}</b> local clusters with annual FHFA tract history</li><li><b>20</b> quarterly FHFA metro benchmarks retained for context</li><li>Cluster pricing scores now vary with measured local momentum</li></ul></article>
+          <article className="quality-now"><span>Measured now</span><h3>Tracts + property evidence</h3><ul><li><b>{LOCAL_PRICING_META.targetTractCount.toLocaleString()}</b> ACS tracts across primary-market counties</li><li><b>{LOCAL_PRICING_META.clusterCount}</b> local clusters with annual FHFA tract history</li><li><b>{propertyValuations.properties.length}</b> qualified property records in three high-intent corridors</li><li>Three independent public-record anchors per property model</li></ul></article>
           <article className="quality-gap"><span>Principal gap</span><h3>No national PLUTO equivalent</h3><p>Assessment parcels, deeds, zoning, permits and building attributes live in separate city, county and state systems. IDs, licensing, field meanings and update cycles vary. A high ACS score therefore describes market conditions—not a parcel’s likely future value.</p><div><b>Next integrations</b><small>Parcel geometry → assessment history → qualified sales → zoning capacity → permits and catalysts</small></div></article>
           <article className="quality-access"><span>Access path</span><h3>API key gap mitigated</h3><p>The official Census Data API now requires a key. Until one is added, this build uses Census Reporter’s open-source mirror of the 2020–2024 ACS and joins it to the Census Bureau’s official TIGERweb service.</p><a href="https://api.census.gov/data/key_signup.html" target="_blank" rel="noreferrer">Add a Census API key →</a><a href="https://censusreporter.org/about/" target="_blank" rel="noreferrer">Audit the mirror →</a></article>
         </div>
-        <div className="method-ribbon"><span><b>Composite scope</b> Weighted percentile of five selectable factors</span><span><b>Local pricing momentum</b> 50% YoY, 25% 3Y CAGR, 15% 5Y growth, 10% acceleration</span><span><b>Pricing competency</b> Latest tract population coverage plus 10-year observation completeness</span><span><b>Still excluded</b> Parcel liquidity, property-level forecasts and causal inference</span></div>
+        <div className="method-ribbon"><span><b>Composite scope</b> Weighted percentile of five selectable factors</span><span><b>Local pricing momentum</b> 50% YoY, 25% 3Y CAGR, 15% 5Y growth, 10% acceleration</span><span><b>Valuation competency</b> Sale recency, comp depth, completeness, anchor agreement and local HPI coverage</span><span><b>Still excluded</b> Unlicensed listings, owner data, offer advice and causal inference</span></div>
       </section>
 
       <section className="sources" id="sources">

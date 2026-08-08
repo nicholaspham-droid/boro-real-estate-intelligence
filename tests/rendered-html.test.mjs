@@ -23,7 +23,7 @@ test("server-renders the national Borocast workbench and verified registry", asy
   assert.match(html, /Find the edge/);
   assert.match(html, /Florida Statewide Parcels 2025/);
   assert.match(html, /CROSS-MARKET COMPARISON/);
-  assert.match(html, /Tracts \+ price history/);
+  assert.match(html, /Tracts \+ property evidence/);
   assert.match(html, /FHFA TRACT-CLUSTER HPI/);
   assert.match(html, /Local cluster/);
   assert.match(html, /Metro benchmark/);
@@ -38,6 +38,14 @@ test("server-renders the national Borocast workbench and verified registry", asy
   assert.match(html, /Northwest Arkansas/);
   assert.match(html, /WHY IT STANDS OUT/);
   assert.match(html, /Open this area in the market workspace/);
+  assert.match(html, /PROPERTY VALUATION LAB/);
+  assert.match(html, /Cross-check the property/);
+  assert.match(html, /Chicago · West Corridor/);
+  assert.match(html, /Public-record model range/);
+  assert.match(html, /INDEPENDENT CROSS-REFERENCE STACK/);
+  assert.match(html, /RentCast/);
+  assert.match(html, /ATTOM/);
+  assert.match(html, /true acquisition-edge percentage remains locked/i);
   assert.match(html, /No national PLUTO equivalent/);
 });
 
@@ -117,4 +125,36 @@ test("hosted samples omit owner and mailing fields", async () => {
     assert.equal("ownerName" in record, false);
     assert.equal("mailingAddress" in record, false);
   }
+});
+
+test("valuation API exposes qualified property models without owner data", async () => {
+  const worker = await loadWorker();
+  const readiness = await worker.fetch(new Request("http://localhost/api/valuation/readiness"), env, ctx);
+  assert.equal(readiness.status, 200);
+  const readinessPayload = await readiness.json();
+  assert.equal(readinessPayload.markets.filter((market) => market.status === "live").length, 3);
+  assert.equal(readinessPayload.markets.find((market) => market.id === "northwest-arkansas").status, "gap");
+  assert.ok(readinessPayload.providers.some((provider) => provider.id === "zillow-research"));
+  assert.ok(readinessPayload.providers.some((provider) => provider.id === "attom"));
+
+  const response = await worker.fetch(new Request("http://localhost/api/valuation/properties?market=chicago"), env, ctx);
+  assert.equal(response.status, 200);
+  const payload = await response.json();
+  assert.equal(payload.count, 18);
+  for (const record of payload.records) {
+    assert.equal(record.marketId, "chicago");
+    assert.ok(record.model.low < record.model.value);
+    assert.ok(record.model.high > record.model.value);
+    assert.ok(record.model.confidence >= 45 && record.model.confidence <= 95);
+    assert.ok(record.model.compCount >= 1);
+    assert.equal(record.listing, null);
+    assert.equal("owner" in record, false);
+    assert.equal("mailingAddress" in record, false);
+  }
+
+  const detail = await worker.fetch(new Request(`http://localhost/api/valuation/properties/${payload.records[0].id}`), env, ctx);
+  assert.equal(detail.status, 200);
+  const detailPayload = await detail.json();
+  assert.equal(detailPayload.property.id, payload.records[0].id);
+  assert.match(detailPayload.methodology.boundary, /asking price or licensed live listing/i);
 });

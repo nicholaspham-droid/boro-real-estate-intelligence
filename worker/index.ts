@@ -8,6 +8,7 @@ import liveAudit from "../data/snapshots/live-audit-2026-08-07.json";
 import acsAggregations from "../data/acs-market-aggregations.json";
 import pricingHistory from "../data/fhfa-pricing-history.json";
 import clusterPricingHistory from "../data/fhfa-cluster-pricing-history.json";
+import propertyValuations from "../data/property-valuations.json";
 
 interface Env {
   ASSETS: Fetcher;
@@ -134,6 +135,30 @@ const worker = {
       return market
         ? Response.json({ retrievedAt: clusterPricingHistory.retrievedAt, source: clusterPricingHistory.source, methodology: clusterPricingHistory.methodology, market }, { headers: snapshotHeaders })
         : Response.json({ error: "Unknown market" }, { status: 404, headers: snapshotHeaders });
+    }
+
+    if (url.pathname === "/api/valuation/readiness") {
+      return Response.json({
+        generatedAt: propertyValuations.generatedAt,
+        asOf: propertyValuations.asOf,
+        methodology: propertyValuations.methodology,
+        markets: propertyValuations.markets,
+        providers: propertyValuations.providers,
+      }, { headers: snapshotHeaders });
+    }
+
+    if (url.pathname === "/api/valuation/properties") {
+      const marketId = url.searchParams.get("market");
+      const records = marketId ? propertyValuations.properties.filter((property) => property.marketId === marketId) : propertyValuations.properties;
+      return Response.json({ generatedAt: propertyValuations.generatedAt, asOf: propertyValuations.asOf, count: records.length, records }, { headers: snapshotHeaders });
+    }
+
+    if (url.pathname.startsWith("/api/valuation/properties/")) {
+      const propertyId = decodeURIComponent(url.pathname.slice("/api/valuation/properties/".length));
+      const property = propertyValuations.properties.find((candidate) => candidate.id === propertyId);
+      return property
+        ? Response.json({ generatedAt: propertyValuations.generatedAt, asOf: propertyValuations.asOf, methodology: propertyValuations.methodology, property }, { headers: snapshotHeaders })
+        : Response.json({ error: "Unknown property" }, { status: 404, headers: snapshotHeaders });
     }
 
     if (url.pathname === "/api/maps-config") {
