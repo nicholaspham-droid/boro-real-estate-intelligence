@@ -23,7 +23,9 @@ test("server-renders the national Borocast workbench and verified registry", asy
   assert.match(html, /Find the edge/);
   assert.match(html, /Florida Statewide Parcels 2025/);
   assert.match(html, /CROSS-MARKET COMPARISON/);
-  assert.match(html, /Real tract aggregations/);
+  assert.match(html, /Tracts \+ price history/);
+  assert.match(html, /FHFA HOUSE PRICE MOMENTUM/);
+  assert.match(html, /Price momentum/);
   assert.match(html, /Northwest Arkansas/);
   assert.match(html, /No national PLUTO equivalent/);
 });
@@ -39,6 +41,8 @@ test("property-data APIs expose health and market evidence", async () => {
   assert.equal(healthPayload.acs.marketCount, 20);
   assert.equal(healthPayload.acs.clusterCount, 97);
   assert.equal(healthPayload.acs.tractCount, 17959);
+  assert.equal(healthPayload.pricing.latestPeriod, "2026Q1");
+  assert.equal(healthPayload.pricing.marketCount, 20);
 
   const market = await worker.fetch(new Request("http://localhost/api/property-data/markets/miami"), env, ctx);
   assert.equal(market.status, 200);
@@ -48,6 +52,18 @@ test("property-data APIs expose health and market evidence", async () => {
 
   const missing = await worker.fetch(new Request("http://localhost/api/property-data/markets/not-a-market"), env, ctx);
   assert.equal(missing.status, 404);
+});
+
+test("pricing API exposes FHFA history and calculated YoY momentum", async () => {
+  const worker = await loadWorker();
+  const response = await worker.fetch(new Request("http://localhost/api/market-intelligence/pricing/miami"), env, ctx);
+  assert.equal(response.status, 200);
+  const payload = await response.json();
+  assert.equal(payload.market.latestPeriod, "2026Q1");
+  assert.equal(payload.market.yoy, 3.78);
+  assert.equal(payload.market.momentumScore, 80);
+  assert.equal(payload.market.history.length, 41);
+  assert.equal(payload.market.components.length, 3);
 });
 
 test("market-intelligence API exposes measured ACS cluster evidence", async () => {

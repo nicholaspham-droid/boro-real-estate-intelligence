@@ -1,0 +1,7099 @@
+{
+  "retrievedAt": "2026-08-08T01:11:34.668Z",
+  "source": "https://www.fhfa.gov/hpi/download/quarterly_datasets/hpi_at_metro.csv",
+  "sourceLabel": "FHFA All-Transactions House Price Index, not seasonally adjusted, 1995Q1=100",
+  "aggregation": "Equal-weighted index across listed FHFA metropolitan divisions when FHFA does not publish a whole-MSA series",
+  "methodology": {
+    "yoy": "Latest quarter divided by the same quarter one year earlier, minus one",
+    "momentumScore": "50% latest YoY percentile, 25% three-year CAGR percentile, 15% five-year growth percentile, 10% YoY acceleration percentile",
+    "scope": "Metro-level pricing context applied equally to local tract clusters; not a neighborhood price series"
+  },
+  "latestPeriod": "2026Q1",
+  "marketCount": 20,
+  "markets": [
+    {
+      "id": "new-york",
+      "label": "New York",
+      "components": [
+        {
+          "code": 35614,
+          "name": "New York-Jersey City-White Plains, NY-NJ (MSAD)"
+        },
+        {
+          "code": 35084,
+          "name": "Newark, NJ (MSAD)"
+        }
+      ],
+      "latestPeriod": "2026Q1",
+      "latestIndex": 418.48,
+      "yoy": 5.4,
+      "priorYoy": 8.43,
+      "acceleration": -3.03,
+      "threeYearCagr": 7.61,
+      "fiveYearGrowth": 50.1,
+      "componentCoverage": 100,
+      "standardErrorPct": 0.48,
+      "pricingCompetency": 99,
+      "seriesStart": "1975Q4",
+      "history": [
+        {
+          "period": "2016Q1",
+          "year": 2016,
+          "quarter": 1,
+          "index": 228.95,
+          "standardError": 0.89,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q2",
+          "year": 2016,
+          "quarter": 2,
+          "index": 232.17,
+          "standardError": 0.88,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q3",
+          "year": 2016,
+          "quarter": 3,
+          "index": 234.63,
+          "standardError": 0.87,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q4",
+          "year": 2016,
+          "quarter": 4,
+          "index": 236.33,
+          "standardError": 0.88,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q1",
+          "year": 2017,
+          "quarter": 1,
+          "index": 235.71,
+          "standardError": 0.94,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q2",
+          "year": 2017,
+          "quarter": 2,
+          "index": 240.33,
+          "standardError": 0.94,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q3",
+          "year": 2017,
+          "quarter": 3,
+          "index": 243.16,
+          "standardError": 0.93,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q4",
+          "year": 2017,
+          "quarter": 4,
+          "index": 244.64,
+          "standardError": 0.94,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q1",
+          "year": 2018,
+          "quarter": 1,
+          "index": 246.93,
+          "standardError": 0.99,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q2",
+          "year": 2018,
+          "quarter": 2,
+          "index": 249.28,
+          "standardError": 0.95,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q3",
+          "year": 2018,
+          "quarter": 3,
+          "index": 250.75,
+          "standardError": 0.94,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q4",
+          "year": 2018,
+          "quarter": 4,
+          "index": 250.47,
+          "standardError": 0.94,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q1",
+          "year": 2019,
+          "quarter": 1,
+          "index": 252.82,
+          "standardError": 0.96,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q2",
+          "year": 2019,
+          "quarter": 2,
+          "index": 256.32,
+          "standardError": 0.93,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q3",
+          "year": 2019,
+          "quarter": 3,
+          "index": 259.33,
+          "standardError": 0.92,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q4",
+          "year": 2019,
+          "quarter": 4,
+          "index": 261.03,
+          "standardError": 0.92,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q1",
+          "year": 2020,
+          "quarter": 1,
+          "index": 263.22,
+          "standardError": 0.93,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q2",
+          "year": 2020,
+          "quarter": 2,
+          "index": 264.62,
+          "standardError": 0.92,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q3",
+          "year": 2020,
+          "quarter": 3,
+          "index": 268.63,
+          "standardError": 0.93,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q4",
+          "year": 2020,
+          "quarter": 4,
+          "index": 273.45,
+          "standardError": 0.94,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q1",
+          "year": 2021,
+          "quarter": 1,
+          "index": 278.81,
+          "standardError": 0.97,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q2",
+          "year": 2021,
+          "quarter": 2,
+          "index": 288.79,
+          "standardError": 1.03,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q3",
+          "year": 2021,
+          "quarter": 3,
+          "index": 300.26,
+          "standardError": 1.08,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q4",
+          "year": 2021,
+          "quarter": 4,
+          "index": 307.14,
+          "standardError": 1.12,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q1",
+          "year": 2022,
+          "quarter": 1,
+          "index": 314.36,
+          "standardError": 1.23,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q2",
+          "year": 2022,
+          "quarter": 2,
+          "index": 332.86,
+          "standardError": 1.46,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q3",
+          "year": 2022,
+          "quarter": 3,
+          "index": 335.04,
+          "standardError": 1.57,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q4",
+          "year": 2022,
+          "quarter": 4,
+          "index": 332.4,
+          "standardError": 1.75,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q1",
+          "year": 2023,
+          "quarter": 1,
+          "index": 335.82,
+          "standardError": 1.92,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q2",
+          "year": 2023,
+          "quarter": 2,
+          "index": 348.74,
+          "standardError": 1.83,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q3",
+          "year": 2023,
+          "quarter": 3,
+          "index": 356.45,
+          "standardError": 1.75,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q4",
+          "year": 2023,
+          "quarter": 4,
+          "index": 360.74,
+          "standardError": 1.75,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q1",
+          "year": 2024,
+          "quarter": 1,
+          "index": 366.16,
+          "standardError": 1.98,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q2",
+          "year": 2024,
+          "quarter": 2,
+          "index": 380.37,
+          "standardError": 1.81,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q3",
+          "year": 2024,
+          "quarter": 3,
+          "index": 386.2,
+          "standardError": 1.82,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q4",
+          "year": 2024,
+          "quarter": 4,
+          "index": 391.18,
+          "standardError": 1.84,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q1",
+          "year": 2025,
+          "quarter": 1,
+          "index": 397.04,
+          "standardError": 2.04,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q2",
+          "year": 2025,
+          "quarter": 2,
+          "index": 406.33,
+          "standardError": 2.03,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q3",
+          "year": 2025,
+          "quarter": 3,
+          "index": 410.03,
+          "standardError": 2.02,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q4",
+          "year": 2025,
+          "quarter": 4,
+          "index": 414.57,
+          "standardError": 1.9,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2026Q1",
+          "year": 2026,
+          "quarter": 1,
+          "index": 418.48,
+          "standardError": 2,
+          "componentCoverage": 100
+        }
+      ],
+      "momentumScore": 81
+    },
+    {
+      "id": "los-angeles",
+      "label": "Los Angeles",
+      "components": [
+        {
+          "code": 31084,
+          "name": "Los Angeles-Long Beach-Glendale, CA (MSAD)"
+        },
+        {
+          "code": 11244,
+          "name": "Anaheim-Santa Ana-Irvine, CA (MSAD)"
+        }
+      ],
+      "latestPeriod": "2026Q1",
+      "latestIndex": 564.08,
+      "yoy": 1.91,
+      "priorYoy": 5.49,
+      "acceleration": -3.58,
+      "threeYearCagr": 5.07,
+      "fiveYearGrowth": 43.82,
+      "componentCoverage": 100,
+      "standardErrorPct": 0.37,
+      "pricingCompetency": 99,
+      "seriesStart": "1975Q1",
+      "history": [
+        {
+          "period": "2016Q1",
+          "year": 2016,
+          "quarter": 1,
+          "index": 305.63,
+          "standardError": 0.65,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q2",
+          "year": 2016,
+          "quarter": 2,
+          "index": 309.69,
+          "standardError": 0.66,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q3",
+          "year": 2016,
+          "quarter": 3,
+          "index": 316.01,
+          "standardError": 0.66,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q4",
+          "year": 2016,
+          "quarter": 4,
+          "index": 319.89,
+          "standardError": 0.68,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q1",
+          "year": 2017,
+          "quarter": 1,
+          "index": 323.62,
+          "standardError": 0.74,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q2",
+          "year": 2017,
+          "quarter": 2,
+          "index": 329.35,
+          "standardError": 0.74,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q3",
+          "year": 2017,
+          "quarter": 3,
+          "index": 334.8,
+          "standardError": 0.74,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q4",
+          "year": 2017,
+          "quarter": 4,
+          "index": 339.32,
+          "standardError": 0.76,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q1",
+          "year": 2018,
+          "quarter": 1,
+          "index": 344.78,
+          "standardError": 0.8,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q2",
+          "year": 2018,
+          "quarter": 2,
+          "index": 350.64,
+          "standardError": 0.8,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q3",
+          "year": 2018,
+          "quarter": 3,
+          "index": 355.04,
+          "standardError": 0.82,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q4",
+          "year": 2018,
+          "quarter": 4,
+          "index": 355.14,
+          "standardError": 0.82,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q1",
+          "year": 2019,
+          "quarter": 1,
+          "index": 357.06,
+          "standardError": 0.79,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q2",
+          "year": 2019,
+          "quarter": 2,
+          "index": 359.68,
+          "standardError": 0.76,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q3",
+          "year": 2019,
+          "quarter": 3,
+          "index": 362.64,
+          "standardError": 0.74,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q4",
+          "year": 2019,
+          "quarter": 4,
+          "index": 365.26,
+          "standardError": 0.75,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q1",
+          "year": 2020,
+          "quarter": 1,
+          "index": 368.99,
+          "standardError": 0.75,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q2",
+          "year": 2020,
+          "quarter": 2,
+          "index": 373.27,
+          "standardError": 0.75,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q3",
+          "year": 2020,
+          "quarter": 3,
+          "index": 376.51,
+          "standardError": 0.75,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q4",
+          "year": 2020,
+          "quarter": 4,
+          "index": 383.1,
+          "standardError": 0.77,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q1",
+          "year": 2021,
+          "quarter": 1,
+          "index": 392.21,
+          "standardError": 0.79,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q2",
+          "year": 2021,
+          "quarter": 2,
+          "index": 412,
+          "standardError": 0.86,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q3",
+          "year": 2021,
+          "quarter": 3,
+          "index": 430.12,
+          "standardError": 0.9,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q4",
+          "year": 2021,
+          "quarter": 4,
+          "index": 446.49,
+          "standardError": 0.97,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q1",
+          "year": 2022,
+          "quarter": 1,
+          "index": 466,
+          "standardError": 1.13,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q2",
+          "year": 2022,
+          "quarter": 2,
+          "index": 498.6,
+          "standardError": 1.54,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q3",
+          "year": 2022,
+          "quarter": 3,
+          "index": 497.3,
+          "standardError": 1.85,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q4",
+          "year": 2022,
+          "quarter": 4,
+          "index": 489.02,
+          "standardError": 1.97,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q1",
+          "year": 2023,
+          "quarter": 1,
+          "index": 486.28,
+          "standardError": 2.1,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q2",
+          "year": 2023,
+          "quarter": 2,
+          "index": 501.66,
+          "standardError": 2.03,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q3",
+          "year": 2023,
+          "quarter": 3,
+          "index": 510.96,
+          "standardError": 1.98,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q4",
+          "year": 2023,
+          "quarter": 4,
+          "index": 514.25,
+          "standardError": 2,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q1",
+          "year": 2024,
+          "quarter": 1,
+          "index": 524.68,
+          "standardError": 2.19,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q2",
+          "year": 2024,
+          "quarter": 2,
+          "index": 538.18,
+          "standardError": 2.01,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q3",
+          "year": 2024,
+          "quarter": 3,
+          "index": 545.89,
+          "standardError": 2,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q4",
+          "year": 2024,
+          "quarter": 4,
+          "index": 548.52,
+          "standardError": 1.98,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q1",
+          "year": 2025,
+          "quarter": 1,
+          "index": 553.49,
+          "standardError": 2.26,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q2",
+          "year": 2025,
+          "quarter": 2,
+          "index": 557.05,
+          "standardError": 2.22,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q3",
+          "year": 2025,
+          "quarter": 3,
+          "index": 559.65,
+          "standardError": 2.16,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q4",
+          "year": 2025,
+          "quarter": 4,
+          "index": 561.92,
+          "standardError": 2.05,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2026Q1",
+          "year": 2026,
+          "quarter": 1,
+          "index": 564.08,
+          "standardError": 2.1,
+          "componentCoverage": 100
+        }
+      ],
+      "momentumScore": 40
+    },
+    {
+      "id": "chicago",
+      "label": "Chicago",
+      "components": [
+        {
+          "code": 16984,
+          "name": "Chicago-Naperville-Schaumburg, IL (MSAD)"
+        },
+        {
+          "code": 20994,
+          "name": "Elgin, IL (MSAD)"
+        },
+        {
+          "code": 29404,
+          "name": "Lake County, IL (MSAD)"
+        }
+      ],
+      "latestPeriod": "2026Q1",
+      "latestIndex": 266.37,
+      "yoy": 5.8,
+      "priorYoy": 7.61,
+      "acceleration": -1.8,
+      "threeYearCagr": 7.4,
+      "fiveYearGrowth": 52.8,
+      "componentCoverage": 100,
+      "standardErrorPct": 0.44,
+      "pricingCompetency": 99,
+      "seriesStart": "1975Q3",
+      "history": [
+        {
+          "period": "2016Q1",
+          "year": 2016,
+          "quarter": 1,
+          "index": 149.59,
+          "standardError": 0.54,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q2",
+          "year": 2016,
+          "quarter": 2,
+          "index": 152.14,
+          "standardError": 0.53,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q3",
+          "year": 2016,
+          "quarter": 3,
+          "index": 154.41,
+          "standardError": 0.52,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q4",
+          "year": 2016,
+          "quarter": 4,
+          "index": 154.68,
+          "standardError": 0.54,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q1",
+          "year": 2017,
+          "quarter": 1,
+          "index": 154.34,
+          "standardError": 0.6,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q2",
+          "year": 2017,
+          "quarter": 2,
+          "index": 156.97,
+          "standardError": 0.57,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q3",
+          "year": 2017,
+          "quarter": 3,
+          "index": 158.63,
+          "standardError": 0.58,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q4",
+          "year": 2017,
+          "quarter": 4,
+          "index": 159.03,
+          "standardError": 0.58,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q1",
+          "year": 2018,
+          "quarter": 1,
+          "index": 159.92,
+          "standardError": 0.62,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q2",
+          "year": 2018,
+          "quarter": 2,
+          "index": 161.21,
+          "standardError": 0.57,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q3",
+          "year": 2018,
+          "quarter": 3,
+          "index": 161.92,
+          "standardError": 0.58,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q4",
+          "year": 2018,
+          "quarter": 4,
+          "index": 161.39,
+          "standardError": 0.59,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q1",
+          "year": 2019,
+          "quarter": 1,
+          "index": 162.56,
+          "standardError": 0.58,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q2",
+          "year": 2019,
+          "quarter": 2,
+          "index": 164.81,
+          "standardError": 0.54,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q3",
+          "year": 2019,
+          "quarter": 3,
+          "index": 166.34,
+          "standardError": 0.53,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q4",
+          "year": 2019,
+          "quarter": 4,
+          "index": 166.85,
+          "standardError": 0.53,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q1",
+          "year": 2020,
+          "quarter": 1,
+          "index": 167.63,
+          "standardError": 0.53,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q2",
+          "year": 2020,
+          "quarter": 2,
+          "index": 168.41,
+          "standardError": 0.52,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q3",
+          "year": 2020,
+          "quarter": 3,
+          "index": 170.02,
+          "standardError": 0.53,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q4",
+          "year": 2020,
+          "quarter": 4,
+          "index": 172.26,
+          "standardError": 0.54,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q1",
+          "year": 2021,
+          "quarter": 1,
+          "index": 174.33,
+          "standardError": 0.54,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q2",
+          "year": 2021,
+          "quarter": 2,
+          "index": 182.66,
+          "standardError": 0.6,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q3",
+          "year": 2021,
+          "quarter": 3,
+          "index": 189.44,
+          "standardError": 0.62,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q4",
+          "year": 2021,
+          "quarter": 4,
+          "index": 193.84,
+          "standardError": 0.66,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q1",
+          "year": 2022,
+          "quarter": 1,
+          "index": 199.79,
+          "standardError": 0.77,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q2",
+          "year": 2022,
+          "quarter": 2,
+          "index": 213.37,
+          "standardError": 0.91,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q3",
+          "year": 2022,
+          "quarter": 3,
+          "index": 214.66,
+          "standardError": 1,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q4",
+          "year": 2022,
+          "quarter": 4,
+          "index": 212.4,
+          "standardError": 1.12,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q1",
+          "year": 2023,
+          "quarter": 1,
+          "index": 215.03,
+          "standardError": 1.28,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q2",
+          "year": 2023,
+          "quarter": 2,
+          "index": 224.9,
+          "standardError": 1.13,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q3",
+          "year": 2023,
+          "quarter": 3,
+          "index": 229.65,
+          "standardError": 1.07,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q4",
+          "year": 2023,
+          "quarter": 4,
+          "index": 230.17,
+          "standardError": 1.09,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q1",
+          "year": 2024,
+          "quarter": 1,
+          "index": 233.96,
+          "standardError": 1.21,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q2",
+          "year": 2024,
+          "quarter": 2,
+          "index": 242.26,
+          "standardError": 1.07,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q3",
+          "year": 2024,
+          "quarter": 3,
+          "index": 246.28,
+          "standardError": 1.07,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q4",
+          "year": 2024,
+          "quarter": 4,
+          "index": 246.9,
+          "standardError": 1.11,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q1",
+          "year": 2025,
+          "quarter": 1,
+          "index": 251.76,
+          "standardError": 1.2,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q2",
+          "year": 2025,
+          "quarter": 2,
+          "index": 258.86,
+          "standardError": 1.15,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q3",
+          "year": 2025,
+          "quarter": 3,
+          "index": 261.89,
+          "standardError": 1.18,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q4",
+          "year": 2025,
+          "quarter": 4,
+          "index": 263.18,
+          "standardError": 1.12,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2026Q1",
+          "year": 2026,
+          "quarter": 1,
+          "index": 266.37,
+          "standardError": 1.18,
+          "componentCoverage": 100
+        }
+      ],
+      "momentumScore": 86
+    },
+    {
+      "id": "dallas-fort-worth",
+      "label": "Dallas–Fort Worth",
+      "components": [
+        {
+          "code": 19124,
+          "name": "Dallas-Plano-Irving, TX (MSAD)"
+        },
+        {
+          "code": 23104,
+          "name": "Fort Worth-Arlington-Grapevine, TX (MSAD)"
+        }
+      ],
+      "latestPeriod": "2026Q1",
+      "latestIndex": 414.33,
+      "yoy": 1,
+      "priorYoy": 1.72,
+      "acceleration": -0.71,
+      "threeYearCagr": 1.81,
+      "fiveYearGrowth": 43.54,
+      "componentCoverage": 100,
+      "standardErrorPct": 0.42,
+      "pricingCompetency": 99,
+      "seriesStart": "1975Q4",
+      "history": [
+        {
+          "period": "2016Q1",
+          "year": 2016,
+          "quarter": 1,
+          "index": 204.73,
+          "standardError": 0.7,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q2",
+          "year": 2016,
+          "quarter": 2,
+          "index": 211.44,
+          "standardError": 0.7,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q3",
+          "year": 2016,
+          "quarter": 3,
+          "index": 216.7,
+          "standardError": 0.7,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q4",
+          "year": 2016,
+          "quarter": 4,
+          "index": 220.12,
+          "standardError": 0.72,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q1",
+          "year": 2017,
+          "quarter": 1,
+          "index": 225.26,
+          "standardError": 0.76,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q2",
+          "year": 2017,
+          "quarter": 2,
+          "index": 233.67,
+          "standardError": 0.76,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q3",
+          "year": 2017,
+          "quarter": 3,
+          "index": 238.29,
+          "standardError": 0.78,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q4",
+          "year": 2017,
+          "quarter": 4,
+          "index": 241.19,
+          "standardError": 0.79,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q1",
+          "year": 2018,
+          "quarter": 1,
+          "index": 245.66,
+          "standardError": 0.82,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q2",
+          "year": 2018,
+          "quarter": 2,
+          "index": 251.2,
+          "standardError": 0.81,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q3",
+          "year": 2018,
+          "quarter": 3,
+          "index": 254.82,
+          "standardError": 0.82,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q4",
+          "year": 2018,
+          "quarter": 4,
+          "index": 255.43,
+          "standardError": 0.83,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q1",
+          "year": 2019,
+          "quarter": 1,
+          "index": 257.81,
+          "standardError": 0.85,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q2",
+          "year": 2019,
+          "quarter": 2,
+          "index": 262.79,
+          "standardError": 0.84,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q3",
+          "year": 2019,
+          "quarter": 3,
+          "index": 265.36,
+          "standardError": 0.83,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q4",
+          "year": 2019,
+          "quarter": 4,
+          "index": 267.7,
+          "standardError": 0.84,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q1",
+          "year": 2020,
+          "quarter": 1,
+          "index": 269.65,
+          "standardError": 0.85,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q2",
+          "year": 2020,
+          "quarter": 2,
+          "index": 271.11,
+          "standardError": 0.83,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q3",
+          "year": 2020,
+          "quarter": 3,
+          "index": 275.21,
+          "standardError": 0.85,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q4",
+          "year": 2020,
+          "quarter": 4,
+          "index": 281.52,
+          "standardError": 0.87,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q1",
+          "year": 2021,
+          "quarter": 1,
+          "index": 288.66,
+          "standardError": 0.9,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q2",
+          "year": 2021,
+          "quarter": 2,
+          "index": 306.31,
+          "standardError": 0.97,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q3",
+          "year": 2021,
+          "quarter": 3,
+          "index": 327.77,
+          "standardError": 1.04,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q4",
+          "year": 2021,
+          "quarter": 4,
+          "index": 341.8,
+          "standardError": 1.1,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q1",
+          "year": 2022,
+          "quarter": 1,
+          "index": 360.67,
+          "standardError": 1.21,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q2",
+          "year": 2022,
+          "quarter": 2,
+          "index": 390.8,
+          "standardError": 1.37,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q3",
+          "year": 2022,
+          "quarter": 3,
+          "index": 399.89,
+          "standardError": 1.48,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q4",
+          "year": 2022,
+          "quarter": 4,
+          "index": 390.83,
+          "standardError": 1.58,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q1",
+          "year": 2023,
+          "quarter": 1,
+          "index": 392.65,
+          "standardError": 1.65,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q2",
+          "year": 2023,
+          "quarter": 2,
+          "index": 397.28,
+          "standardError": 1.58,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q3",
+          "year": 2023,
+          "quarter": 3,
+          "index": 401.12,
+          "standardError": 1.6,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q4",
+          "year": 2023,
+          "quarter": 4,
+          "index": 396.35,
+          "standardError": 1.64,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q1",
+          "year": 2024,
+          "quarter": 1,
+          "index": 403.29,
+          "standardError": 1.72,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q2",
+          "year": 2024,
+          "quarter": 2,
+          "index": 407.43,
+          "standardError": 1.61,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q3",
+          "year": 2024,
+          "quarter": 3,
+          "index": 408.52,
+          "standardError": 1.66,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q4",
+          "year": 2024,
+          "quarter": 4,
+          "index": 412.19,
+          "standardError": 1.69,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q1",
+          "year": 2025,
+          "quarter": 1,
+          "index": 410.21,
+          "standardError": 1.8,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q2",
+          "year": 2025,
+          "quarter": 2,
+          "index": 412.01,
+          "standardError": 1.73,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q3",
+          "year": 2025,
+          "quarter": 3,
+          "index": 411.87,
+          "standardError": 1.75,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q4",
+          "year": 2025,
+          "quarter": 4,
+          "index": 412.02,
+          "standardError": 1.71,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2026Q1",
+          "year": 2026,
+          "quarter": 1,
+          "index": 414.33,
+          "standardError": 1.73,
+          "componentCoverage": 100
+        }
+      ],
+      "momentumScore": 22
+    },
+    {
+      "id": "houston",
+      "label": "Houston",
+      "components": [
+        {
+          "code": 26420,
+          "name": "Houston-Pasadena-The Woodlands, TX"
+        }
+      ],
+      "latestPeriod": "2026Q1",
+      "latestIndex": 410.73,
+      "yoy": 1.35,
+      "priorYoy": 2.89,
+      "acceleration": -1.54,
+      "threeYearCagr": 2.89,
+      "fiveYearGrowth": 37.34,
+      "componentCoverage": 100,
+      "standardErrorPct": 0.56,
+      "pricingCompetency": 99,
+      "seriesStart": "1976Q1",
+      "history": [
+        {
+          "period": "2016Q1",
+          "year": 2016,
+          "quarter": 1,
+          "index": 240.12,
+          "standardError": 1.05,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q2",
+          "year": 2016,
+          "quarter": 2,
+          "index": 245.37,
+          "standardError": 1.04,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q3",
+          "year": 2016,
+          "quarter": 3,
+          "index": 248.58,
+          "standardError": 1.02,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q4",
+          "year": 2016,
+          "quarter": 4,
+          "index": 249.19,
+          "standardError": 1.05,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q1",
+          "year": 2017,
+          "quarter": 1,
+          "index": 251.04,
+          "standardError": 1.09,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q2",
+          "year": 2017,
+          "quarter": 2,
+          "index": 255.71,
+          "standardError": 1.07,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q3",
+          "year": 2017,
+          "quarter": 3,
+          "index": 256.58,
+          "standardError": 1.11,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q4",
+          "year": 2017,
+          "quarter": 4,
+          "index": 259.85,
+          "standardError": 1.14,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q1",
+          "year": 2018,
+          "quarter": 1,
+          "index": 262.21,
+          "standardError": 1.17,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q2",
+          "year": 2018,
+          "quarter": 2,
+          "index": 266.64,
+          "standardError": 1.08,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q3",
+          "year": 2018,
+          "quarter": 3,
+          "index": 270.19,
+          "standardError": 1.08,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q4",
+          "year": 2018,
+          "quarter": 4,
+          "index": 269.91,
+          "standardError": 1.09,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q1",
+          "year": 2019,
+          "quarter": 1,
+          "index": 272.9,
+          "standardError": 1.13,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q2",
+          "year": 2019,
+          "quarter": 2,
+          "index": 277.17,
+          "standardError": 1.06,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q3",
+          "year": 2019,
+          "quarter": 3,
+          "index": 279.87,
+          "standardError": 1.05,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q4",
+          "year": 2019,
+          "quarter": 4,
+          "index": 280.91,
+          "standardError": 1.07,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q1",
+          "year": 2020,
+          "quarter": 1,
+          "index": 285.3,
+          "standardError": 1.07,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q2",
+          "year": 2020,
+          "quarter": 2,
+          "index": 289.23,
+          "standardError": 1,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q3",
+          "year": 2020,
+          "quarter": 3,
+          "index": 291.16,
+          "standardError": 1.02,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q4",
+          "year": 2020,
+          "quarter": 4,
+          "index": 295.11,
+          "standardError": 1.04,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q1",
+          "year": 2021,
+          "quarter": 1,
+          "index": 299.05,
+          "standardError": 1.07,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q2",
+          "year": 2021,
+          "quarter": 2,
+          "index": 312.05,
+          "standardError": 1.16,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q3",
+          "year": 2021,
+          "quarter": 3,
+          "index": 325.48,
+          "standardError": 1.22,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q4",
+          "year": 2021,
+          "quarter": 4,
+          "index": 336.75,
+          "standardError": 1.3,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q1",
+          "year": 2022,
+          "quarter": 1,
+          "index": 351.58,
+          "standardError": 1.45,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q2",
+          "year": 2022,
+          "quarter": 2,
+          "index": 364.93,
+          "standardError": 1.63,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q3",
+          "year": 2022,
+          "quarter": 3,
+          "index": 376.44,
+          "standardError": 1.89,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q4",
+          "year": 2022,
+          "quarter": 4,
+          "index": 376.93,
+          "standardError": 2.18,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q1",
+          "year": 2023,
+          "quarter": 1,
+          "index": 377.06,
+          "standardError": 2.28,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q2",
+          "year": 2023,
+          "quarter": 2,
+          "index": 385.13,
+          "standardError": 2.12,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q3",
+          "year": 2023,
+          "quarter": 3,
+          "index": 388.02,
+          "standardError": 2.2,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q4",
+          "year": 2023,
+          "quarter": 4,
+          "index": 386.91,
+          "standardError": 2.23,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q1",
+          "year": 2024,
+          "quarter": 1,
+          "index": 393.87,
+          "standardError": 2.44,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q2",
+          "year": 2024,
+          "quarter": 2,
+          "index": 393.83,
+          "standardError": 2.14,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q3",
+          "year": 2024,
+          "quarter": 3,
+          "index": 401.47,
+          "standardError": 2.27,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q4",
+          "year": 2024,
+          "quarter": 4,
+          "index": 403.39,
+          "standardError": 2.26,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q1",
+          "year": 2025,
+          "quarter": 1,
+          "index": 405.26,
+          "standardError": 2.54,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q2",
+          "year": 2025,
+          "quarter": 2,
+          "index": 401.88,
+          "standardError": 2.28,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q3",
+          "year": 2025,
+          "quarter": 3,
+          "index": 407.67,
+          "standardError": 2.35,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q4",
+          "year": 2025,
+          "quarter": 4,
+          "index": 409.92,
+          "standardError": 2.35,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2026Q1",
+          "year": 2026,
+          "quarter": 1,
+          "index": 410.73,
+          "standardError": 2.29,
+          "componentCoverage": 100
+        }
+      ],
+      "momentumScore": 25
+    },
+    {
+      "id": "atlanta",
+      "label": "Atlanta",
+      "components": [
+        {
+          "code": 12054,
+          "name": "Atlanta-Sandy Springs-Roswell, GA (MSAD)"
+        }
+      ],
+      "latestPeriod": "2026Q1",
+      "latestIndex": 376.9,
+      "yoy": 2.18,
+      "priorYoy": 3.17,
+      "acceleration": -0.99,
+      "threeYearCagr": 3.54,
+      "fiveYearGrowth": 52.22,
+      "componentCoverage": 100,
+      "standardErrorPct": 0.38,
+      "pricingCompetency": 99,
+      "seriesStart": "1976Q1",
+      "history": [
+        {
+          "period": "2016Q1",
+          "year": 2016,
+          "quarter": 1,
+          "index": 173.57,
+          "standardError": 0.52,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q2",
+          "year": 2016,
+          "quarter": 2,
+          "index": 179.07,
+          "standardError": 0.51,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q3",
+          "year": 2016,
+          "quarter": 3,
+          "index": 183.27,
+          "standardError": 0.5,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q4",
+          "year": 2016,
+          "quarter": 4,
+          "index": 185.18,
+          "standardError": 0.51,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q1",
+          "year": 2017,
+          "quarter": 1,
+          "index": 186.18,
+          "standardError": 0.55,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q2",
+          "year": 2017,
+          "quarter": 2,
+          "index": 192.15,
+          "standardError": 0.54,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q3",
+          "year": 2017,
+          "quarter": 3,
+          "index": 195.42,
+          "standardError": 0.55,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q4",
+          "year": 2017,
+          "quarter": 4,
+          "index": 197.27,
+          "standardError": 0.56,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q1",
+          "year": 2018,
+          "quarter": 1,
+          "index": 202.34,
+          "standardError": 0.58,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q2",
+          "year": 2018,
+          "quarter": 2,
+          "index": 207.51,
+          "standardError": 0.56,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q3",
+          "year": 2018,
+          "quarter": 3,
+          "index": 211.65,
+          "standardError": 0.58,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q4",
+          "year": 2018,
+          "quarter": 4,
+          "index": 211.87,
+          "standardError": 0.57,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q1",
+          "year": 2019,
+          "quarter": 1,
+          "index": 215.56,
+          "standardError": 0.59,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q2",
+          "year": 2019,
+          "quarter": 2,
+          "index": 220.46,
+          "standardError": 0.56,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q3",
+          "year": 2019,
+          "quarter": 3,
+          "index": 223.38,
+          "standardError": 0.55,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q4",
+          "year": 2019,
+          "quarter": 4,
+          "index": 225.44,
+          "standardError": 0.56,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q1",
+          "year": 2020,
+          "quarter": 1,
+          "index": 229,
+          "standardError": 0.56,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q2",
+          "year": 2020,
+          "quarter": 2,
+          "index": 231.25,
+          "standardError": 0.54,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q3",
+          "year": 2020,
+          "quarter": 3,
+          "index": 235.78,
+          "standardError": 0.56,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q4",
+          "year": 2020,
+          "quarter": 4,
+          "index": 240.3,
+          "standardError": 0.57,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q1",
+          "year": 2021,
+          "quarter": 1,
+          "index": 247.61,
+          "standardError": 0.59,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q2",
+          "year": 2021,
+          "quarter": 2,
+          "index": 262.52,
+          "standardError": 0.64,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q3",
+          "year": 2021,
+          "quarter": 3,
+          "index": 277.96,
+          "standardError": 0.69,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q4",
+          "year": 2021,
+          "quarter": 4,
+          "index": 292.81,
+          "standardError": 0.74,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q1",
+          "year": 2022,
+          "quarter": 1,
+          "index": 308.43,
+          "standardError": 0.83,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q2",
+          "year": 2022,
+          "quarter": 2,
+          "index": 329.44,
+          "standardError": 0.97,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q3",
+          "year": 2022,
+          "quarter": 3,
+          "index": 338.54,
+          "standardError": 1.11,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q4",
+          "year": 2022,
+          "quarter": 4,
+          "index": 336.34,
+          "standardError": 1.25,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q1",
+          "year": 2023,
+          "quarter": 1,
+          "index": 339.55,
+          "standardError": 1.33,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q2",
+          "year": 2023,
+          "quarter": 2,
+          "index": 347.72,
+          "standardError": 1.28,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q3",
+          "year": 2023,
+          "quarter": 3,
+          "index": 351.81,
+          "standardError": 1.28,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q4",
+          "year": 2023,
+          "quarter": 4,
+          "index": 353.07,
+          "standardError": 1.34,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q1",
+          "year": 2024,
+          "quarter": 1,
+          "index": 357.53,
+          "standardError": 1.42,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q2",
+          "year": 2024,
+          "quarter": 2,
+          "index": 363.76,
+          "standardError": 1.31,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q3",
+          "year": 2024,
+          "quarter": 3,
+          "index": 367.49,
+          "standardError": 1.36,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q4",
+          "year": 2024,
+          "quarter": 4,
+          "index": 366.18,
+          "standardError": 1.38,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q1",
+          "year": 2025,
+          "quarter": 1,
+          "index": 368.87,
+          "standardError": 1.51,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q2",
+          "year": 2025,
+          "quarter": 2,
+          "index": 371.53,
+          "standardError": 1.45,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q3",
+          "year": 2025,
+          "quarter": 3,
+          "index": 373.49,
+          "standardError": 1.52,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q4",
+          "year": 2025,
+          "quarter": 4,
+          "index": 374.82,
+          "standardError": 1.4,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2026Q1",
+          "year": 2026,
+          "quarter": 1,
+          "index": 376.9,
+          "standardError": 1.45,
+          "componentCoverage": 100
+        }
+      ],
+      "momentumScore": 46
+    },
+    {
+      "id": "washington",
+      "label": "Washington",
+      "components": [
+        {
+          "code": 47764,
+          "name": "Washington, DC-MD (MSAD)"
+        },
+        {
+          "code": 11694,
+          "name": "Arlington-Alexandria-Reston, VA-WV (MSAD)"
+        },
+        {
+          "code": 23224,
+          "name": "Frederick-Gaithersburg-Bethesda, MD (MSAD)"
+        }
+      ],
+      "latestPeriod": "2026Q1",
+      "latestIndex": 388.42,
+      "yoy": 2.44,
+      "priorYoy": 3.87,
+      "acceleration": -1.44,
+      "threeYearCagr": 3.93,
+      "fiveYearGrowth": 31.55,
+      "componentCoverage": 100,
+      "standardErrorPct": 0.65,
+      "pricingCompetency": 98,
+      "seriesStart": "1975Q4",
+      "history": [
+        {
+          "period": "2016Q1",
+          "year": 2016,
+          "quarter": 1,
+          "index": 242.17,
+          "standardError": 1.21,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q2",
+          "year": 2016,
+          "quarter": 2,
+          "index": 245.82,
+          "standardError": 1.2,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q3",
+          "year": 2016,
+          "quarter": 3,
+          "index": 248.18,
+          "standardError": 1.19,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q4",
+          "year": 2016,
+          "quarter": 4,
+          "index": 249.82,
+          "standardError": 1.21,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q1",
+          "year": 2017,
+          "quarter": 1,
+          "index": 248.26,
+          "standardError": 1.28,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q2",
+          "year": 2017,
+          "quarter": 2,
+          "index": 254.8,
+          "standardError": 1.29,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q3",
+          "year": 2017,
+          "quarter": 3,
+          "index": 256.12,
+          "standardError": 1.3,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q4",
+          "year": 2017,
+          "quarter": 4,
+          "index": 257.06,
+          "standardError": 1.3,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q1",
+          "year": 2018,
+          "quarter": 1,
+          "index": 259.04,
+          "standardError": 1.36,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q2",
+          "year": 2018,
+          "quarter": 2,
+          "index": 262.03,
+          "standardError": 1.32,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q3",
+          "year": 2018,
+          "quarter": 3,
+          "index": 263.6,
+          "standardError": 1.33,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q4",
+          "year": 2018,
+          "quarter": 4,
+          "index": 263.34,
+          "standardError": 1.33,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q1",
+          "year": 2019,
+          "quarter": 1,
+          "index": 266.35,
+          "standardError": 1.33,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q2",
+          "year": 2019,
+          "quarter": 2,
+          "index": 270.52,
+          "standardError": 1.28,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q3",
+          "year": 2019,
+          "quarter": 3,
+          "index": 273.06,
+          "standardError": 1.26,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q4",
+          "year": 2019,
+          "quarter": 4,
+          "index": 274.61,
+          "standardError": 1.26,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q1",
+          "year": 2020,
+          "quarter": 1,
+          "index": 277.58,
+          "standardError": 1.27,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q2",
+          "year": 2020,
+          "quarter": 2,
+          "index": 280.12,
+          "standardError": 1.26,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q3",
+          "year": 2020,
+          "quarter": 3,
+          "index": 283.99,
+          "standardError": 1.28,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q4",
+          "year": 2020,
+          "quarter": 4,
+          "index": 289.31,
+          "standardError": 1.3,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q1",
+          "year": 2021,
+          "quarter": 1,
+          "index": 295.27,
+          "standardError": 1.33,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q2",
+          "year": 2021,
+          "quarter": 2,
+          "index": 308.76,
+          "standardError": 1.43,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q3",
+          "year": 2021,
+          "quarter": 3,
+          "index": 319.72,
+          "standardError": 1.5,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q4",
+          "year": 2021,
+          "quarter": 4,
+          "index": 326.13,
+          "standardError": 1.56,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q1",
+          "year": 2022,
+          "quarter": 1,
+          "index": 334.06,
+          "standardError": 1.71,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q2",
+          "year": 2022,
+          "quarter": 2,
+          "index": 350.66,
+          "standardError": 2.04,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q3",
+          "year": 2022,
+          "quarter": 3,
+          "index": 348.96,
+          "standardError": 2.28,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q4",
+          "year": 2022,
+          "quarter": 4,
+          "index": 342.96,
+          "standardError": 2.5,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q1",
+          "year": 2023,
+          "quarter": 1,
+          "index": 346.01,
+          "standardError": 2.61,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q2",
+          "year": 2023,
+          "quarter": 2,
+          "index": 357.55,
+          "standardError": 2.47,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q3",
+          "year": 2023,
+          "quarter": 3,
+          "index": 359.76,
+          "standardError": 2.45,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q4",
+          "year": 2023,
+          "quarter": 4,
+          "index": 357.3,
+          "standardError": 2.43,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q1",
+          "year": 2024,
+          "quarter": 1,
+          "index": 365.04,
+          "standardError": 2.63,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q2",
+          "year": 2024,
+          "quarter": 2,
+          "index": 375.85,
+          "standardError": 2.39,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q3",
+          "year": 2024,
+          "quarter": 3,
+          "index": 377,
+          "standardError": 2.45,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q4",
+          "year": 2024,
+          "quarter": 4,
+          "index": 377.38,
+          "standardError": 2.46,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q1",
+          "year": 2025,
+          "quarter": 1,
+          "index": 379.18,
+          "standardError": 2.69,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q2",
+          "year": 2025,
+          "quarter": 2,
+          "index": 385.28,
+          "standardError": 2.57,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q3",
+          "year": 2025,
+          "quarter": 3,
+          "index": 386.12,
+          "standardError": 2.65,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q4",
+          "year": 2025,
+          "quarter": 4,
+          "index": 388.3,
+          "standardError": 2.48,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2026Q1",
+          "year": 2026,
+          "quarter": 1,
+          "index": 388.42,
+          "standardError": 2.53,
+          "componentCoverage": 100
+        }
+      ],
+      "momentumScore": 45
+    },
+    {
+      "id": "miami",
+      "label": "Miami",
+      "components": [
+        {
+          "code": 33124,
+          "name": "Miami-Miami Beach-Kendall, FL (MSAD)"
+        },
+        {
+          "code": 22744,
+          "name": "Fort Lauderdale-Pompano Beach-Sunrise, FL (MSAD)"
+        },
+        {
+          "code": 48424,
+          "name": "West Palm Beach-Boca Raton-Delray Beach, FL (MSAD)"
+        }
+      ],
+      "latestPeriod": "2026Q1",
+      "latestIndex": 603.26,
+      "yoy": 3.78,
+      "priorYoy": 2.73,
+      "acceleration": 1.05,
+      "threeYearCagr": 5.66,
+      "fiveYearGrowth": 69.24,
+      "componentCoverage": 100,
+      "standardErrorPct": 0.82,
+      "pricingCompetency": 98,
+      "seriesStart": "1975Q4",
+      "history": [
+        {
+          "period": "2016Q1",
+          "year": 2016,
+          "quarter": 1,
+          "index": 253.88,
+          "standardError": 1.39,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q2",
+          "year": 2016,
+          "quarter": 2,
+          "index": 259.62,
+          "standardError": 1.38,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q3",
+          "year": 2016,
+          "quarter": 3,
+          "index": 266.82,
+          "standardError": 1.36,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q4",
+          "year": 2016,
+          "quarter": 4,
+          "index": 270.82,
+          "standardError": 1.39,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q1",
+          "year": 2017,
+          "quarter": 1,
+          "index": 274.69,
+          "standardError": 1.46,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q2",
+          "year": 2017,
+          "quarter": 2,
+          "index": 282.02,
+          "standardError": 1.48,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q3",
+          "year": 2017,
+          "quarter": 3,
+          "index": 287.21,
+          "standardError": 1.53,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q4",
+          "year": 2017,
+          "quarter": 4,
+          "index": 291.34,
+          "standardError": 1.54,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q1",
+          "year": 2018,
+          "quarter": 1,
+          "index": 297.68,
+          "standardError": 1.58,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q2",
+          "year": 2018,
+          "quarter": 2,
+          "index": 301.6,
+          "standardError": 1.51,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q3",
+          "year": 2018,
+          "quarter": 3,
+          "index": 306.16,
+          "standardError": 1.55,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q4",
+          "year": 2018,
+          "quarter": 4,
+          "index": 309.76,
+          "standardError": 1.57,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q1",
+          "year": 2019,
+          "quarter": 1,
+          "index": 311.47,
+          "standardError": 1.61,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q2",
+          "year": 2019,
+          "quarter": 2,
+          "index": 315.8,
+          "standardError": 1.52,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q3",
+          "year": 2019,
+          "quarter": 3,
+          "index": 320.63,
+          "standardError": 1.51,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q4",
+          "year": 2019,
+          "quarter": 4,
+          "index": 324.62,
+          "standardError": 1.53,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q1",
+          "year": 2020,
+          "quarter": 1,
+          "index": 329.13,
+          "standardError": 1.54,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q2",
+          "year": 2020,
+          "quarter": 2,
+          "index": 332.62,
+          "standardError": 1.5,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q3",
+          "year": 2020,
+          "quarter": 3,
+          "index": 337.94,
+          "standardError": 1.53,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q4",
+          "year": 2020,
+          "quarter": 4,
+          "index": 346.45,
+          "standardError": 1.56,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q1",
+          "year": 2021,
+          "quarter": 1,
+          "index": 356.45,
+          "standardError": 1.62,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q2",
+          "year": 2021,
+          "quarter": 2,
+          "index": 377.36,
+          "standardError": 1.77,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q3",
+          "year": 2021,
+          "quarter": 3,
+          "index": 401.8,
+          "standardError": 1.91,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q4",
+          "year": 2021,
+          "quarter": 4,
+          "index": 423.64,
+          "standardError": 2.07,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q1",
+          "year": 2022,
+          "quarter": 1,
+          "index": 446.49,
+          "standardError": 2.32,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q2",
+          "year": 2022,
+          "quarter": 2,
+          "index": 484.15,
+          "standardError": 2.91,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q3",
+          "year": 2022,
+          "quarter": 3,
+          "index": 506.6,
+          "standardError": 3.46,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q4",
+          "year": 2022,
+          "quarter": 4,
+          "index": 508.57,
+          "standardError": 3.95,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q1",
+          "year": 2023,
+          "quarter": 1,
+          "index": 511.42,
+          "standardError": 3.92,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q2",
+          "year": 2023,
+          "quarter": 2,
+          "index": 524.93,
+          "standardError": 3.83,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q3",
+          "year": 2023,
+          "quarter": 3,
+          "index": 542.22,
+          "standardError": 4.18,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q4",
+          "year": 2023,
+          "quarter": 4,
+          "index": 548.82,
+          "standardError": 4.29,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q1",
+          "year": 2024,
+          "quarter": 1,
+          "index": 565.82,
+          "standardError": 4.63,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q2",
+          "year": 2024,
+          "quarter": 2,
+          "index": 572.14,
+          "standardError": 4.26,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q3",
+          "year": 2024,
+          "quarter": 3,
+          "index": 575.94,
+          "standardError": 4.48,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q4",
+          "year": 2024,
+          "quarter": 4,
+          "index": 584.79,
+          "standardError": 4.68,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q1",
+          "year": 2025,
+          "quarter": 1,
+          "index": 581.29,
+          "standardError": 4.96,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q2",
+          "year": 2025,
+          "quarter": 2,
+          "index": 590.74,
+          "standardError": 4.89,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q3",
+          "year": 2025,
+          "quarter": 3,
+          "index": 587.12,
+          "standardError": 4.85,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q4",
+          "year": 2025,
+          "quarter": 4,
+          "index": 594.75,
+          "standardError": 4.68,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2026Q1",
+          "year": 2026,
+          "quarter": 1,
+          "index": 603.26,
+          "standardError": 4.96,
+          "componentCoverage": 100
+        }
+      ],
+      "momentumScore": 80
+    },
+    {
+      "id": "philadelphia",
+      "label": "Philadelphia",
+      "components": [
+        {
+          "code": 37964,
+          "name": "Philadelphia, PA (MSAD)"
+        },
+        {
+          "code": 33874,
+          "name": "Montgomery County-Bucks County-Chester County, PA (MSAD)"
+        },
+        {
+          "code": 15804,
+          "name": "Camden, NJ (MSAD)"
+        }
+      ],
+      "latestPeriod": "2026Q1",
+      "latestIndex": 383.84,
+      "yoy": 5.35,
+      "priorYoy": 6.85,
+      "acceleration": -1.5,
+      "threeYearCagr": 6.51,
+      "fiveYearGrowth": 51.09,
+      "componentCoverage": 100,
+      "standardErrorPct": 0.55,
+      "pricingCompetency": 99,
+      "seriesStart": "1976Q3",
+      "history": [
+        {
+          "period": "2016Q1",
+          "year": 2016,
+          "quarter": 1,
+          "index": 199.72,
+          "standardError": 0.99,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q2",
+          "year": 2016,
+          "quarter": 2,
+          "index": 203.2,
+          "standardError": 0.96,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q3",
+          "year": 2016,
+          "quarter": 3,
+          "index": 206.15,
+          "standardError": 0.96,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q4",
+          "year": 2016,
+          "quarter": 4,
+          "index": 206.05,
+          "standardError": 0.97,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q1",
+          "year": 2017,
+          "quarter": 1,
+          "index": 206.28,
+          "standardError": 1.03,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q2",
+          "year": 2017,
+          "quarter": 2,
+          "index": 210.41,
+          "standardError": 1,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q3",
+          "year": 2017,
+          "quarter": 3,
+          "index": 213.3,
+          "standardError": 1.02,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q4",
+          "year": 2017,
+          "quarter": 4,
+          "index": 213.64,
+          "standardError": 1.03,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q1",
+          "year": 2018,
+          "quarter": 1,
+          "index": 215.85,
+          "standardError": 1.06,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q2",
+          "year": 2018,
+          "quarter": 2,
+          "index": 218.79,
+          "standardError": 1.02,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q3",
+          "year": 2018,
+          "quarter": 3,
+          "index": 220.8,
+          "standardError": 1.02,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q4",
+          "year": 2018,
+          "quarter": 4,
+          "index": 221.29,
+          "standardError": 1.03,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q1",
+          "year": 2019,
+          "quarter": 1,
+          "index": 223.09,
+          "standardError": 1.05,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q2",
+          "year": 2019,
+          "quarter": 2,
+          "index": 227.32,
+          "standardError": 1.02,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q3",
+          "year": 2019,
+          "quarter": 3,
+          "index": 230.69,
+          "standardError": 1.02,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q4",
+          "year": 2019,
+          "quarter": 4,
+          "index": 232.99,
+          "standardError": 1.03,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q1",
+          "year": 2020,
+          "quarter": 1,
+          "index": 235.1,
+          "standardError": 1.04,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q2",
+          "year": 2020,
+          "quarter": 2,
+          "index": 237.81,
+          "standardError": 1.03,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q3",
+          "year": 2020,
+          "quarter": 3,
+          "index": 242.84,
+          "standardError": 1.05,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q4",
+          "year": 2020,
+          "quarter": 4,
+          "index": 247.62,
+          "standardError": 1.07,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q1",
+          "year": 2021,
+          "quarter": 1,
+          "index": 254.05,
+          "standardError": 1.1,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q2",
+          "year": 2021,
+          "quarter": 2,
+          "index": 266.16,
+          "standardError": 1.18,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q3",
+          "year": 2021,
+          "quarter": 3,
+          "index": 279.54,
+          "standardError": 1.25,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q4",
+          "year": 2021,
+          "quarter": 4,
+          "index": 285.47,
+          "standardError": 1.28,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q1",
+          "year": 2022,
+          "quarter": 1,
+          "index": 293.45,
+          "standardError": 1.4,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q2",
+          "year": 2022,
+          "quarter": 2,
+          "index": 308.54,
+          "standardError": 1.55,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q3",
+          "year": 2022,
+          "quarter": 3,
+          "index": 314.58,
+          "standardError": 1.69,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q4",
+          "year": 2022,
+          "quarter": 4,
+          "index": 315.97,
+          "standardError": 1.86,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q1",
+          "year": 2023,
+          "quarter": 1,
+          "index": 317.65,
+          "standardError": 2,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q2",
+          "year": 2023,
+          "quarter": 2,
+          "index": 326.6,
+          "standardError": 1.87,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q3",
+          "year": 2023,
+          "quarter": 3,
+          "index": 335.88,
+          "standardError": 1.9,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q4",
+          "year": 2023,
+          "quarter": 4,
+          "index": 336.21,
+          "standardError": 1.88,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q1",
+          "year": 2024,
+          "quarter": 1,
+          "index": 341,
+          "standardError": 2.13,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q2",
+          "year": 2024,
+          "quarter": 2,
+          "index": 352.5,
+          "standardError": 1.94,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q3",
+          "year": 2024,
+          "quarter": 3,
+          "index": 357.49,
+          "standardError": 1.98,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q4",
+          "year": 2024,
+          "quarter": 4,
+          "index": 359.4,
+          "standardError": 1.97,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q1",
+          "year": 2025,
+          "quarter": 1,
+          "index": 364.35,
+          "standardError": 2.2,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q2",
+          "year": 2025,
+          "quarter": 2,
+          "index": 373.08,
+          "standardError": 2.13,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q3",
+          "year": 2025,
+          "quarter": 3,
+          "index": 376.13,
+          "standardError": 2.14,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q4",
+          "year": 2025,
+          "quarter": 4,
+          "index": 378.93,
+          "standardError": 2.05,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2026Q1",
+          "year": 2026,
+          "quarter": 1,
+          "index": 383.84,
+          "standardError": 2.11,
+          "componentCoverage": 100
+        }
+      ],
+      "momentumScore": 80
+    },
+    {
+      "id": "phoenix",
+      "label": "Phoenix",
+      "components": [
+        {
+          "code": 38060,
+          "name": "Phoenix-Mesa-Chandler, AZ"
+        }
+      ],
+      "latestPeriod": "2026Q1",
+      "latestIndex": 519.93,
+      "yoy": 2.39,
+      "priorYoy": 1.83,
+      "acceleration": 0.56,
+      "threeYearCagr": 3.41,
+      "fiveYearGrowth": 48.06,
+      "componentCoverage": 100,
+      "standardErrorPct": 0.35,
+      "pricingCompetency": 99,
+      "seriesStart": "1977Q2",
+      "history": [
+        {
+          "period": "2016Q1",
+          "year": 2016,
+          "quarter": 1,
+          "index": 230.49,
+          "standardError": 0.61,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q2",
+          "year": 2016,
+          "quarter": 2,
+          "index": 235.53,
+          "standardError": 0.6,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q3",
+          "year": 2016,
+          "quarter": 3,
+          "index": 240.03,
+          "standardError": 0.59,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q4",
+          "year": 2016,
+          "quarter": 4,
+          "index": 244.09,
+          "standardError": 0.6,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q1",
+          "year": 2017,
+          "quarter": 1,
+          "index": 247.54,
+          "standardError": 0.64,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q2",
+          "year": 2017,
+          "quarter": 2,
+          "index": 254.15,
+          "standardError": 0.64,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q3",
+          "year": 2017,
+          "quarter": 3,
+          "index": 259.38,
+          "standardError": 0.64,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q4",
+          "year": 2017,
+          "quarter": 4,
+          "index": 263.01,
+          "standardError": 0.65,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q1",
+          "year": 2018,
+          "quarter": 1,
+          "index": 268.72,
+          "standardError": 0.67,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q2",
+          "year": 2018,
+          "quarter": 2,
+          "index": 274.66,
+          "standardError": 0.67,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q3",
+          "year": 2018,
+          "quarter": 3,
+          "index": 281.42,
+          "standardError": 0.69,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q4",
+          "year": 2018,
+          "quarter": 4,
+          "index": 284.54,
+          "standardError": 0.7,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q1",
+          "year": 2019,
+          "quarter": 1,
+          "index": 288.24,
+          "standardError": 0.7,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q2",
+          "year": 2019,
+          "quarter": 2,
+          "index": 293.83,
+          "standardError": 0.68,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q3",
+          "year": 2019,
+          "quarter": 3,
+          "index": 298.29,
+          "standardError": 0.67,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q4",
+          "year": 2019,
+          "quarter": 4,
+          "index": 303.67,
+          "standardError": 0.68,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q1",
+          "year": 2020,
+          "quarter": 1,
+          "index": 310.37,
+          "standardError": 0.7,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q2",
+          "year": 2020,
+          "quarter": 2,
+          "index": 316.23,
+          "standardError": 0.7,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q3",
+          "year": 2020,
+          "quarter": 3,
+          "index": 323.97,
+          "standardError": 0.72,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q4",
+          "year": 2020,
+          "quarter": 4,
+          "index": 336.06,
+          "standardError": 0.75,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q1",
+          "year": 2021,
+          "quarter": 1,
+          "index": 351.16,
+          "standardError": 0.78,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q2",
+          "year": 2021,
+          "quarter": 2,
+          "index": 380.7,
+          "standardError": 0.87,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q3",
+          "year": 2021,
+          "quarter": 3,
+          "index": 413.19,
+          "standardError": 0.95,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q4",
+          "year": 2021,
+          "quarter": 4,
+          "index": 435.68,
+          "standardError": 1.02,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q1",
+          "year": 2022,
+          "quarter": 1,
+          "index": 457.33,
+          "standardError": 1.12,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q2",
+          "year": 2022,
+          "quarter": 2,
+          "index": 495.04,
+          "standardError": 1.4,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q3",
+          "year": 2022,
+          "quarter": 3,
+          "index": 501.61,
+          "standardError": 1.6,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q4",
+          "year": 2022,
+          "quarter": 4,
+          "index": 476.74,
+          "standardError": 1.68,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q1",
+          "year": 2023,
+          "quarter": 1,
+          "index": 470.18,
+          "standardError": 1.71,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q2",
+          "year": 2023,
+          "quarter": 2,
+          "index": 479.27,
+          "standardError": 1.74,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q3",
+          "year": 2023,
+          "quarter": 3,
+          "index": 490.95,
+          "standardError": 1.78,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q4",
+          "year": 2023,
+          "quarter": 4,
+          "index": 493.79,
+          "standardError": 1.81,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q1",
+          "year": 2024,
+          "quarter": 1,
+          "index": 498.69,
+          "standardError": 1.93,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q2",
+          "year": 2024,
+          "quarter": 2,
+          "index": 504.36,
+          "standardError": 1.75,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q3",
+          "year": 2024,
+          "quarter": 3,
+          "index": 507.54,
+          "standardError": 1.79,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q4",
+          "year": 2024,
+          "quarter": 4,
+          "index": 509.37,
+          "standardError": 1.76,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q1",
+          "year": 2025,
+          "quarter": 1,
+          "index": 507.81,
+          "standardError": 1.9,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q2",
+          "year": 2025,
+          "quarter": 2,
+          "index": 513.66,
+          "standardError": 1.87,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q3",
+          "year": 2025,
+          "quarter": 3,
+          "index": 512.13,
+          "standardError": 1.91,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q4",
+          "year": 2025,
+          "quarter": 4,
+          "index": 515.97,
+          "standardError": 1.82,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2026Q1",
+          "year": 2026,
+          "quarter": 1,
+          "index": 519.93,
+          "standardError": 1.83,
+          "componentCoverage": 100
+        }
+      ],
+      "momentumScore": 44
+    },
+    {
+      "id": "ocala",
+      "label": "Ocala",
+      "components": [
+        {
+          "code": 36100,
+          "name": "Ocala, FL"
+        }
+      ],
+      "latestPeriod": "2026Q1",
+      "latestIndex": 402.08,
+      "yoy": 0.51,
+      "priorYoy": 1.78,
+      "acceleration": -1.27,
+      "threeYearCagr": 3.04,
+      "fiveYearGrowth": 57.39,
+      "componentCoverage": 100,
+      "standardErrorPct": 1.92,
+      "pricingCompetency": 95,
+      "seriesStart": "1986Q2",
+      "history": [
+        {
+          "period": "2016Q1",
+          "year": 2016,
+          "quarter": 1,
+          "index": 172.44,
+          "standardError": 3.03,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q2",
+          "year": 2016,
+          "quarter": 2,
+          "index": 175.61,
+          "standardError": 3,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q3",
+          "year": 2016,
+          "quarter": 3,
+          "index": 180.16,
+          "standardError": 3.07,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q4",
+          "year": 2016,
+          "quarter": 4,
+          "index": 182.53,
+          "standardError": 3.04,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q1",
+          "year": 2017,
+          "quarter": 1,
+          "index": 188.07,
+          "standardError": 3.26,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q2",
+          "year": 2017,
+          "quarter": 2,
+          "index": 189.27,
+          "standardError": 3.19,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q3",
+          "year": 2017,
+          "quarter": 3,
+          "index": 193.21,
+          "standardError": 3.23,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q4",
+          "year": 2017,
+          "quarter": 4,
+          "index": 200.76,
+          "standardError": 3.3,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q1",
+          "year": 2018,
+          "quarter": 1,
+          "index": 201.37,
+          "standardError": 3.36,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q2",
+          "year": 2018,
+          "quarter": 2,
+          "index": 205.19,
+          "standardError": 3.3,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q3",
+          "year": 2018,
+          "quarter": 3,
+          "index": 211.32,
+          "standardError": 3.39,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q4",
+          "year": 2018,
+          "quarter": 4,
+          "index": 212.91,
+          "standardError": 3.39,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q1",
+          "year": 2019,
+          "quarter": 1,
+          "index": 217.85,
+          "standardError": 3.53,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q2",
+          "year": 2019,
+          "quarter": 2,
+          "index": 222.12,
+          "standardError": 3.52,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q3",
+          "year": 2019,
+          "quarter": 3,
+          "index": 227.5,
+          "standardError": 3.53,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q4",
+          "year": 2019,
+          "quarter": 4,
+          "index": 229.91,
+          "standardError": 3.54,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q1",
+          "year": 2020,
+          "quarter": 1,
+          "index": 234.39,
+          "standardError": 3.63,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q2",
+          "year": 2020,
+          "quarter": 2,
+          "index": 235.98,
+          "standardError": 3.58,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q3",
+          "year": 2020,
+          "quarter": 3,
+          "index": 242,
+          "standardError": 3.68,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q4",
+          "year": 2020,
+          "quarter": 4,
+          "index": 246.88,
+          "standardError": 3.73,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q1",
+          "year": 2021,
+          "quarter": 1,
+          "index": 255.46,
+          "standardError": 3.84,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q2",
+          "year": 2021,
+          "quarter": 2,
+          "index": 270.19,
+          "standardError": 4.11,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q3",
+          "year": 2021,
+          "quarter": 3,
+          "index": 288.97,
+          "standardError": 4.4,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q4",
+          "year": 2021,
+          "quarter": 4,
+          "index": 312.71,
+          "standardError": 4.76,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q1",
+          "year": 2022,
+          "quarter": 1,
+          "index": 328.04,
+          "standardError": 5.12,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q2",
+          "year": 2022,
+          "quarter": 2,
+          "index": 358.32,
+          "standardError": 5.74,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q3",
+          "year": 2022,
+          "quarter": 3,
+          "index": 366.72,
+          "standardError": 6.32,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q4",
+          "year": 2022,
+          "quarter": 4,
+          "index": 381.76,
+          "standardError": 6.79,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q1",
+          "year": 2023,
+          "quarter": 1,
+          "index": 367.55,
+          "standardError": 6.52,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q2",
+          "year": 2023,
+          "quarter": 2,
+          "index": 374.17,
+          "standardError": 6.52,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q3",
+          "year": 2023,
+          "quarter": 3,
+          "index": 383.91,
+          "standardError": 6.86,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q4",
+          "year": 2023,
+          "quarter": 4,
+          "index": 384.82,
+          "standardError": 6.94,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q1",
+          "year": 2024,
+          "quarter": 1,
+          "index": 393.05,
+          "standardError": 7.73,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q2",
+          "year": 2024,
+          "quarter": 2,
+          "index": 384.61,
+          "standardError": 6.88,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q3",
+          "year": 2024,
+          "quarter": 3,
+          "index": 384.45,
+          "standardError": 6.85,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q4",
+          "year": 2024,
+          "quarter": 4,
+          "index": 401.93,
+          "standardError": 7.46,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q1",
+          "year": 2025,
+          "quarter": 1,
+          "index": 400.05,
+          "standardError": 7.55,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q2",
+          "year": 2025,
+          "quarter": 2,
+          "index": 392.14,
+          "standardError": 7.35,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q3",
+          "year": 2025,
+          "quarter": 3,
+          "index": 401.34,
+          "standardError": 7.47,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q4",
+          "year": 2025,
+          "quarter": 4,
+          "index": 398.12,
+          "standardError": 7.35,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2026Q1",
+          "year": 2026,
+          "quarter": 1,
+          "index": 402.08,
+          "standardError": 7.7,
+          "componentCoverage": 100
+        }
+      ],
+      "momentumScore": 29
+    },
+    {
+      "id": "myrtle-beach",
+      "label": "Myrtle Beach",
+      "components": [
+        {
+          "code": 34820,
+          "name": "Myrtle Beach-Conway-North Myrtle Beach, SC"
+        }
+      ],
+      "latestPeriod": "2026Q1",
+      "latestIndex": 381.71,
+      "yoy": 2.48,
+      "priorYoy": 4.42,
+      "acceleration": -1.94,
+      "threeYearCagr": 5.23,
+      "fiveYearGrowth": 62.52,
+      "componentCoverage": 100,
+      "standardErrorPct": 2.15,
+      "pricingCompetency": 95,
+      "seriesStart": "1987Q1",
+      "history": [
+        {
+          "period": "2016Q1",
+          "year": 2016,
+          "quarter": 1,
+          "index": 179.7,
+          "standardError": 3.32,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q2",
+          "year": 2016,
+          "quarter": 2,
+          "index": 181.05,
+          "standardError": 3.25,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q3",
+          "year": 2016,
+          "quarter": 3,
+          "index": 186.36,
+          "standardError": 3.26,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q4",
+          "year": 2016,
+          "quarter": 4,
+          "index": 183.33,
+          "standardError": 3.15,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q1",
+          "year": 2017,
+          "quarter": 1,
+          "index": 186.37,
+          "standardError": 3.39,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q2",
+          "year": 2017,
+          "quarter": 2,
+          "index": 190.49,
+          "standardError": 3.3,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q3",
+          "year": 2017,
+          "quarter": 3,
+          "index": 192.92,
+          "standardError": 3.46,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q4",
+          "year": 2017,
+          "quarter": 4,
+          "index": 193.64,
+          "standardError": 3.42,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q1",
+          "year": 2018,
+          "quarter": 1,
+          "index": 198.55,
+          "standardError": 3.5,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q2",
+          "year": 2018,
+          "quarter": 2,
+          "index": 197.85,
+          "standardError": 3.43,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q3",
+          "year": 2018,
+          "quarter": 3,
+          "index": 201.62,
+          "standardError": 3.52,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q4",
+          "year": 2018,
+          "quarter": 4,
+          "index": 204.81,
+          "standardError": 3.5,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q1",
+          "year": 2019,
+          "quarter": 1,
+          "index": 205.76,
+          "standardError": 3.52,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q2",
+          "year": 2019,
+          "quarter": 2,
+          "index": 211.62,
+          "standardError": 3.51,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q3",
+          "year": 2019,
+          "quarter": 3,
+          "index": 213.15,
+          "standardError": 3.51,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q4",
+          "year": 2019,
+          "quarter": 4,
+          "index": 215.11,
+          "standardError": 3.51,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q1",
+          "year": 2020,
+          "quarter": 1,
+          "index": 220.62,
+          "standardError": 3.65,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q2",
+          "year": 2020,
+          "quarter": 2,
+          "index": 220.76,
+          "standardError": 3.54,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q3",
+          "year": 2020,
+          "quarter": 3,
+          "index": 223.06,
+          "standardError": 3.57,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q4",
+          "year": 2020,
+          "quarter": 4,
+          "index": 229.93,
+          "standardError": 3.7,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q1",
+          "year": 2021,
+          "quarter": 1,
+          "index": 234.87,
+          "standardError": 3.77,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q2",
+          "year": 2021,
+          "quarter": 2,
+          "index": 248.92,
+          "standardError": 4.05,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q3",
+          "year": 2021,
+          "quarter": 3,
+          "index": 265.65,
+          "standardError": 4.36,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q4",
+          "year": 2021,
+          "quarter": 4,
+          "index": 279.61,
+          "standardError": 4.59,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q1",
+          "year": 2022,
+          "quarter": 1,
+          "index": 294.11,
+          "standardError": 5,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q2",
+          "year": 2022,
+          "quarter": 2,
+          "index": 313.09,
+          "standardError": 5.57,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q3",
+          "year": 2022,
+          "quarter": 3,
+          "index": 333.61,
+          "standardError": 6.58,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q4",
+          "year": 2022,
+          "quarter": 4,
+          "index": 331.2,
+          "standardError": 7.18,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q1",
+          "year": 2023,
+          "quarter": 1,
+          "index": 327.62,
+          "standardError": 7.09,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q2",
+          "year": 2023,
+          "quarter": 2,
+          "index": 343.58,
+          "standardError": 7.14,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q3",
+          "year": 2023,
+          "quarter": 3,
+          "index": 349.86,
+          "standardError": 7.12,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q4",
+          "year": 2023,
+          "quarter": 4,
+          "index": 358.86,
+          "standardError": 7.5,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q1",
+          "year": 2024,
+          "quarter": 1,
+          "index": 356.68,
+          "standardError": 7.34,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q2",
+          "year": 2024,
+          "quarter": 2,
+          "index": 356.32,
+          "standardError": 7.28,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q3",
+          "year": 2024,
+          "quarter": 3,
+          "index": 357.65,
+          "standardError": 7.38,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q4",
+          "year": 2024,
+          "quarter": 4,
+          "index": 363.7,
+          "standardError": 7.43,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q1",
+          "year": 2025,
+          "quarter": 1,
+          "index": 372.46,
+          "standardError": 8.07,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q2",
+          "year": 2025,
+          "quarter": 2,
+          "index": 378.81,
+          "standardError": 7.94,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q3",
+          "year": 2025,
+          "quarter": 3,
+          "index": 378.84,
+          "standardError": 8.41,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q4",
+          "year": 2025,
+          "quarter": 4,
+          "index": 375,
+          "standardError": 7.86,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2026Q1",
+          "year": 2026,
+          "quarter": 1,
+          "index": 381.71,
+          "standardError": 8.22,
+          "componentCoverage": 100
+        }
+      ],
+      "momentumScore": 62
+    },
+    {
+      "id": "spartanburg",
+      "label": "Spartanburg",
+      "components": [
+        {
+          "code": 43900,
+          "name": "Spartanburg, SC"
+        }
+      ],
+      "latestPeriod": "2026Q1",
+      "latestIndex": 346.02,
+      "yoy": 4.59,
+      "priorYoy": 3.84,
+      "acceleration": 0.75,
+      "threeYearCagr": 5.28,
+      "fiveYearGrowth": 61.37,
+      "componentCoverage": 100,
+      "standardErrorPct": 1.43,
+      "pricingCompetency": 97,
+      "seriesStart": "1986Q3",
+      "history": [
+        {
+          "period": "2016Q1",
+          "year": 2016,
+          "quarter": 1,
+          "index": 157.27,
+          "standardError": 2.17,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q2",
+          "year": 2016,
+          "quarter": 2,
+          "index": 155.41,
+          "standardError": 2,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q3",
+          "year": 2016,
+          "quarter": 3,
+          "index": 160.85,
+          "standardError": 1.99,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q4",
+          "year": 2016,
+          "quarter": 4,
+          "index": 163.51,
+          "standardError": 2.01,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q1",
+          "year": 2017,
+          "quarter": 1,
+          "index": 161.76,
+          "standardError": 2.21,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q2",
+          "year": 2017,
+          "quarter": 2,
+          "index": 168.15,
+          "standardError": 2.07,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q3",
+          "year": 2017,
+          "quarter": 3,
+          "index": 173.25,
+          "standardError": 2.13,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q4",
+          "year": 2017,
+          "quarter": 4,
+          "index": 173.31,
+          "standardError": 2.16,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q1",
+          "year": 2018,
+          "quarter": 1,
+          "index": 171.44,
+          "standardError": 2.22,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q2",
+          "year": 2018,
+          "quarter": 2,
+          "index": 181.07,
+          "standardError": 2.13,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q3",
+          "year": 2018,
+          "quarter": 3,
+          "index": 183.56,
+          "standardError": 2.2,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q4",
+          "year": 2018,
+          "quarter": 4,
+          "index": 185.02,
+          "standardError": 2.17,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q1",
+          "year": 2019,
+          "quarter": 1,
+          "index": 185.1,
+          "standardError": 2.21,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q2",
+          "year": 2019,
+          "quarter": 2,
+          "index": 191.27,
+          "standardError": 2.18,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q3",
+          "year": 2019,
+          "quarter": 3,
+          "index": 194.2,
+          "standardError": 2.19,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q4",
+          "year": 2019,
+          "quarter": 4,
+          "index": 195.34,
+          "standardError": 2.21,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q1",
+          "year": 2020,
+          "quarter": 1,
+          "index": 199.61,
+          "standardError": 2.2,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q2",
+          "year": 2020,
+          "quarter": 2,
+          "index": 200.83,
+          "standardError": 2.16,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q3",
+          "year": 2020,
+          "quarter": 3,
+          "index": 204.65,
+          "standardError": 2.23,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q4",
+          "year": 2020,
+          "quarter": 4,
+          "index": 208.93,
+          "standardError": 2.25,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q1",
+          "year": 2021,
+          "quarter": 1,
+          "index": 214.42,
+          "standardError": 2.32,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q2",
+          "year": 2021,
+          "quarter": 2,
+          "index": 225.83,
+          "standardError": 2.48,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q3",
+          "year": 2021,
+          "quarter": 3,
+          "index": 238.87,
+          "standardError": 2.6,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q4",
+          "year": 2021,
+          "quarter": 4,
+          "index": 254.64,
+          "standardError": 2.85,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q1",
+          "year": 2022,
+          "quarter": 1,
+          "index": 261.75,
+          "standardError": 3.08,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q2",
+          "year": 2022,
+          "quarter": 2,
+          "index": 281.75,
+          "standardError": 3.4,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q3",
+          "year": 2022,
+          "quarter": 3,
+          "index": 288.63,
+          "standardError": 3.84,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q4",
+          "year": 2022,
+          "quarter": 4,
+          "index": 300.63,
+          "standardError": 4.11,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q1",
+          "year": 2023,
+          "quarter": 1,
+          "index": 296.5,
+          "standardError": 4.34,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q2",
+          "year": 2023,
+          "quarter": 2,
+          "index": 298.23,
+          "standardError": 4.31,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q3",
+          "year": 2023,
+          "quarter": 3,
+          "index": 318.16,
+          "standardError": 4.67,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q4",
+          "year": 2023,
+          "quarter": 4,
+          "index": 316.02,
+          "standardError": 4.53,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q1",
+          "year": 2024,
+          "quarter": 1,
+          "index": 318.59,
+          "standardError": 4.62,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q2",
+          "year": 2024,
+          "quarter": 2,
+          "index": 322.18,
+          "standardError": 4.48,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q3",
+          "year": 2024,
+          "quarter": 3,
+          "index": 338.2,
+          "standardError": 4.86,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q4",
+          "year": 2024,
+          "quarter": 4,
+          "index": 327.36,
+          "standardError": 4.75,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q1",
+          "year": 2025,
+          "quarter": 1,
+          "index": 330.83,
+          "standardError": 4.84,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q2",
+          "year": 2025,
+          "quarter": 2,
+          "index": 339.58,
+          "standardError": 4.69,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q3",
+          "year": 2025,
+          "quarter": 3,
+          "index": 341.1,
+          "standardError": 4.96,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q4",
+          "year": 2025,
+          "quarter": 4,
+          "index": 345.47,
+          "standardError": 4.97,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2026Q1",
+          "year": 2026,
+          "quarter": 1,
+          "index": 346.02,
+          "standardError": 4.94,
+          "componentCoverage": 100
+        }
+      ],
+      "momentumScore": 83
+    },
+    {
+      "id": "lakeland",
+      "label": "Lakeland",
+      "components": [
+        {
+          "code": 29460,
+          "name": "Lakeland-Winter Haven, FL"
+        }
+      ],
+      "latestPeriod": "2026Q1",
+      "latestIndex": 434.32,
+      "yoy": 1.58,
+      "priorYoy": 0.28,
+      "acceleration": 1.3,
+      "threeYearCagr": 2.26,
+      "fiveYearGrowth": 54.53,
+      "componentCoverage": 100,
+      "standardErrorPct": 1.72,
+      "pricingCompetency": 96,
+      "seriesStart": "1981Q2",
+      "history": [
+        {
+          "period": "2016Q1",
+          "year": 2016,
+          "quarter": 1,
+          "index": 179.53,
+          "standardError": 2.46,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q2",
+          "year": 2016,
+          "quarter": 2,
+          "index": 187.23,
+          "standardError": 2.45,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q3",
+          "year": 2016,
+          "quarter": 3,
+          "index": 190.09,
+          "standardError": 2.47,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q4",
+          "year": 2016,
+          "quarter": 4,
+          "index": 194.73,
+          "standardError": 2.46,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q1",
+          "year": 2017,
+          "quarter": 1,
+          "index": 196.68,
+          "standardError": 2.59,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q2",
+          "year": 2017,
+          "quarter": 2,
+          "index": 202.9,
+          "standardError": 2.5,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q3",
+          "year": 2017,
+          "quarter": 3,
+          "index": 209.2,
+          "standardError": 2.64,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q4",
+          "year": 2017,
+          "quarter": 4,
+          "index": 214.08,
+          "standardError": 2.68,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q1",
+          "year": 2018,
+          "quarter": 1,
+          "index": 218.29,
+          "standardError": 2.74,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q2",
+          "year": 2018,
+          "quarter": 2,
+          "index": 225.41,
+          "standardError": 2.76,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q3",
+          "year": 2018,
+          "quarter": 3,
+          "index": 232.07,
+          "standardError": 2.78,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q4",
+          "year": 2018,
+          "quarter": 4,
+          "index": 233.43,
+          "standardError": 2.78,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q1",
+          "year": 2019,
+          "quarter": 1,
+          "index": 236.45,
+          "standardError": 2.87,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q2",
+          "year": 2019,
+          "quarter": 2,
+          "index": 241.8,
+          "standardError": 2.83,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q3",
+          "year": 2019,
+          "quarter": 3,
+          "index": 245.9,
+          "standardError": 2.79,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q4",
+          "year": 2019,
+          "quarter": 4,
+          "index": 249.81,
+          "standardError": 2.84,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q1",
+          "year": 2020,
+          "quarter": 1,
+          "index": 255.22,
+          "standardError": 2.92,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q2",
+          "year": 2020,
+          "quarter": 2,
+          "index": 258.27,
+          "standardError": 2.87,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q3",
+          "year": 2020,
+          "quarter": 3,
+          "index": 262.95,
+          "standardError": 2.96,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q4",
+          "year": 2020,
+          "quarter": 4,
+          "index": 275.13,
+          "standardError": 3.08,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q1",
+          "year": 2021,
+          "quarter": 1,
+          "index": 281.06,
+          "standardError": 3.14,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q2",
+          "year": 2021,
+          "quarter": 2,
+          "index": 297.47,
+          "standardError": 3.36,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q3",
+          "year": 2021,
+          "quarter": 3,
+          "index": 320.5,
+          "standardError": 3.62,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q4",
+          "year": 2021,
+          "quarter": 4,
+          "index": 338.32,
+          "standardError": 3.8,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q1",
+          "year": 2022,
+          "quarter": 1,
+          "index": 354.55,
+          "standardError": 4.08,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q2",
+          "year": 2022,
+          "quarter": 2,
+          "index": 386.43,
+          "standardError": 4.84,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q3",
+          "year": 2022,
+          "quarter": 3,
+          "index": 402.67,
+          "standardError": 5.3,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q4",
+          "year": 2022,
+          "quarter": 4,
+          "index": 400.27,
+          "standardError": 5.73,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q1",
+          "year": 2023,
+          "quarter": 1,
+          "index": 406.1,
+          "standardError": 6.01,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q2",
+          "year": 2023,
+          "quarter": 2,
+          "index": 414.11,
+          "standardError": 6.16,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q3",
+          "year": 2023,
+          "quarter": 3,
+          "index": 413.49,
+          "standardError": 6.15,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q4",
+          "year": 2023,
+          "quarter": 4,
+          "index": 421.85,
+          "standardError": 6.37,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q1",
+          "year": 2024,
+          "quarter": 1,
+          "index": 426.37,
+          "standardError": 7.45,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q2",
+          "year": 2024,
+          "quarter": 2,
+          "index": 417.49,
+          "standardError": 6.44,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q3",
+          "year": 2024,
+          "quarter": 3,
+          "index": 428.18,
+          "standardError": 6.82,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q4",
+          "year": 2024,
+          "quarter": 4,
+          "index": 429.43,
+          "standardError": 7.06,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q1",
+          "year": 2025,
+          "quarter": 1,
+          "index": 427.56,
+          "standardError": 7.44,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q2",
+          "year": 2025,
+          "quarter": 2,
+          "index": 416.16,
+          "standardError": 7.25,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q3",
+          "year": 2025,
+          "quarter": 3,
+          "index": 415.34,
+          "standardError": 6.67,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q4",
+          "year": 2025,
+          "quarter": 4,
+          "index": 427.82,
+          "standardError": 6.76,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2026Q1",
+          "year": 2026,
+          "quarter": 1,
+          "index": 434.32,
+          "standardError": 7.46,
+          "componentCoverage": 100
+        }
+      ],
+      "momentumScore": 38
+    },
+    {
+      "id": "punta-gorda",
+      "label": "Punta Gorda",
+      "components": [
+        {
+          "code": 39460,
+          "name": "Punta Gorda, FL"
+        }
+      ],
+      "latestPeriod": "2026Q1",
+      "latestIndex": 387.44,
+      "yoy": -7.32,
+      "priorYoy": -2.71,
+      "acceleration": -4.61,
+      "threeYearCagr": -3.7,
+      "fiveYearGrowth": 34.59,
+      "componentCoverage": 100,
+      "standardErrorPct": 2.32,
+      "pricingCompetency": 94,
+      "seriesStart": "1987Q1",
+      "history": [
+        {
+          "period": "2016Q1",
+          "year": 2016,
+          "quarter": 1,
+          "index": 200.16,
+          "standardError": 3.75,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q2",
+          "year": 2016,
+          "quarter": 2,
+          "index": 207.89,
+          "standardError": 3.85,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q3",
+          "year": 2016,
+          "quarter": 3,
+          "index": 210.67,
+          "standardError": 3.9,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q4",
+          "year": 2016,
+          "quarter": 4,
+          "index": 214.58,
+          "standardError": 3.93,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q1",
+          "year": 2017,
+          "quarter": 1,
+          "index": 222.31,
+          "standardError": 4.07,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q2",
+          "year": 2017,
+          "quarter": 2,
+          "index": 224.22,
+          "standardError": 4.07,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q3",
+          "year": 2017,
+          "quarter": 3,
+          "index": 228.05,
+          "standardError": 4.19,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q4",
+          "year": 2017,
+          "quarter": 4,
+          "index": 233.01,
+          "standardError": 4.28,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q1",
+          "year": 2018,
+          "quarter": 1,
+          "index": 235.72,
+          "standardError": 4.31,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q2",
+          "year": 2018,
+          "quarter": 2,
+          "index": 238.62,
+          "standardError": 4.22,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q3",
+          "year": 2018,
+          "quarter": 3,
+          "index": 243.79,
+          "standardError": 4.34,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q4",
+          "year": 2018,
+          "quarter": 4,
+          "index": 245.49,
+          "standardError": 4.41,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q1",
+          "year": 2019,
+          "quarter": 1,
+          "index": 250.25,
+          "standardError": 4.45,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q2",
+          "year": 2019,
+          "quarter": 2,
+          "index": 252.63,
+          "standardError": 4.38,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q3",
+          "year": 2019,
+          "quarter": 3,
+          "index": 256.79,
+          "standardError": 4.5,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q4",
+          "year": 2019,
+          "quarter": 4,
+          "index": 258.26,
+          "standardError": 4.44,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q1",
+          "year": 2020,
+          "quarter": 1,
+          "index": 257.54,
+          "standardError": 4.45,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q2",
+          "year": 2020,
+          "quarter": 2,
+          "index": 262.84,
+          "standardError": 4.48,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q3",
+          "year": 2020,
+          "quarter": 3,
+          "index": 268.69,
+          "standardError": 4.59,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q4",
+          "year": 2020,
+          "quarter": 4,
+          "index": 275.64,
+          "standardError": 4.69,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q1",
+          "year": 2021,
+          "quarter": 1,
+          "index": 287.87,
+          "standardError": 4.92,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q2",
+          "year": 2021,
+          "quarter": 2,
+          "index": 310.06,
+          "standardError": 5.32,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q3",
+          "year": 2021,
+          "quarter": 3,
+          "index": 338.03,
+          "standardError": 5.82,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q4",
+          "year": 2021,
+          "quarter": 4,
+          "index": 362.76,
+          "standardError": 6.3,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q1",
+          "year": 2022,
+          "quarter": 1,
+          "index": 387.95,
+          "standardError": 6.8,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q2",
+          "year": 2022,
+          "quarter": 2,
+          "index": 420.05,
+          "standardError": 7.6,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q3",
+          "year": 2022,
+          "quarter": 3,
+          "index": 437.13,
+          "standardError": 8.42,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q4",
+          "year": 2022,
+          "quarter": 4,
+          "index": 432.21,
+          "standardError": 10.19,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q1",
+          "year": 2023,
+          "quarter": 1,
+          "index": 433.78,
+          "standardError": 9.6,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q2",
+          "year": 2023,
+          "quarter": 2,
+          "index": 434.22,
+          "standardError": 9,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q3",
+          "year": 2023,
+          "quarter": 3,
+          "index": 438.23,
+          "standardError": 9.71,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q4",
+          "year": 2023,
+          "quarter": 4,
+          "index": 421.86,
+          "standardError": 9.72,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q1",
+          "year": 2024,
+          "quarter": 1,
+          "index": 429.71,
+          "standardError": 10,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q2",
+          "year": 2024,
+          "quarter": 2,
+          "index": 425.63,
+          "standardError": 8.98,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q3",
+          "year": 2024,
+          "quarter": 3,
+          "index": 416.43,
+          "standardError": 9.48,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q4",
+          "year": 2024,
+          "quarter": 4,
+          "index": 435.52,
+          "standardError": 10.64,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q1",
+          "year": 2025,
+          "quarter": 1,
+          "index": 418.06,
+          "standardError": 10.1,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q2",
+          "year": 2025,
+          "quarter": 2,
+          "index": 396.53,
+          "standardError": 8.99,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q3",
+          "year": 2025,
+          "quarter": 3,
+          "index": 385.2,
+          "standardError": 9.27,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q4",
+          "year": 2025,
+          "quarter": 4,
+          "index": 390.87,
+          "standardError": 8.82,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2026Q1",
+          "year": 2026,
+          "quarter": 1,
+          "index": 387.44,
+          "standardError": 8.98,
+          "componentCoverage": 100
+        }
+      ],
+      "momentumScore": 6
+    },
+    {
+      "id": "huntsville",
+      "label": "Huntsville",
+      "components": [
+        {
+          "code": 26620,
+          "name": "Huntsville, AL"
+        }
+      ],
+      "latestPeriod": "2026Q1",
+      "latestIndex": 324.85,
+      "yoy": 2.59,
+      "priorYoy": 2.19,
+      "acceleration": 0.4,
+      "threeYearCagr": 3.46,
+      "fiveYearGrowth": 49.76,
+      "componentCoverage": 100,
+      "standardErrorPct": 0.94,
+      "pricingCompetency": 98,
+      "seriesStart": "1984Q3",
+      "history": [
+        {
+          "period": "2016Q1",
+          "year": 2016,
+          "quarter": 1,
+          "index": 161.48,
+          "standardError": 1.29,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q2",
+          "year": 2016,
+          "quarter": 2,
+          "index": 163.89,
+          "standardError": 1.24,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q3",
+          "year": 2016,
+          "quarter": 3,
+          "index": 165.47,
+          "standardError": 1.23,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q4",
+          "year": 2016,
+          "quarter": 4,
+          "index": 165.64,
+          "standardError": 1.27,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q1",
+          "year": 2017,
+          "quarter": 1,
+          "index": 165.77,
+          "standardError": 1.31,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q2",
+          "year": 2017,
+          "quarter": 2,
+          "index": 167.7,
+          "standardError": 1.25,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q3",
+          "year": 2017,
+          "quarter": 3,
+          "index": 167.37,
+          "standardError": 1.27,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q4",
+          "year": 2017,
+          "quarter": 4,
+          "index": 169.46,
+          "standardError": 1.3,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q1",
+          "year": 2018,
+          "quarter": 1,
+          "index": 171.92,
+          "standardError": 1.33,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q2",
+          "year": 2018,
+          "quarter": 2,
+          "index": 175.46,
+          "standardError": 1.29,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q3",
+          "year": 2018,
+          "quarter": 3,
+          "index": 176.35,
+          "standardError": 1.27,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q4",
+          "year": 2018,
+          "quarter": 4,
+          "index": 178.63,
+          "standardError": 1.3,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q1",
+          "year": 2019,
+          "quarter": 1,
+          "index": 181.76,
+          "standardError": 1.31,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q2",
+          "year": 2019,
+          "quarter": 2,
+          "index": 185.14,
+          "standardError": 1.29,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q3",
+          "year": 2019,
+          "quarter": 3,
+          "index": 188,
+          "standardError": 1.29,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q4",
+          "year": 2019,
+          "quarter": 4,
+          "index": 192.11,
+          "standardError": 1.32,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q1",
+          "year": 2020,
+          "quarter": 1,
+          "index": 196.43,
+          "standardError": 1.33,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q2",
+          "year": 2020,
+          "quarter": 2,
+          "index": 199.03,
+          "standardError": 1.3,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q3",
+          "year": 2020,
+          "quarter": 3,
+          "index": 204.13,
+          "standardError": 1.35,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q4",
+          "year": 2020,
+          "quarter": 4,
+          "index": 211.79,
+          "standardError": 1.39,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q1",
+          "year": 2021,
+          "quarter": 1,
+          "index": 216.91,
+          "standardError": 1.44,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q2",
+          "year": 2021,
+          "quarter": 2,
+          "index": 231.21,
+          "standardError": 1.57,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q3",
+          "year": 2021,
+          "quarter": 3,
+          "index": 247.22,
+          "standardError": 1.67,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q4",
+          "year": 2021,
+          "quarter": 4,
+          "index": 262.92,
+          "standardError": 1.79,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q1",
+          "year": 2022,
+          "quarter": 1,
+          "index": 270.18,
+          "standardError": 1.92,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q2",
+          "year": 2022,
+          "quarter": 2,
+          "index": 287.06,
+          "standardError": 2.18,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q3",
+          "year": 2022,
+          "quarter": 3,
+          "index": 297.24,
+          "standardError": 2.39,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q4",
+          "year": 2022,
+          "quarter": 4,
+          "index": 291.52,
+          "standardError": 2.59,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q1",
+          "year": 2023,
+          "quarter": 1,
+          "index": 293.37,
+          "standardError": 2.72,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q2",
+          "year": 2023,
+          "quarter": 2,
+          "index": 302.6,
+          "standardError": 2.8,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q3",
+          "year": 2023,
+          "quarter": 3,
+          "index": 305.6,
+          "standardError": 2.66,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q4",
+          "year": 2023,
+          "quarter": 4,
+          "index": 298.7,
+          "standardError": 2.83,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q1",
+          "year": 2024,
+          "quarter": 1,
+          "index": 309.86,
+          "standardError": 3.12,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q2",
+          "year": 2024,
+          "quarter": 2,
+          "index": 310.04,
+          "standardError": 2.82,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q3",
+          "year": 2024,
+          "quarter": 3,
+          "index": 319.58,
+          "standardError": 2.9,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q4",
+          "year": 2024,
+          "quarter": 4,
+          "index": 316.86,
+          "standardError": 2.96,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q1",
+          "year": 2025,
+          "quarter": 1,
+          "index": 316.64,
+          "standardError": 3.08,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q2",
+          "year": 2025,
+          "quarter": 2,
+          "index": 320.77,
+          "standardError": 3.05,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q3",
+          "year": 2025,
+          "quarter": 3,
+          "index": 319.53,
+          "standardError": 3.08,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q4",
+          "year": 2025,
+          "quarter": 4,
+          "index": 326.72,
+          "standardError": 3.01,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2026Q1",
+          "year": 2026,
+          "quarter": 1,
+          "index": 324.85,
+          "standardError": 3.06,
+          "componentCoverage": 100
+        }
+      ],
+      "momentumScore": 53
+    },
+    {
+      "id": "wilmington",
+      "label": "Wilmington",
+      "components": [
+        {
+          "code": 48900,
+          "name": "Wilmington, NC"
+        }
+      ],
+      "latestPeriod": "2026Q1",
+      "latestIndex": 454.61,
+      "yoy": 4.37,
+      "priorYoy": 3.1,
+      "acceleration": 1.27,
+      "threeYearCagr": 4.64,
+      "fiveYearGrowth": 67.39,
+      "componentCoverage": 100,
+      "standardErrorPct": 1.13,
+      "pricingCompetency": 97,
+      "seriesStart": "1984Q1",
+      "history": [
+        {
+          "period": "2016Q1",
+          "year": 2016,
+          "quarter": 1,
+          "index": 196.54,
+          "standardError": 1.83,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q2",
+          "year": 2016,
+          "quarter": 2,
+          "index": 196.78,
+          "standardError": 1.73,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q3",
+          "year": 2016,
+          "quarter": 3,
+          "index": 200.62,
+          "standardError": 1.69,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q4",
+          "year": 2016,
+          "quarter": 4,
+          "index": 203.05,
+          "standardError": 1.76,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q1",
+          "year": 2017,
+          "quarter": 1,
+          "index": 204.28,
+          "standardError": 1.83,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q2",
+          "year": 2017,
+          "quarter": 2,
+          "index": 210.54,
+          "standardError": 1.85,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q3",
+          "year": 2017,
+          "quarter": 3,
+          "index": 214.28,
+          "standardError": 1.87,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q4",
+          "year": 2017,
+          "quarter": 4,
+          "index": 217,
+          "standardError": 1.92,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q1",
+          "year": 2018,
+          "quarter": 1,
+          "index": 217.89,
+          "standardError": 1.97,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q2",
+          "year": 2018,
+          "quarter": 2,
+          "index": 224.08,
+          "standardError": 1.88,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q3",
+          "year": 2018,
+          "quarter": 3,
+          "index": 228.57,
+          "standardError": 1.98,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q4",
+          "year": 2018,
+          "quarter": 4,
+          "index": 229.69,
+          "standardError": 1.92,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q1",
+          "year": 2019,
+          "quarter": 1,
+          "index": 232.87,
+          "standardError": 1.96,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q2",
+          "year": 2019,
+          "quarter": 2,
+          "index": 239.62,
+          "standardError": 1.93,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q3",
+          "year": 2019,
+          "quarter": 3,
+          "index": 241.52,
+          "standardError": 1.88,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q4",
+          "year": 2019,
+          "quarter": 4,
+          "index": 246.29,
+          "standardError": 1.93,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q1",
+          "year": 2020,
+          "quarter": 1,
+          "index": 251.2,
+          "standardError": 1.95,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q2",
+          "year": 2020,
+          "quarter": 2,
+          "index": 251.01,
+          "standardError": 1.88,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q3",
+          "year": 2020,
+          "quarter": 3,
+          "index": 257.11,
+          "standardError": 1.93,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q4",
+          "year": 2020,
+          "quarter": 4,
+          "index": 263.49,
+          "standardError": 1.98,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q1",
+          "year": 2021,
+          "quarter": 1,
+          "index": 271.59,
+          "standardError": 2.06,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q2",
+          "year": 2021,
+          "quarter": 2,
+          "index": 288.35,
+          "standardError": 2.24,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q3",
+          "year": 2021,
+          "quarter": 3,
+          "index": 308.94,
+          "standardError": 2.46,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q4",
+          "year": 2021,
+          "quarter": 4,
+          "index": 320.64,
+          "standardError": 2.59,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q1",
+          "year": 2022,
+          "quarter": 1,
+          "index": 338.34,
+          "standardError": 2.89,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q2",
+          "year": 2022,
+          "quarter": 2,
+          "index": 369.36,
+          "standardError": 3.67,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q3",
+          "year": 2022,
+          "quarter": 3,
+          "index": 382.25,
+          "standardError": 4.11,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q4",
+          "year": 2022,
+          "quarter": 4,
+          "index": 381.88,
+          "standardError": 4.73,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q1",
+          "year": 2023,
+          "quarter": 1,
+          "index": 396.78,
+          "standardError": 5.17,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q2",
+          "year": 2023,
+          "quarter": 2,
+          "index": 403.95,
+          "standardError": 4.66,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q3",
+          "year": 2023,
+          "quarter": 3,
+          "index": 408.24,
+          "standardError": 4.82,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q4",
+          "year": 2023,
+          "quarter": 4,
+          "index": 408.35,
+          "standardError": 4.79,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q1",
+          "year": 2024,
+          "quarter": 1,
+          "index": 422.45,
+          "standardError": 4.96,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q2",
+          "year": 2024,
+          "quarter": 2,
+          "index": 427.31,
+          "standardError": 5.01,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q3",
+          "year": 2024,
+          "quarter": 3,
+          "index": 427.45,
+          "standardError": 4.78,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q4",
+          "year": 2024,
+          "quarter": 4,
+          "index": 434.46,
+          "standardError": 5.06,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q1",
+          "year": 2025,
+          "quarter": 1,
+          "index": 435.56,
+          "standardError": 5.27,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q2",
+          "year": 2025,
+          "quarter": 2,
+          "index": 444.36,
+          "standardError": 5.17,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q3",
+          "year": 2025,
+          "quarter": 3,
+          "index": 449.19,
+          "standardError": 5.39,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q4",
+          "year": 2025,
+          "quarter": 4,
+          "index": 451.15,
+          "standardError": 5.31,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2026Q1",
+          "year": 2026,
+          "quarter": 1,
+          "index": 454.61,
+          "standardError": 5.15,
+          "componentCoverage": 100
+        }
+      ],
+      "momentumScore": 78
+    },
+    {
+      "id": "st-george",
+      "label": "St. George",
+      "components": [
+        {
+          "code": 41100,
+          "name": "St. George, UT"
+        }
+      ],
+      "latestPeriod": "2026Q1",
+      "latestIndex": 381.59,
+      "yoy": 3.78,
+      "priorYoy": 1.18,
+      "acceleration": 2.6,
+      "threeYearCagr": 2.53,
+      "fiveYearGrowth": 46.62,
+      "componentCoverage": 100,
+      "standardErrorPct": 1.19,
+      "pricingCompetency": 97,
+      "seriesStart": "1986Q2",
+      "history": [
+        {
+          "period": "2016Q1",
+          "year": 2016,
+          "quarter": 1,
+          "index": 173.76,
+          "standardError": 1.78,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q2",
+          "year": 2016,
+          "quarter": 2,
+          "index": 175.03,
+          "standardError": 1.7,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q3",
+          "year": 2016,
+          "quarter": 3,
+          "index": 179.06,
+          "standardError": 1.7,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q4",
+          "year": 2016,
+          "quarter": 4,
+          "index": 180.77,
+          "standardError": 1.71,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q1",
+          "year": 2017,
+          "quarter": 1,
+          "index": 181.74,
+          "standardError": 1.8,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q2",
+          "year": 2017,
+          "quarter": 2,
+          "index": 187.3,
+          "standardError": 1.81,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q3",
+          "year": 2017,
+          "quarter": 3,
+          "index": 191.78,
+          "standardError": 1.85,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q4",
+          "year": 2017,
+          "quarter": 4,
+          "index": 195.16,
+          "standardError": 1.85,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q1",
+          "year": 2018,
+          "quarter": 1,
+          "index": 200.4,
+          "standardError": 1.94,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q2",
+          "year": 2018,
+          "quarter": 2,
+          "index": 204.6,
+          "standardError": 1.91,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q3",
+          "year": 2018,
+          "quarter": 3,
+          "index": 208.49,
+          "standardError": 1.93,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q4",
+          "year": 2018,
+          "quarter": 4,
+          "index": 212.25,
+          "standardError": 1.97,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q1",
+          "year": 2019,
+          "quarter": 1,
+          "index": 217.17,
+          "standardError": 2.01,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q2",
+          "year": 2019,
+          "quarter": 2,
+          "index": 219.53,
+          "standardError": 1.96,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q3",
+          "year": 2019,
+          "quarter": 3,
+          "index": 223.78,
+          "standardError": 1.96,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q4",
+          "year": 2019,
+          "quarter": 4,
+          "index": 226.45,
+          "standardError": 1.99,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q1",
+          "year": 2020,
+          "quarter": 1,
+          "index": 230.26,
+          "standardError": 2.02,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q2",
+          "year": 2020,
+          "quarter": 2,
+          "index": 233.78,
+          "standardError": 2.03,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q3",
+          "year": 2020,
+          "quarter": 3,
+          "index": 239.38,
+          "standardError": 2.09,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q4",
+          "year": 2020,
+          "quarter": 4,
+          "index": 246.74,
+          "standardError": 2.16,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q1",
+          "year": 2021,
+          "quarter": 1,
+          "index": 260.25,
+          "standardError": 2.29,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q2",
+          "year": 2021,
+          "quarter": 2,
+          "index": 289.63,
+          "standardError": 2.63,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q3",
+          "year": 2021,
+          "quarter": 3,
+          "index": 313.49,
+          "standardError": 2.85,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q4",
+          "year": 2021,
+          "quarter": 4,
+          "index": 328.89,
+          "standardError": 3.07,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q1",
+          "year": 2022,
+          "quarter": 1,
+          "index": 341.83,
+          "standardError": 3.32,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q2",
+          "year": 2022,
+          "quarter": 2,
+          "index": 369.63,
+          "standardError": 4.1,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q3",
+          "year": 2022,
+          "quarter": 3,
+          "index": 372.8,
+          "standardError": 4.61,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q4",
+          "year": 2022,
+          "quarter": 4,
+          "index": 353.05,
+          "standardError": 5.02,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q1",
+          "year": 2023,
+          "quarter": 1,
+          "index": 354.03,
+          "standardError": 4.93,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q2",
+          "year": 2023,
+          "quarter": 2,
+          "index": 352.94,
+          "standardError": 4.5,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q3",
+          "year": 2023,
+          "quarter": 3,
+          "index": 365.79,
+          "standardError": 4.92,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q4",
+          "year": 2023,
+          "quarter": 4,
+          "index": 359.96,
+          "standardError": 4.68,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q1",
+          "year": 2024,
+          "quarter": 1,
+          "index": 363.38,
+          "standardError": 5.24,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q2",
+          "year": 2024,
+          "quarter": 2,
+          "index": 362.77,
+          "standardError": 4.47,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q3",
+          "year": 2024,
+          "quarter": 3,
+          "index": 371.43,
+          "standardError": 4.83,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q4",
+          "year": 2024,
+          "quarter": 4,
+          "index": 374.76,
+          "standardError": 4.65,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q1",
+          "year": 2025,
+          "quarter": 1,
+          "index": 367.68,
+          "standardError": 4.91,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q2",
+          "year": 2025,
+          "quarter": 2,
+          "index": 376.88,
+          "standardError": 4.68,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q3",
+          "year": 2025,
+          "quarter": 3,
+          "index": 375.98,
+          "standardError": 4.79,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q4",
+          "year": 2025,
+          "quarter": 4,
+          "index": 376.74,
+          "standardError": 4.5,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2026Q1",
+          "year": 2026,
+          "quarter": 1,
+          "index": 381.59,
+          "standardError": 4.53,
+          "componentCoverage": 100
+        }
+      ],
+      "momentumScore": 55
+    },
+    {
+      "id": "northwest-arkansas",
+      "label": "Northwest Arkansas",
+      "components": [
+        {
+          "code": 22220,
+          "name": "Fayetteville-Springdale-Rogers, AR"
+        }
+      ],
+      "latestPeriod": "2026Q1",
+      "latestIndex": 393.82,
+      "yoy": 3.9,
+      "priorYoy": 5.78,
+      "acceleration": -1.88,
+      "threeYearCagr": 5.05,
+      "fiveYearGrowth": 69.03,
+      "componentCoverage": 100,
+      "standardErrorPct": 1.13,
+      "pricingCompetency": 97,
+      "seriesStart": "1979Q3",
+      "history": [
+        {
+          "period": "2016Q1",
+          "year": 2016,
+          "quarter": 1,
+          "index": 171.17,
+          "standardError": 1.79,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q2",
+          "year": 2016,
+          "quarter": 2,
+          "index": 173.2,
+          "standardError": 1.73,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q3",
+          "year": 2016,
+          "quarter": 3,
+          "index": 175.87,
+          "standardError": 1.73,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q4",
+          "year": 2016,
+          "quarter": 4,
+          "index": 178.35,
+          "standardError": 1.78,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q1",
+          "year": 2017,
+          "quarter": 1,
+          "index": 184.33,
+          "standardError": 1.9,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q2",
+          "year": 2017,
+          "quarter": 2,
+          "index": 185.1,
+          "standardError": 1.85,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q3",
+          "year": 2017,
+          "quarter": 3,
+          "index": 187.85,
+          "standardError": 1.89,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q4",
+          "year": 2017,
+          "quarter": 4,
+          "index": 189.8,
+          "standardError": 1.89,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q1",
+          "year": 2018,
+          "quarter": 1,
+          "index": 194.9,
+          "standardError": 1.99,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q2",
+          "year": 2018,
+          "quarter": 2,
+          "index": 197.37,
+          "standardError": 1.93,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q3",
+          "year": 2018,
+          "quarter": 3,
+          "index": 200.12,
+          "standardError": 1.94,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q4",
+          "year": 2018,
+          "quarter": 4,
+          "index": 203.08,
+          "standardError": 1.96,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q1",
+          "year": 2019,
+          "quarter": 1,
+          "index": 205.19,
+          "standardError": 2,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q2",
+          "year": 2019,
+          "quarter": 2,
+          "index": 208.39,
+          "standardError": 1.99,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q3",
+          "year": 2019,
+          "quarter": 3,
+          "index": 210.93,
+          "standardError": 1.99,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q4",
+          "year": 2019,
+          "quarter": 4,
+          "index": 212.27,
+          "standardError": 2,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q1",
+          "year": 2020,
+          "quarter": 1,
+          "index": 213.36,
+          "standardError": 2.03,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q2",
+          "year": 2020,
+          "quarter": 2,
+          "index": 217.21,
+          "standardError": 2.01,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q3",
+          "year": 2020,
+          "quarter": 3,
+          "index": 221.03,
+          "standardError": 2.04,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q4",
+          "year": 2020,
+          "quarter": 4,
+          "index": 226.99,
+          "standardError": 2.1,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q1",
+          "year": 2021,
+          "quarter": 1,
+          "index": 232.99,
+          "standardError": 2.17,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q2",
+          "year": 2021,
+          "quarter": 2,
+          "index": 249.97,
+          "standardError": 2.36,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q3",
+          "year": 2021,
+          "quarter": 3,
+          "index": 268.78,
+          "standardError": 2.54,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q4",
+          "year": 2021,
+          "quarter": 4,
+          "index": 281.89,
+          "standardError": 2.68,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q1",
+          "year": 2022,
+          "quarter": 1,
+          "index": 294.58,
+          "standardError": 2.88,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q2",
+          "year": 2022,
+          "quarter": 2,
+          "index": 319.99,
+          "standardError": 3.34,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q3",
+          "year": 2022,
+          "quarter": 3,
+          "index": 329.38,
+          "standardError": 3.52,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q4",
+          "year": 2022,
+          "quarter": 4,
+          "index": 328.38,
+          "standardError": 3.87,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q1",
+          "year": 2023,
+          "quarter": 1,
+          "index": 339.75,
+          "standardError": 4.15,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q2",
+          "year": 2023,
+          "quarter": 2,
+          "index": 348.56,
+          "standardError": 4.13,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q3",
+          "year": 2023,
+          "quarter": 3,
+          "index": 353.34,
+          "standardError": 3.96,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q4",
+          "year": 2023,
+          "quarter": 4,
+          "index": 357.04,
+          "standardError": 4.09,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q1",
+          "year": 2024,
+          "quarter": 1,
+          "index": 358.33,
+          "standardError": 4.39,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q2",
+          "year": 2024,
+          "quarter": 2,
+          "index": 365.66,
+          "standardError": 4.17,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q3",
+          "year": 2024,
+          "quarter": 3,
+          "index": 370.39,
+          "standardError": 4.28,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q4",
+          "year": 2024,
+          "quarter": 4,
+          "index": 372.97,
+          "standardError": 4.33,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q1",
+          "year": 2025,
+          "quarter": 1,
+          "index": 379.04,
+          "standardError": 4.47,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q2",
+          "year": 2025,
+          "quarter": 2,
+          "index": 383.17,
+          "standardError": 4.43,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q3",
+          "year": 2025,
+          "quarter": 3,
+          "index": 384.73,
+          "standardError": 4.57,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q4",
+          "year": 2025,
+          "quarter": 4,
+          "index": 390.73,
+          "standardError": 4.35,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2026Q1",
+          "year": 2026,
+          "quarter": 1,
+          "index": 393.82,
+          "standardError": 4.44,
+          "componentCoverage": 100
+        }
+      ],
+      "momentumScore": 71
+    },
+    {
+      "id": "raleigh",
+      "label": "Raleigh",
+      "components": [
+        {
+          "code": 39580,
+          "name": "Raleigh-Cary, NC"
+        }
+      ],
+      "latestPeriod": "2026Q1",
+      "latestIndex": 367.92,
+      "yoy": 0.96,
+      "priorYoy": 4.14,
+      "acceleration": -3.18,
+      "threeYearCagr": 3.58,
+      "fiveYearGrowth": 55.75,
+      "componentCoverage": 100,
+      "standardErrorPct": 0.58,
+      "pricingCompetency": 99,
+      "seriesStart": "1977Q4",
+      "history": [
+        {
+          "period": "2016Q1",
+          "year": 2016,
+          "quarter": 1,
+          "index": 176.06,
+          "standardError": 0.77,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q2",
+          "year": 2016,
+          "quarter": 2,
+          "index": 178.94,
+          "standardError": 0.74,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q3",
+          "year": 2016,
+          "quarter": 3,
+          "index": 181.95,
+          "standardError": 0.73,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2016Q4",
+          "year": 2016,
+          "quarter": 4,
+          "index": 183.13,
+          "standardError": 0.74,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q1",
+          "year": 2017,
+          "quarter": 1,
+          "index": 186.79,
+          "standardError": 0.84,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q2",
+          "year": 2017,
+          "quarter": 2,
+          "index": 192.49,
+          "standardError": 0.81,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q3",
+          "year": 2017,
+          "quarter": 3,
+          "index": 194.87,
+          "standardError": 0.83,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2017Q4",
+          "year": 2017,
+          "quarter": 4,
+          "index": 194.93,
+          "standardError": 0.84,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q1",
+          "year": 2018,
+          "quarter": 1,
+          "index": 198.26,
+          "standardError": 0.87,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q2",
+          "year": 2018,
+          "quarter": 2,
+          "index": 203.38,
+          "standardError": 0.84,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q3",
+          "year": 2018,
+          "quarter": 3,
+          "index": 206.65,
+          "standardError": 0.86,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2018Q4",
+          "year": 2018,
+          "quarter": 4,
+          "index": 207.31,
+          "standardError": 0.87,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q1",
+          "year": 2019,
+          "quarter": 1,
+          "index": 212.02,
+          "standardError": 0.89,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q2",
+          "year": 2019,
+          "quarter": 2,
+          "index": 214.39,
+          "standardError": 0.84,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q3",
+          "year": 2019,
+          "quarter": 3,
+          "index": 216.58,
+          "standardError": 0.81,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2019Q4",
+          "year": 2019,
+          "quarter": 4,
+          "index": 218.71,
+          "standardError": 0.82,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q1",
+          "year": 2020,
+          "quarter": 1,
+          "index": 221.67,
+          "standardError": 0.82,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q2",
+          "year": 2020,
+          "quarter": 2,
+          "index": 223.86,
+          "standardError": 0.8,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q3",
+          "year": 2020,
+          "quarter": 3,
+          "index": 227.56,
+          "standardError": 0.81,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2020Q4",
+          "year": 2020,
+          "quarter": 4,
+          "index": 231.91,
+          "standardError": 0.84,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q1",
+          "year": 2021,
+          "quarter": 1,
+          "index": 236.23,
+          "standardError": 0.86,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q2",
+          "year": 2021,
+          "quarter": 2,
+          "index": 253.43,
+          "standardError": 0.96,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q3",
+          "year": 2021,
+          "quarter": 3,
+          "index": 272.31,
+          "standardError": 1.03,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2021Q4",
+          "year": 2021,
+          "quarter": 4,
+          "index": 287.76,
+          "standardError": 1.11,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q1",
+          "year": 2022,
+          "quarter": 1,
+          "index": 304.44,
+          "standardError": 1.28,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q2",
+          "year": 2022,
+          "quarter": 2,
+          "index": 331.45,
+          "standardError": 1.53,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q3",
+          "year": 2022,
+          "quarter": 3,
+          "index": 339.07,
+          "standardError": 1.83,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2022Q4",
+          "year": 2022,
+          "quarter": 4,
+          "index": 329.4,
+          "standardError": 1.99,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q1",
+          "year": 2023,
+          "quarter": 1,
+          "index": 331.1,
+          "standardError": 2.15,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q2",
+          "year": 2023,
+          "quarter": 2,
+          "index": 343.73,
+          "standardError": 2.12,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q3",
+          "year": 2023,
+          "quarter": 3,
+          "index": 343.8,
+          "standardError": 2.08,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2023Q4",
+          "year": 2023,
+          "quarter": 4,
+          "index": 345.5,
+          "standardError": 2.02,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q1",
+          "year": 2024,
+          "quarter": 1,
+          "index": 349.95,
+          "standardError": 2.19,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q2",
+          "year": 2024,
+          "quarter": 2,
+          "index": 357.18,
+          "standardError": 1.97,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q3",
+          "year": 2024,
+          "quarter": 3,
+          "index": 358.34,
+          "standardError": 2.07,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2024Q4",
+          "year": 2024,
+          "quarter": 4,
+          "index": 359.47,
+          "standardError": 2.04,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q1",
+          "year": 2025,
+          "quarter": 1,
+          "index": 364.43,
+          "standardError": 2.29,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q2",
+          "year": 2025,
+          "quarter": 2,
+          "index": 363.49,
+          "standardError": 2.11,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q3",
+          "year": 2025,
+          "quarter": 3,
+          "index": 366.58,
+          "standardError": 2.17,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2025Q4",
+          "year": 2025,
+          "quarter": 4,
+          "index": 362.97,
+          "standardError": 2.08,
+          "componentCoverage": 100
+        },
+        {
+          "period": "2026Q1",
+          "year": 2026,
+          "quarter": 1,
+          "index": 367.92,
+          "standardError": 2.12,
+          "componentCoverage": 100
+        }
+      ],
+      "momentumScore": 32
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "source": "https://www.fhfa.gov/hpi/download/quarterly_datasets/hpi_at_metro.csv",
+  "index": "FHFA All-Transactions House Price Index, not seasonally adjusted, 1995Q1=100",
+  "aggregation": "Equal-weighted index across listed FHFA metropolitan divisions when FHFA does not publish a whole-MSA series",
+  "markets": [
+    { "id": "new-york", "label": "New York", "components": [{ "code": 35614, "name": "New York-Jersey City-White Plains, NY-NJ (MSAD)" }, { "code": 35084, "name": "Newark, NJ (MSAD)" }] },
+    { "id": "los-angeles", "label": "Los Angeles", "components": [{ "code": 31084, "name": "Los Angeles-Long Beach-Glendale, CA (MSAD)" }, { "code": 11244, "name": "Anaheim-Santa Ana-Irvine, CA (MSAD)" }] },
+    { "id": "chicago", "label": "Chicago", "components": [{ "code": 16984, "name": "Chicago-Naperville-Schaumburg, IL (MSAD)" }, { "code": 20994, "name": "Elgin, IL (MSAD)" }, { "code": 29404, "name": "Lake County, IL (MSAD)" }] },
+    { "id": "dallas-fort-worth", "label": "Dallas–Fort Worth", "components": [{ "code": 19124, "name": "Dallas-Plano-Irving, TX (MSAD)" }, { "code": 23104, "name": "Fort Worth-Arlington-Grapevine, TX (MSAD)" }] },
+    { "id": "houston", "label": "Houston", "components": [{ "code": 26420, "name": "Houston-Pasadena-The Woodlands, TX" }] },
+    { "id": "atlanta", "label": "Atlanta", "components": [{ "code": 12054, "name": "Atlanta-Sandy Springs-Roswell, GA (MSAD)" }] },
+    { "id": "washington", "label": "Washington", "components": [{ "code": 47764, "name": "Washington, DC-MD (MSAD)" }, { "code": 11694, "name": "Arlington-Alexandria-Reston, VA-WV (MSAD)" }, { "code": 23224, "name": "Frederick-Gaithersburg-Bethesda, MD (MSAD)" }] },
+    { "id": "miami", "label": "Miami", "components": [{ "code": 33124, "name": "Miami-Miami Beach-Kendall, FL (MSAD)" }, { "code": 22744, "name": "Fort Lauderdale-Pompano Beach-Sunrise, FL (MSAD)" }, { "code": 48424, "name": "West Palm Beach-Boca Raton-Delray Beach, FL (MSAD)" }] },
+    { "id": "philadelphia", "label": "Philadelphia", "components": [{ "code": 37964, "name": "Philadelphia, PA (MSAD)" }, { "code": 33874, "name": "Montgomery County-Bucks County-Chester County, PA (MSAD)" }, { "code": 15804, "name": "Camden, NJ (MSAD)" }] },
+    { "id": "phoenix", "label": "Phoenix", "components": [{ "code": 38060, "name": "Phoenix-Mesa-Chandler, AZ" }] },
+    { "id": "ocala", "label": "Ocala", "components": [{ "code": 36100, "name": "Ocala, FL" }] },
+    { "id": "myrtle-beach", "label": "Myrtle Beach", "components": [{ "code": 34820, "name": "Myrtle Beach-Conway-North Myrtle Beach, SC" }] },
+    { "id": "spartanburg", "label": "Spartanburg", "components": [{ "code": 43900, "name": "Spartanburg, SC" }] },
+    { "id": "lakeland", "label": "Lakeland", "components": [{ "code": 29460, "name": "Lakeland-Winter Haven, FL" }] },
+    { "id": "punta-gorda", "label": "Punta Gorda", "components": [{ "code": 39460, "name": "Punta Gorda, FL" }] },
+    { "id": "huntsville", "label": "Huntsville", "components": [{ "code": 26620, "name": "Huntsville, AL" }] },
+    { "id": "wilmington", "label": "Wilmington", "components": [{ "code": 48900, "name": "Wilmington, NC" }] },
+    { "id": "st-george", "label": "St. George", "components": [{ "code": 41100, "name": "St. George, UT" }] },
+    { "id": "northwest-arkansas", "label": "Northwest Arkansas", "components": [{ "code": 22220, "name": "Fayetteville-Springdale-Rogers, AR" }] },
+    { "id": "raleigh", "label": "Raleigh", "components": [{ "code": 39580, "name": "Raleigh-Cary, NC" }] }
+  ]
+}
