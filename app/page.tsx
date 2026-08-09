@@ -12,6 +12,7 @@ import { PropertyOpportunityMap } from "./PropertyOpportunityMap";
 import { AttomMarketAudit } from "./AttomMarketAudit";
 import { RentCastEvidence } from "./RentCastEvidence";
 import { RaleighListingPilot } from "./RaleighListingPilot";
+import { ReviewFeedback } from "./ReviewFeedback";
 import {
   ACS_AGGREGATION_META,
   BALANCED_WEIGHTS,
@@ -36,7 +37,7 @@ const FACTORS: Array<{ key: keyof FactorWeights; label: string; description: str
   { key: "pricing", label: "Price momentum", description: "FHFA YoY, acceleration and multi-year growth" },
 ];
 
-type ProductView = "overview" | "explore" | "areas" | "underwrite" | "properties" | "coverage";
+type ProductView = "overview" | "explore" | "areas" | "underwrite" | "properties" | "coverage" | "feedback";
 
 const PRODUCT_TABS: Array<{ id: ProductView; label: string; purpose: string; boundary: string; hash: string }> = [
   { id: "overview", label: "Overview", purpose: "Understand the evidence workflow and where each decision belongs.", boundary: "Orientation only—no market or property conclusion is made here.", hash: "#overview" },
@@ -45,6 +46,7 @@ const PRODUCT_TABS: Array<{ id: ProductView; label: string; purpose: string; bou
   { id: "underwrite", label: "Deal Studio", purpose: "Test an actual price, rent, expenses, financing and investment hurdles.", boundary: "Outputs are scenario math and require verified deal inputs.", hash: "#decision-studio" },
   { id: "properties", label: "Properties", purpose: "Map qualified records, inspect model ranges and run independent vendor checks.", boundary: "Color bands are relative evidence priority—not a buy, hold or sell verdict.", hash: "#valuation" },
   { id: "coverage", label: "Data Coverage", purpose: "See feature availability, expansion waves, source quality and known gaps.", boundary: "A market appears only where the selected feature has current usable data.", hash: "#availability" },
+  { id: "feedback", label: "Give Feedback", purpose: "Share a short, private review of the MVP after exploring the workflow.", boundary: "Comments are product research, not an investment recommendation or mailing-list signup.", hash: "#feedback" },
 ];
 
 function viewFromHash(hash: string): ProductView {
@@ -53,6 +55,7 @@ function viewFromHash(hash: string): ProductView {
   if (hash === "#decision-studio") return "underwrite";
   if (hash === "#valuation") return "properties";
   if (["#availability", "#compare", "#quality", "#sources"].includes(hash)) return "coverage";
+  if (hash === "#feedback") return "feedback";
   return "overview";
 }
 
@@ -398,6 +401,10 @@ export default function Home() {
         <div className="source-market-filter"><label><span>Available parcel market</span><select value={sourceMarketId} onChange={(event) => setSourceMarketId(event.target.value)}>{connectedSourceMarketIds.map((id) => <option key={id} value={id}>{MARKET_EXPLORERS.find((item) => item.id === id)?.metro.short ?? id}</option>)}</select></label><p>Only markets backed by a verified source appear here. {visibleSources.length} current source{visibleSources.length === 1 ? "" : "s"} support this market.</p></div>
         <div className="source-grid">{visibleSources.map((source) => <a key={source.id} href={source.sourcePage} target="_blank" rel="noreferrer"><b>{source.status} · {source.adapter}</b><h3>{source.name}</h3><p>{source.publisher}. {source.limits[0]}</p><span>{(source.marketRecordCounts[sourceMarketId as keyof typeof source.marketRecordCounts] ?? source.recordCount).toLocaleString()} market records · {source.cadence}</span></a>)}</div>
       </section>
+      </div>
+
+      <div className={`product-view ${activeView === "feedback" ? "active" : ""}`} aria-hidden={activeView !== "feedback"}>
+        <ReviewFeedback />
       </div>
 
       <footer><a className="brand" href="#top"><span>BORO</span>CAST</a><p>Public-data market intelligence · ACS 2020–2024 · FHFA through {PRICING_HISTORY_META.latestPeriod}</p><span>Screening signal · not investment advice</span></footer>

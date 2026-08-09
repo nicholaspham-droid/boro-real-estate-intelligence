@@ -76,6 +76,85 @@ test("server-renders the national Borocast workbench and verified registry", asy
   assert.match(html, /Load local safety context/);
   assert.match(html, /true acquisition-edge percentage remains locked/i);
   assert.match(html, /No national PLUTO equivalent/);
+  assert.match(html, /Give Feedback/);
+  assert.match(html, /Help pressure-test/);
+});
+
+test("private review gate rejects unknown visitors and issues an HttpOnly review cookie", async () => {
+  const worker = await loadWorker();
+  const protectedEnv = { ...env, REVIEW_PASSWORD: "test-review-password" };
+  const locked = await worker.fetch(new Request("http://localhost/", { headers: { accept: "text/html" } }), protectedEnv, ctx);
+  assert.equal(locked.status, 200);
+  assert.match(await locked.text(), /Private B-school/);
+
+  const apiLocked = await worker.fetch(new Request("http://localhost/api/property-data/health"), protectedEnv, ctx);
+  assert.equal(apiLocked.status, 401);
+
+  const wrong = await worker.fetch(new Request("http://localhost/api/review/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password: "wrong" }),
+  }), protectedEnv, ctx);
+  assert.equal(wrong.status, 401);
+
+  const login = await worker.fetch(new Request("http://localhost/api/review/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password: "test-review-password" }),
+  }), protectedEnv, ctx);
+  assert.equal(login.status, 200);
+  const setCookie = login.headers.get("set-cookie");
+  assert.match(setCookie, /borocast_review=/);
+  assert.match(setCookie, /HttpOnly/);
+  assert.match(setCookie, /Secure/);
+
+  const cookie = setCookie.split(";")[0];
+  const unlocked = await worker.fetch(new Request("http://localhost/api/property-data/health", { headers: { Cookie: cookie } }), protectedEnv, ctx);
+  assert.equal(unlocked.status, 200);
+});
+
+test("authenticated reviewers can save structured feedback to D1", async () => {
+  const worker = await loadWorker();
+  let inserted = null;
+  const db = {
+    prepare(sql) {
+      assert.match(sql, /INSERT INTO review_feedback/);
+      return {
+        bind(...values) {
+          inserted = values;
+          return { run: async () => ({ success: true }) };
+        },
+      };
+    },
+  };
+  const protectedEnv = { ...env, DB: db, REVIEW_PASSWORD: "test-review-password" };
+  const login = await worker.fetch(new Request("http://localhost/api/review/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password: "test-review-password" }),
+  }), protectedEnv, ctx);
+  const cookie = login.headers.get("set-cookie").split(";")[0];
+  const response = await worker.fetch(new Request("http://localhost/api/review/feedback", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Cookie: cookie },
+    body: JSON.stringify({
+      reviewerName: "Maya",
+      reviewerEmail: "maya@example.com",
+      usefulness: 5,
+      trust: 4,
+      clarity: 4,
+      mostValuable: "The local price history comparison.",
+      confusing: "The competency score needs one more example.",
+      nextFeature: "A saved shortlist.",
+      notes: "Strong first pass.",
+      sourcePath: "/",
+    }),
+  }), protectedEnv, ctx);
+  assert.equal(response.status, 201);
+  assert.equal((await response.json()).ok, true);
+  assert.equal(inserted[1], "Maya");
+  assert.equal(inserted[3], 5);
+  assert.equal(inserted[6], "The local price history comparison.");
 });
 
 test("public-safety API validates geography before contacting a local agency feed", async () => {

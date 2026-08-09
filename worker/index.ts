@@ -12,10 +12,11 @@ import propertyValuations from "../data/property-valuations.json";
 
 interface Env {
   ASSETS: Fetcher;
-  DB: D1Database;
+  DB?: D1Database;
   GOOGLE_MAPS_API_KEY?: string;
   ATTOM_API_KEY?: string;
   RENTCAST_API_KEY?: string;
+  REVIEW_PASSWORD?: string;
   IMAGES: {
     input(stream: ReadableStream): {
       transform(options: Record<string, unknown>): {
@@ -383,9 +384,103 @@ async function carySafety(lat: number, lng: number, from: string, to: string) {
 // dangerouslyAllowSVG: true in next.config.js and uncomment below:
 // const imageConfig: ImageConfig = { dangerouslyAllowSVG: true };
 
+const REVIEW_COOKIE = "borocast_review";
+
+function reviewCookieValue(request: Request) {
+  const cookie = request.headers.get("Cookie") ?? "";
+  const match = cookie.split(";").map((part) => part.trim()).find((part) => part.startsWith(`${REVIEW_COOKIE}=`));
+  return match ? decodeURIComponent(match.slice(REVIEW_COOKIE.length + 1)) : "";
+}
+
+async function reviewToken(password: string) {
+  const bytes = new TextEncoder().encode(`borocast-private-review-v1:${password}`);
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+function safeEqual(left: string, right: string) {
+  const length = Math.max(left.length, right.length);
+  let mismatch = left.length ^ right.length;
+  for (let index = 0; index < length; index += 1) mismatch |= (left.charCodeAt(index) || 0) ^ (right.charCodeAt(index) || 0);
+  return mismatch === 0;
+}
+
+function reviewLoginHtml() {
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Private review · Borocast</title><style>
+  *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#071a38;color:#fff;font-family:Arial,sans-serif}main{width:min(92vw,470px);padding:48px;border:1px solid #304762;background:#0b2244;box-shadow:0 30px 90px #020b1b}i{display:block;width:12px;height:12px;margin-bottom:35px;border-radius:50%;background:#d9ff55;box-shadow:0 0 0 8px rgba(217,255,85,.08)}span{color:#70dfcc;font-size:10px;font-weight:900;letter-spacing:.13em}h1{margin:15px 0 16px;font-size:42px;line-height:.95;letter-spacing:-.055em}p{margin:0 0 28px;color:#a7b6c9;font-size:13px;line-height:1.65}label{display:block;color:#8fa0b6;font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}input{width:100%;height:50px;margin:9px 0 12px;padding:0 14px;border:1px solid #405674;background:#071a38;color:white;font:inherit;outline:0}input:focus{border-color:#d9ff55}button{width:100%;height:50px;border:0;background:#d9ff55;color:#071a38;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}button:disabled{opacity:.6}b{display:block;min-height:16px;margin-top:14px;color:#ff958d;font-size:10px}@media(max-width:520px){main{padding:35px 26px}h1{font-size:36px}}
+  </style></head><body><main><i></i><span>BOROCAST · INVITED REVIEW</span><h1>Private B-school<br>MVP review</h1><p>Enter the shared review password to explore the market-intelligence workbench and leave structured feedback.</p><form><label for="password">Review password</label><input id="password" name="password" type="password" autocomplete="current-password" autofocus required><button>Enter private MVP →</button><b role="alert"></b></form></main><script>
+  const form=document.querySelector('form'),button=document.querySelector('button'),error=document.querySelector('b');form.addEventListener('submit',async(event)=>{event.preventDefault();button.disabled=true;error.textContent='';try{const response=await fetch('/api/review/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:form.password.value})});const result=await response.json();if(!response.ok)throw new Error(result.error||'Could not sign in.');location.reload()}catch(reason){error.textContent=reason.message||'Could not sign in.';button.disabled=false}});
+  </script></body></html>`;
+}
+
+function limitedText(value: unknown, maximum: number) {
+  return typeof value === "string" ? value.trim().slice(0, maximum) : "";
+}
+
+function rating(value: unknown) {
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed >= 1 && parsed <= 5 ? parsed : null;
+}
+
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+
+    if (url.pathname === "/api/review/login") {
+      if (request.method !== "POST") return Response.json({ error: "Method not allowed" }, { status: 405 });
+      if (!env.REVIEW_PASSWORD) return Response.json({ error: "Private review access is not configured." }, { status: 503 });
+      let body: { password?: unknown } = {};
+      try { body = await request.json() as typeof body; } catch { return Response.json({ error: "Enter the shared review password." }, { status: 400 }); }
+      const supplied = limitedText(body.password, 256);
+      if (!safeEqual(supplied, env.REVIEW_PASSWORD)) return Response.json({ error: "That password does not match. Check the shared invite and try again." }, { status: 401, headers: { "Cache-Control": "no-store" } });
+      const token = await reviewToken(env.REVIEW_PASSWORD);
+      return Response.json({ ok: true }, { headers: { "Cache-Control": "no-store", "Set-Cookie": `${REVIEW_COOKIE}=${encodeURIComponent(token)}; Path=/; Max-Age=1209600; HttpOnly; Secure; SameSite=Lax` } });
+    }
+
+    if (url.pathname === "/api/review/logout") {
+      return Response.json({ ok: true }, { headers: { "Cache-Control": "no-store", "Set-Cookie": `${REVIEW_COOKIE}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax` } });
+    }
+
+    if (env.REVIEW_PASSWORD && !url.pathname.startsWith("/_next/") && !url.pathname.startsWith("/favicon") && url.pathname !== "/robots.txt") {
+      const expected = await reviewToken(env.REVIEW_PASSWORD);
+      const authenticated = safeEqual(reviewCookieValue(request), expected);
+      if (!authenticated) {
+        if (url.pathname.startsWith("/api/")) return Response.json({ error: "Private review authentication required." }, { status: 401, headers: { "Cache-Control": "no-store" } });
+        return new Response(reviewLoginHtml(), { status: 200, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex, nofollow", "Referrer-Policy": "no-referrer" } });
+      }
+    }
+
+    if (url.pathname === "/api/review/feedback") {
+      if (request.method !== "POST") return Response.json({ error: "Method not allowed" }, { status: 405 });
+      if (!env.DB) return Response.json({ error: "Feedback storage is not configured." }, { status: 503 });
+      let body: Record<string, unknown>;
+      try { body = await request.json() as Record<string, unknown>; } catch { return Response.json({ error: "Invalid feedback payload." }, { status: 400 }); }
+      const usefulness = rating(body.usefulness);
+      const trust = rating(body.trust);
+      const clarity = rating(body.clarity);
+      const mostValuable = limitedText(body.mostValuable, 1500);
+      const confusing = limitedText(body.confusing, 1500);
+      const nextFeature = limitedText(body.nextFeature, 1500);
+      if (usefulness === null || trust === null || clarity === null) return Response.json({ error: "All three ratings must be between 1 and 5." }, { status: 400 });
+      if (!mostValuable || !confusing || !nextFeature) return Response.json({ error: "Please answer the three product questions." }, { status: 400 });
+      await env.DB.prepare(`INSERT INTO review_feedback
+        (created_at, reviewer_name, reviewer_email, usefulness, trust, clarity, most_valuable, confusing, next_feature, notes, source_path)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+        .bind(
+          new Date().toISOString(),
+          limitedText(body.reviewerName, 120) || null,
+          limitedText(body.reviewerEmail, 160) || null,
+          usefulness,
+          trust,
+          clarity,
+          mostValuable,
+          confusing,
+          nextFeature,
+          limitedText(body.notes, 2500) || null,
+          limitedText(body.sourcePath, 240) || null,
+        ).run();
+      return Response.json({ ok: true }, { status: 201, headers: { "Cache-Control": "no-store" } });
+    }
 
     const snapshotHeaders = {
       "Cache-Control": "public, max-age=300, s-maxage=900",
