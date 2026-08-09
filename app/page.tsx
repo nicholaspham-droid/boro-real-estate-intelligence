@@ -13,6 +13,7 @@ import { AttomMarketAudit } from "./AttomMarketAudit";
 import { RentCastEvidence } from "./RentCastEvidence";
 import { RaleighListingPilot } from "./RaleighListingPilot";
 import { ReviewFeedback } from "./ReviewFeedback";
+import { PortfolioLab } from "./PortfolioLab";
 import {
   ACS_AGGREGATION_META,
   BALANCED_WEIGHTS,
@@ -37,7 +38,7 @@ const FACTORS: Array<{ key: keyof FactorWeights; label: string; description: str
   { key: "pricing", label: "Price momentum", description: "FHFA YoY, acceleration and multi-year growth" },
 ];
 
-type ProductView = "overview" | "explore" | "areas" | "underwrite" | "properties" | "coverage" | "feedback";
+type ProductView = "overview" | "explore" | "areas" | "underwrite" | "properties" | "portfolio" | "coverage" | "feedback";
 
 const PRODUCT_TABS: Array<{ id: ProductView; label: string; purpose: string; boundary: string; hash: string }> = [
   { id: "overview", label: "Overview", purpose: "Understand the evidence workflow and where each decision belongs.", boundary: "Orientation only—no market or property conclusion is made here.", hash: "#overview" },
@@ -45,6 +46,7 @@ const PRODUCT_TABS: Array<{ id: ProductView; label: string; purpose: string; bou
   { id: "areas", label: "Top Areas", purpose: "Inspect the ten highest-ranked local clusters under the active factor lens.", boundary: "Rank is relative and changes with weights; it is not a return forecast.", hash: "#leaders" },
   { id: "underwrite", label: "Deal Studio", purpose: "Test an actual price, rent, expenses, financing and investment hurdles.", boundary: "Outputs are scenario math and require verified deal inputs.", hash: "#decision-studio" },
   { id: "properties", label: "Properties", purpose: "Map qualified records, inspect model ranges and run independent vendor checks.", boundary: "Color bands are relative evidence priority—not a buy, hold or sell verdict.", hash: "#valuation" },
+  { id: "portfolio", label: "Portfolio Lab", purpose: "Build a hypothetical portfolio, measure concentration and pressure-test shared assumptions.", boundary: "Model mode only—do not enter private account or ownership information behind the shared review password.", hash: "#portfolio" },
   { id: "coverage", label: "Data Coverage", purpose: "See feature availability, expansion waves, source quality and known gaps.", boundary: "A market appears only where the selected feature has current usable data.", hash: "#availability" },
   { id: "feedback", label: "Give Feedback", purpose: "Share a short, private review of the MVP after exploring the workflow.", boundary: "Comments are product research, not an investment recommendation or mailing-list signup.", hash: "#feedback" },
 ];
@@ -54,6 +56,7 @@ function viewFromHash(hash: string): ProductView {
   if (hash === "#leaders") return "areas";
   if (hash === "#decision-studio") return "underwrite";
   if (hash === "#valuation") return "properties";
+  if (hash === "#portfolio") return "portfolio";
   if (["#availability", "#compare", "#quality", "#sources"].includes(hash)) return "coverage";
   if (hash === "#feedback") return "feedback";
   return "overview";
@@ -377,6 +380,10 @@ export default function Home() {
         <AttomMarketAudit />
         <div className="valuation-method"><span><b>Model center</b>{propertyValuations.methodology.value}</span><span><b>Validation</b>{propertyValuations.methodology.validation}</span><span><b>Uncertainty</b>{propertyValuations.methodology.range}</span><span><b>Sorting</b>{propertyValuations.methodology.watchScore}</span><span><b>Hard boundary</b>{propertyValuations.methodology.boundary}</span></div>
       </section>
+      </div>
+
+      <div className={`product-view ${activeView === "portfolio" ? "active" : ""}`} aria-hidden={activeView !== "portfolio"}>
+      <PortfolioLab />
       </div>
 
       <div className={`product-view ${activeView === "coverage" ? "active" : ""}`} aria-hidden={activeView !== "coverage"}>

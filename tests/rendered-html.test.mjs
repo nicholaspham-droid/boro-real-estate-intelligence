@@ -80,6 +80,16 @@ test("server-renders the national Borocast workbench and verified registry", asy
   assert.match(html, /Help pressure-test/);
   assert.match(html, /Print 2-page area report/);
   assert.match(html, /Print 2-page property report/);
+  assert.match(html, /Portfolio Lab/);
+  assert.match(html, /PORTFOLIO LAB · V2 MODEL MODE/);
+  assert.match(html, /Build the book/);
+  assert.match(html, /Portfolio Edge Score/);
+  assert.match(html, /Portfolio Builder/);
+  assert.match(html, /Risk &amp; Scenarios/);
+  assert.match(html, /MODEL PORTFOLIO ONLY/);
+  assert.match(html, /Chicago · West Corridor/);
+  assert.match(html, /Philadelphia · West Corridor/);
+  assert.match(html, /Raleigh · West Corridor/);
 });
 
 test("area and property reports render two-page analytical audit trails", async () => {
