@@ -178,17 +178,19 @@ test("owner repository groups feedback by failure mode and protects triage updat
       throw new Error(`Unexpected SQL: ${sql}`);
     },
   };
-  const protectedEnv = { ...env, DB: db, REVIEW_PASSWORD: "test-review-password", FEEDBACK_ADMIN_PASSWORD: "owner-password" };
-  const reviewLogin = await worker.fetch(new Request("http://localhost/api/review/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: "test-review-password" }) }), protectedEnv, ctx);
-  const reviewCookie = reviewLogin.headers.get("set-cookie").split(";")[0];
-  const locked = await worker.fetch(new Request("http://localhost/api/review/repository", { headers: { Cookie: reviewCookie } }), protectedEnv, ctx);
+  const protectedEnv = { ...env, DB: db, REVIEW_PASSWORD: "test-review-password", FEEDBACK_ADMIN_PASSWORD: "owner-password", FEEDBACK_ADMIN_EMAIL: "owner@example.com" };
+  const noIdentity = await worker.fetch(new Request("http://localhost/api/review/admin/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: "owner-password" }) }), protectedEnv, ctx);
+  assert.equal(noIdentity.status, 403);
+
+  const ownerHeaders = { "oai-authenticated-user-email": "owner@example.com" };
+  const locked = await worker.fetch(new Request("http://localhost/api/review/repository", { headers: ownerHeaders }), protectedEnv, ctx);
   assert.equal(locked.status, 401);
 
-  const adminLogin = await worker.fetch(new Request("http://localhost/api/review/admin/login", { method: "POST", headers: { "Content-Type": "application/json", Cookie: reviewCookie }, body: JSON.stringify({ password: "owner-password" }) }), protectedEnv, ctx);
+  const adminLogin = await worker.fetch(new Request("http://localhost/api/review/admin/login", { method: "POST", headers: { "Content-Type": "application/json", ...ownerHeaders }, body: JSON.stringify({ password: "owner-password" }) }), protectedEnv, ctx);
   assert.equal(adminLogin.status, 200);
   const adminCookie = adminLogin.headers.get("set-cookie").split(";")[0];
-  const cookies = `${reviewCookie}; ${adminCookie}`;
-  const repository = await worker.fetch(new Request("http://localhost/api/review/repository", { headers: { Cookie: cookies } }), protectedEnv, ctx);
+  const repositoryHeaders = { Cookie: adminCookie, ...ownerHeaders };
+  const repository = await worker.fetch(new Request("http://localhost/api/review/repository", { headers: repositoryHeaders }), protectedEnv, ctx);
   assert.equal(repository.status, 200);
   const payload = await repository.json();
   assert.equal(payload.summary.total, 1);
@@ -196,7 +198,7 @@ test("owner repository groups feedback by failure mode and protects triage updat
   assert.equal(payload.summary.wouldUseCount, 1);
   assert.equal(payload.buckets.find((item) => item.id === "model_scoring").count, 1);
 
-  const patchResponse = await worker.fetch(new Request("http://localhost/api/review/repository/7", { method: "PATCH", headers: { "Content-Type": "application/json", Cookie: cookies }, body: JSON.stringify({ triageStatus: "reviewing" }) }), protectedEnv, ctx);
+  const patchResponse = await worker.fetch(new Request("http://localhost/api/review/repository/7", { method: "PATCH", headers: { "Content-Type": "application/json", ...repositoryHeaders }, body: JSON.stringify({ triageStatus: "reviewing" }) }), protectedEnv, ctx);
   assert.equal(patchResponse.status, 200);
   assert.deepEqual(updated, ["reviewing", 7]);
 });

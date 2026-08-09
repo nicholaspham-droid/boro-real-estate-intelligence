@@ -39,7 +39,7 @@ function label(value: string) {
   return value.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
-export function FeedbackRepository() {
+export function FeedbackRepository({ ownerEmail }: { ownerEmail: string }) {
   const [repository, setRepository] = useState<Repository | null>(null);
   const [access, setAccess] = useState<"loading" | "locked" | "ready" | "error">("loading");
   const [message, setMessage] = useState("");
@@ -96,7 +96,7 @@ export function FeedbackRepository() {
   const visible = useMemo(() => (repository?.entries ?? []).filter((entry) => (bucket === "all" || entry.failureModes.includes(bucket)) && (statusFilter === "all" || entry.triageStatus === statusFilter) && (featureFilter === "all" || entry.featureArea === featureFilter)), [repository, bucket, statusFilter, featureFilter]);
 
   if (access === "loading") return <main className="repository-lock"><span>BOROCAST · OWNER REPOSITORY</span><h1>Loading feedback…</h1></main>;
-  if (access === "locked") return <main className="repository-lock"><span>BOROCAST · OWNER REPOSITORY</span><h1>Feedback is separate from the shared review.</h1><p>Use the owner password to view reviewer identities, comments and triage status.</p><form onSubmit={unlock}><label htmlFor="owner-password">Owner password</label><input id="owner-password" name="password" type="password" autoComplete="current-password" required /><button>Open repository →</button><b role="alert">{message}</b></form><Link href="/">← Back to Borocast</Link></main>;
+  if (access === "locked") return <main className="repository-lock"><span>BOROCAST · OWNER REPOSITORY</span><h1>Identity verified. Complete step two.</h1><p>Signed in as {ownerEmail}. Enter the reset owner password to view reviewer identities, comments and triage status.</p><form onSubmit={unlock}><label htmlFor="owner-password">Owner password · step 2 of 2</label><input id="owner-password" name="password" type="password" autoComplete="current-password" required /><button>Open repository →</button><b role="alert">{message}</b></form><Link href="/">← Back to Borocast</Link></main>;
   if (access === "error" || !repository) return <main className="repository-lock"><h1>Repository unavailable.</h1><p>{message}</p><button onClick={() => void load()}>Try again</button></main>;
 
   return <main className="feedback-repository">

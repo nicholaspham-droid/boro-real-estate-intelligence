@@ -18,6 +18,7 @@ interface Env {
   RENTCAST_API_KEY?: string;
   REVIEW_PASSWORD?: string;
   FEEDBACK_ADMIN_PASSWORD?: string;
+  FEEDBACK_ADMIN_EMAIL?: string;
   IMAGES: {
     input(stream: ReadableStream): {
       transform(options: Record<string, unknown>): {
@@ -461,6 +462,12 @@ function parseStoredModes(value: unknown) {
   try { return feedbackModes(JSON.parse(typeof value === "string" ? value : "[]")); } catch { return []; }
 }
 
+function feedbackAdminEmailAuthorized(request: Request, env: Env) {
+  const expected = env.FEEDBACK_ADMIN_EMAIL?.trim().toLowerCase() ?? "";
+  const supplied = request.headers.get("oai-authenticated-user-email")?.trim().toLowerCase() ?? "";
+  return Boolean(expected && supplied && safeEqual(supplied, expected));
+}
+
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
@@ -480,7 +487,20 @@ const worker = {
       return Response.json({ ok: true }, { headers: { "Cache-Control": "no-store", "Set-Cookie": `${REVIEW_COOKIE}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax` } });
     }
 
-    if (env.REVIEW_PASSWORD && !url.pathname.startsWith("/_next/") && !url.pathname.startsWith("/favicon") && url.pathname !== "/robots.txt") {
+    if (url.pathname === "/api/review/admin/login") {
+      if (request.method !== "POST") return Response.json({ error: "Method not allowed" }, { status: 405 });
+      if (!env.FEEDBACK_ADMIN_PASSWORD || !env.FEEDBACK_ADMIN_EMAIL) return Response.json({ error: "Owner repository access is not configured." }, { status: 503 });
+      if (!feedbackAdminEmailAuthorized(request, env)) return Response.json({ error: "Sign in with the approved ChatGPT owner account first." }, { status: 403, headers: { "Cache-Control": "no-store" } });
+      let body: { password?: unknown } = {};
+      try { body = await request.json() as typeof body; } catch { return Response.json({ error: "Enter the owner password." }, { status: 400 }); }
+      if (!safeEqual(limitedText(body.password, 256), env.FEEDBACK_ADMIN_PASSWORD)) return Response.json({ error: "That owner password does not match." }, { status: 401, headers: { "Cache-Control": "no-store" } });
+      const token = await feedbackAdminToken(env.FEEDBACK_ADMIN_PASSWORD);
+      return Response.json({ ok: true }, { headers: { "Cache-Control": "no-store", "Set-Cookie": `${FEEDBACK_ADMIN_COOKIE}=${encodeURIComponent(token)}; Path=/; Max-Age=1209600; HttpOnly; Secure; SameSite=Lax` } });
+    }
+
+    const isFeedbackRepository = url.pathname === "/review-repository" || url.pathname.startsWith("/review-repository/") || url.pathname === "/api/review/admin/login" || url.pathname === "/api/review/repository" || url.pathname.startsWith("/api/review/repository/");
+    const isPlatformAuthPath = url.pathname === "/signin-with-chatgpt" || url.pathname === "/signout-with-chatgpt" || url.pathname === "/callback";
+    if (env.REVIEW_PASSWORD && !isFeedbackRepository && !isPlatformAuthPath && !url.pathname.startsWith("/_next/") && !url.pathname.startsWith("/favicon") && url.pathname !== "/robots.txt") {
       const expected = await reviewToken(env.REVIEW_PASSWORD);
       const authenticated = safeEqual(reviewCookieValue(request), expected);
       if (!authenticated) {
@@ -489,18 +509,9 @@ const worker = {
       }
     }
 
-    if (url.pathname === "/api/review/admin/login") {
-      if (request.method !== "POST") return Response.json({ error: "Method not allowed" }, { status: 405 });
-      if (!env.FEEDBACK_ADMIN_PASSWORD) return Response.json({ error: "Owner repository access is not configured." }, { status: 503 });
-      let body: { password?: unknown } = {};
-      try { body = await request.json() as typeof body; } catch { return Response.json({ error: "Enter the owner password." }, { status: 400 }); }
-      if (!safeEqual(limitedText(body.password, 256), env.FEEDBACK_ADMIN_PASSWORD)) return Response.json({ error: "That owner password does not match." }, { status: 401, headers: { "Cache-Control": "no-store" } });
-      const token = await feedbackAdminToken(env.FEEDBACK_ADMIN_PASSWORD);
-      return Response.json({ ok: true }, { headers: { "Cache-Control": "no-store", "Set-Cookie": `${FEEDBACK_ADMIN_COOKIE}=${encodeURIComponent(token)}; Path=/; Max-Age=1209600; HttpOnly; Secure; SameSite=Lax` } });
-    }
-
     if (url.pathname === "/api/review/repository" || url.pathname.startsWith("/api/review/repository/")) {
-      if (!env.FEEDBACK_ADMIN_PASSWORD) return Response.json({ error: "Owner repository access is not configured." }, { status: 503 });
+      if (!env.FEEDBACK_ADMIN_PASSWORD || !env.FEEDBACK_ADMIN_EMAIL) return Response.json({ error: "Owner repository access is not configured." }, { status: 503 });
+      if (!feedbackAdminEmailAuthorized(request, env)) return Response.json({ error: "Approved ChatGPT owner authentication required." }, { status: 403, headers: { "Cache-Control": "no-store" } });
       const expectedAdmin = await feedbackAdminToken(env.FEEDBACK_ADMIN_PASSWORD);
       if (!safeEqual(cookieValue(request, FEEDBACK_ADMIN_COOKIE), expectedAdmin)) return Response.json({ error: "Owner repository authentication required." }, { status: 401, headers: { "Cache-Control": "no-store" } });
       if (!env.DB) return Response.json({ error: "Feedback storage is not configured." }, { status: 503 });
