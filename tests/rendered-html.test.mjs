@@ -78,6 +78,32 @@ test("server-renders the national Borocast workbench and verified registry", asy
   assert.match(html, /No national PLUTO equivalent/);
   assert.match(html, /Give Feedback/);
   assert.match(html, /Help pressure-test/);
+  assert.match(html, /Print 2-page area report/);
+  assert.match(html, /Print 2-page property report/);
+});
+
+test("area and property reports render two-page analytical audit trails", async () => {
+  const worker = await loadWorker();
+  const areaResponse = await worker.fetch(new Request("http://localhost/report?type=area&market=new-york&cluster=new-york-central&demographic=10&economic=25&education=40&housing=10&pricing=15", { headers: { accept: "text/html" } }), env, ctx);
+  assert.equal(areaResponse.status, 200);
+  const areaHtml = await areaResponse.text();
+  assert.match(areaHtml, /AREA ANALYTICAL REPORT/);
+  assert.match(areaHtml, /Central Core/);
+  assert.match(areaHtml, /SCREENING CONCLUSION/);
+  assert.match(areaHtml, /How this signal was built/);
+  assert.match(areaHtml, /PAGE\s*(?:<!-- -->)?1\s*(?:<!-- -->)? OF 2/);
+  assert.match(areaHtml, /PAGE\s*(?:<!-- -->)?2\s*(?:<!-- -->)? OF 2/);
+  assert.match(areaHtml, /Print \/ Save PDF/);
+
+  const propertyResponse = await worker.fetch(new Request("http://localhost/report?type=property&id=cook-08214030100000", { headers: { accept: "text/html" } }), env, ctx);
+  assert.equal(propertyResponse.status, 200);
+  const propertyHtml = await propertyResponse.text();
+  assert.match(propertyHtml, /PROPERTY ANALYTICAL REPORT/);
+  assert.match(propertyHtml, /6 FOREST LN/);
+  assert.match(propertyHtml, /Three independently visible anchors/);
+  assert.match(propertyHtml, /How this value screen was built/);
+  assert.match(propertyHtml, /PAGE\s*(?:<!-- -->)?1\s*(?:<!-- -->)? OF 2/);
+  assert.match(propertyHtml, /PAGE\s*(?:<!-- -->)?2\s*(?:<!-- -->)? OF 2/);
 });
 
 test("private review gate rejects unknown visitors and issues an HttpOnly review cookie", async () => {

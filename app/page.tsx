@@ -87,6 +87,12 @@ function scoreMarket(market: MarketExplorer, weights: FactorWeights) {
   return Math.round(average);
 }
 
+function areaReportHref(marketId: string, clusterId: string, weights: FactorWeights) {
+  const params = new URLSearchParams({ type: "area", market: marketId, cluster: clusterId });
+  for (const factor of FACTORS) params.set(factor.key, String(weights[factor.key]));
+  return `/report?${params.toString()}`;
+}
+
 export default function Home() {
   const [activeView, setActiveView] = useState<ProductView>("overview");
   const [selectedMarketId, setSelectedMarketId] = useState(MARKET_EXPLORERS[0].id);
@@ -297,6 +303,7 @@ export default function Home() {
               <div><dt>ACS reliability</dt><dd>{selectedCluster.reliability}%</dd></div>
             </dl>
             <div className="cluster-read"><b>How to use this</b><p>Treat this as a screening signal. Move the top cluster into parcel, sales, zoning and permit diligence before making an investment conclusion.</p></div>
+            <a className="print-report-link" href={areaReportHref(market.id, selectedCluster.id, weights)} target="_blank" rel="noreferrer">Print 2-page area report →</a>
           </article>
         </div>
 
@@ -326,7 +333,7 @@ export default function Home() {
             <div className="leader-number-grid"><div><span>Local HPI YoY</span><b className={(leaderPricing?.yoy ?? 0) < 0 ? "negative" : ""}>{signed(leaderPricing?.yoy)}</b><small>{leaderPricing ? `FHFA ${leaderPricing.latestYear}` : "Metro proxy"}</small></div><div><span>Five-year HPI</span><b>{signed(leaderPricing?.fiveYearGrowth)}</b><small>{leaderPricing ? `${leaderPricing.pricingCompetency}% pricing competency` : "No tract series"}</small></div><div><span>Household income</span><b>{currency(selectedLeader.cluster.medianIncome)}</b><small>{percent(selectedLeader.cluster.unemploymentPct)} unemployment</small></div><div><span>Home value</span><b>{currency(selectedLeader.cluster.medianHomeValue)}</b><small>{currency(selectedLeader.cluster.medianRent)} median rent</small></div></div>
             <div className="leader-why"><div><p className="eyebrow">WHY IT STANDS OUT</p><ul><li><b>{leaderFactors[0].label} leads the profile at {leaderFactors[0].value}/100.</b> {leaderFactors[0].description}.</li><li><b>{leaderFactors[1].label} adds a {leaderFactors[1].value}/100 supporting signal.</b> {leaderFactors[1].description}.</li><li><b>Local price momentum is {selectedLeader.cluster.pricing}/100.</b> {leaderPricing ? `${signed(leaderPricing.yoy)} YoY and ${signed(leaderPricing.fiveYearGrowth)} over five years.` : "FHFA tract history is not sufficient, so the metro benchmark is used."}</li></ul></div><div className="leader-confidence"><span>Evidence check</span><strong>{selectedLeader.cluster.confidence}%</strong><i><span style={{ width: `${selectedLeader.cluster.confidence}%` }} /></i><p>{leaderPricing && leaderLatest ? `${leaderLatest.observedTracts} of ${leaderPricing.totalTractCount} tracts support the latest price change, covering ${leaderLatest.coveragePct}% of cluster population.` : "No qualified local FHFA tract series. Treat the price factor as market context only."}</p></div></div>
             <div className="leader-factor-row">{FACTORS.map((factor) => <div key={factor.key}><span>{factor.label}</span><i><b style={{ width: `${selectedLeader.cluster[factor.key]}%` }} /></i><strong>{selectedLeader.cluster[factor.key]}</strong></div>)}</div>
-            <a href="#workspace" onClick={() => { chooseMarket(selectedLeader.market.id); setSelectedClusterId(selectedLeader.cluster.id); }}>Open this area in the market workspace →</a>
+            <div className="leader-actions"><a href="#workspace" onClick={() => { chooseMarket(selectedLeader.market.id); setSelectedClusterId(selectedLeader.cluster.id); }}>Open this area in the market workspace →</a><a className="print-report-link" href={areaReportHref(selectedLeader.market.id, selectedLeader.cluster.id, weights)} target="_blank" rel="noreferrer">Print 2-page area report →</a></div>
           </article>
         </div>
         <p className="leaders-note">Ranking basis: weighted composite under the active lens, with competency used only as a tie-breaker. This is a screening leaderboard, not a forecast of future returns.</p>
@@ -361,7 +368,7 @@ export default function Home() {
             <SafetyEvidence key={selectedProperty.id} marketId={selectedProperty.marketId} lat={selectedProperty.lat} lng={selectedProperty.lng} address={selectedProperty.address} locality={selectedProperty.locality} />
             <RentCastEvidence key={`rentcast-${selectedProperty.id}`} address={selectedProperty.address} locality={selectedProperty.locality} />
             <p className="valuation-provenance"><b>{selectedProperty.sourceLabel}:</b> {selectedProperty.qualification}</p>
-            <div className="valuation-links"><a href={selectedProperty.sourceUrl} target="_blank" rel="noreferrer">Open official source →</a><a href={`https://www.google.com/maps/search/?api=1&query=${selectedProperty.lat},${selectedProperty.lng}`} target="_blank" rel="noreferrer">Open in Google Maps →</a><a href={`/api/valuation/properties/${selectedProperty.id}`} target="_blank" rel="noreferrer">Open model JSON →</a></div>
+            <div className="valuation-links"><a className="print-report-link" href={`/report?type=property&id=${encodeURIComponent(selectedProperty.id)}`} target="_blank" rel="noreferrer">Print 2-page property report →</a><a href={selectedProperty.sourceUrl} target="_blank" rel="noreferrer">Open official source →</a><a href={`https://www.google.com/maps/search/?api=1&query=${selectedProperty.lat},${selectedProperty.lng}`} target="_blank" rel="noreferrer">Open in Google Maps →</a><a href={`/api/valuation/properties/${selectedProperty.id}`} target="_blank" rel="noreferrer">Open model JSON →</a></div>
           </article>}
         </div> : <article className="valuation-gap-card"><p className="eyebrow">PRINCIPAL GAP</p><h3>{valuationMarketMeta.label}</h3><p>{valuationMarketMeta.gap}</p><b>The market remains in the neighborhood leaderboard, but property sorting is intentionally disabled until a reusable sale-price source or licensed vendor connection is verified.</b></article>}
         <div className="provider-heading"><div><p className="eyebrow">INDEPENDENT CROSS-REFERENCE STACK</p><h3>Agreement matters more than another opaque average.</h3></div><p>Public records establish the factual base. Aggregate market series check direction. Paid AVMs and MLS listings remain separate evidence channels so correlated estimates do not masquerade as independent confirmation.</p></div>
