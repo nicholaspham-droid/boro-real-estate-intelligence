@@ -20,10 +20,13 @@ const PIN_URLS: Record<Heat, string> = {
   cool: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
 };
 
-export function propertyHeat(property: PropertyRecord): Heat {
-  if (property.model.watchScore >= 80 && property.model.confidence >= 75) return "hot";
-  if (property.model.watchScore >= 75 && property.model.confidence >= 65) return "watch";
-  return "cool";
+export function propertyHeat(property: PropertyRecord, cohort: PropertyRecord[]): Heat {
+  if (property.model.confidence < 65) return "cool";
+  const ranked = [...cohort].sort((a, b) => b.model.watchScore - a.model.watchScore || b.model.confidence - a.model.confidence || b.model.valuationGapPct - a.model.valuationGapPct);
+  const rank = Math.max(0, ranked.findIndex((candidate) => candidate.id === property.id));
+  if (rank < Math.ceil(ranked.length * .25)) return "hot";
+  if (rank >= Math.ceil(ranked.length * .75)) return "cool";
+  return "watch";
 }
 
 function money(value: number) {
@@ -86,7 +89,7 @@ export function PropertyOpportunityMap({ marketLabel, properties, selectedId, on
     map.setZoom(11);
 
     for (const property of properties) {
-      const heat = propertyHeat(property);
+      const heat = propertyHeat(property, properties);
       const marker = new maps.Marker({
         map,
         position: { lat: property.lat, lng: property.lng },
@@ -97,7 +100,7 @@ export function PropertyOpportunityMap({ marketLabel, properties, selectedId, on
         zIndex: property.id === selectedId ? 20 : heat === "hot" ? 15 : 10,
       });
       const show = () => {
-        infoRef.current?.setContent(`<div class="map-tooltip property opportunity"><b>${property.address}</b><strong>${heat.toUpperCase()} · ${property.model.watchScore}/100 evidence priority</strong><span>${money(property.model.low)}–${money(property.model.high)} · ${property.model.confidence}% evidence quality</span><small>Click the pin to open the full public-record detail below</small></div>`);
+        infoRef.current?.setContent(`<div class="map-tooltip property opportunity"><b>${property.address}</b><strong>${heat === "hot" ? "LEADING QUARTILE" : heat === "cool" ? "LOWER QUARTILE" : "MIDDLE COHORT"} · ${property.model.watchScore}/100</strong><span>${money(property.model.low)}–${money(property.model.high)} · ${property.model.confidence}% evidence quality</span><small>Relative within this market · click for public-record detail</small></div>`);
         infoRef.current?.open({ map, anchor: marker });
       };
       marker.addListener("click", () => { onSelectRef.current(property.id); show(); });
@@ -113,16 +116,21 @@ export function PropertyOpportunityMap({ marketLabel, properties, selectedId, on
   }, [properties, ready, selectedId]);
 
   const selected = properties.find((property) => property.id === selectedId) ?? properties[0];
-  const counts = properties.reduce((current, property) => ({ ...current, [propertyHeat(property)]: current[propertyHeat(property)] + 1 }), { hot: 0, watch: 0, cool: 0 });
+  const counts = properties.reduce((current, property) => {
+    const heat = propertyHeat(property, properties);
+    current[heat] += 1;
+    return current;
+  }, { hot: 0, watch: 0, cool: 0 });
+  const selectedHeat = selected ? propertyHeat(selected, properties) : "watch";
 
   return <div className="opportunity-map-shell">
-    <div className="opportunity-map-head"><div><p className="eyebrow">MAP-FIRST PROPERTY EXPLORER</p><h3>{marketLabel} evidence map</h3><p>Color ranks diligence priority from the public-record watch model. It does not claim a property is a good or bad investment.</p></div><div className="opportunity-legend"><span className="hot">Hot <b>{counts.hot}</b></span><span className="watch">Watch <b>{counts.watch}</b></span><span className="cool">Cool <b>{counts.cool}</b></span></div></div>
+    <div className="opportunity-map-head"><div><p className="eyebrow">MAP-FIRST PROPERTY EXPLORER</p><h3>{marketLabel} recorded-evidence map</h3><p>Color is relative within the selected market: leading quartile, middle cohort and lower quartile. It does not claim a property is a good or bad investment.</p></div><div className="opportunity-legend"><span className="hot">Leading <b>{counts.hot}</b></span><span className="watch">Middle <b>{counts.watch}</b></span><span className="cool">Lower <b>{counts.cool}</b></span></div></div>
     <div className="opportunity-map-stage">
       <div ref={containerRef} className="opportunity-google-map" aria-label={`Interactive Google map of ${marketLabel} property evidence`} />
       {!ready && !error && <div className="map-loading"><i /> Loading property evidence…</div>}
       {error && <div className="map-error"><strong>Map unavailable</strong><span>{error}</span></div>}
       {ready && <div className="map-live-badge"><i /> Google Maps · {properties.length} qualified records</div>}
     </div>
-    {selected && <button className={`opportunity-selected ${propertyHeat(selected)}`} onClick={() => onSelect(selected.id)}><span>Selected · {propertyHeat(selected)}</span><b>{selected.address}</b><small>{money(selected.model.low)}–{money(selected.model.high)} · {selected.model.confidence}% evidence quality · open detail below ↓</small></button>}
+    {selected && <button className={`opportunity-selected ${selectedHeat}`} onClick={() => onSelect(selected.id)}><span>Selected · {selectedHeat === "hot" ? "leading quartile" : selectedHeat === "cool" ? "lower quartile" : "middle cohort"}</span><b>{selected.address}</b><small>{money(selected.model.low)}–{money(selected.model.high)} · {selected.model.confidence}% evidence quality · open detail below ↓</small></button>}
   </div>;
 }

@@ -43,7 +43,7 @@ const PRODUCT_TABS: Array<{ id: ProductView; label: string; purpose: string; bou
   { id: "explore", label: "Market Explorer", purpose: "Compare neighborhood fundamentals, price history and tract-cluster momentum.", boundary: "Use for screening; move a candidate into property diligence before acting.", hash: "#workspace" },
   { id: "areas", label: "Top Areas", purpose: "Inspect the ten highest-ranked local clusters under the active factor lens.", boundary: "Rank is relative and changes with weights; it is not a return forecast.", hash: "#leaders" },
   { id: "underwrite", label: "Deal Studio", purpose: "Test an actual price, rent, expenses, financing and investment hurdles.", boundary: "Outputs are scenario math and require verified deal inputs.", hash: "#decision-studio" },
-  { id: "properties", label: "Properties", purpose: "Map qualified records, inspect model ranges and run independent vendor checks.", boundary: "Hot/watch/cool is evidence priority—not a buy, hold or sell verdict.", hash: "#valuation" },
+  { id: "properties", label: "Properties", purpose: "Map qualified records, inspect model ranges and run independent vendor checks.", boundary: "Color bands are relative evidence priority—not a buy, hold or sell verdict.", hash: "#valuation" },
   { id: "coverage", label: "Data Coverage", purpose: "See feature availability, expansion waves, source quality and known gaps.", boundary: "A market appears only where the selected feature has current usable data.", hash: "#availability" },
 ];
 
