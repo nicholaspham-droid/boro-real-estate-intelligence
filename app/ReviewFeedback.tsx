@@ -122,7 +122,7 @@ export function ReviewFeedback() {
           <label><span>Anything else? <i>optional</i></span><textarea name="notes" maxLength={2500} placeholder="Open notes…" /></label>
         </div>
         <div className="review-submit">
-          <p>Your response is visible only to the Borocast team.</p>
+          <p>Your response is visible only to the BORO team.</p>
           {status === "error" && <b role="alert">{message}</b>}
           <button type="submit" disabled={status === "sending"}>{status === "sending" ? "Saving…" : "Send private feedback →"}</button>
         </div>

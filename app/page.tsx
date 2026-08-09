@@ -213,8 +213,8 @@ export default function Home() {
   return (
     <main id="top">
       <header className="topbar product-topbar">
-        <a className="brand" href="#overview" aria-label="Borocast home" onClick={() => setActiveView("overview")}><span>BORO</span>CAST</a>
-        <span className="product-label">Market intelligence</span>
+        <a className="brand" href="#overview" aria-label="BORO home" onClick={() => setActiveView("overview")}><span>BORO</span></a>
+        <span className="product-label">Real Estate Intelligence</span>
         <label className="global-market-picker"><span>Market</span><select value={market.id} onChange={(event) => chooseMarket(event.target.value)}>{MARKET_EXPLORERS.map((item) => <option key={item.id} value={item.id}>{item.metro.short}</option>)}</select></label>
         <nav className="product-tabs" aria-label="Product features">{PRODUCT_TABS.map((tab) => <button key={tab.id} aria-pressed={activeView === tab.id} className={activeView === tab.id ? "active" : ""} onClick={() => selectView(tab.id)}>{tab.label}</button>)}</nav>
       </header>
@@ -238,7 +238,7 @@ export default function Home() {
       </section>
 
       <section className="product-overview" id="overview">
-        <div className="section-title"><div><p className="eyebrow">PRODUCT OVERVIEW · FROM SIGNAL TO MEMO</p><h2>One workflow.<br />Five explicit decisions.</h2></div><p>Borocast is an evidence-first screening and underwriting workbench. It helps an investor narrow markets, inspect local fundamentals, challenge a property value, model an actual deal and document why it should advance—or stop.</p></div>
+        <div className="section-title"><div><p className="eyebrow">PRODUCT OVERVIEW · FROM SIGNAL TO MEMO</p><h2>One workflow.<br />Five explicit decisions.</h2></div><p>BORO is an evidence-first screening and underwriting workbench. It helps an investor narrow markets, inspect local fundamentals, challenge a property value, model an actual deal and document why it should advance—or stop.</p></div>
         <div className="product-journey">
           <article><span>01</span><b>Configure</b><p>Choose a growth, income, balanced or value-add lens. The active weights and hurdles stay visible.</p><a href="#workspace">Set the market lens →</a></article>
           <article><span>02</span><b>Rank</b><p>Compare 97 tract clusters on demographic, economic, education, housing and measured price momentum.</p><a href="#leaders">Review local leaders →</a></article>
@@ -407,7 +407,7 @@ export default function Home() {
         <ReviewFeedback />
       </div>
 
-      <footer><a className="brand" href="#top"><span>BORO</span>CAST</a><p>Public-data market intelligence · ACS 2020–2024 · FHFA through {PRICING_HISTORY_META.latestPeriod}</p><span>Screening signal · not investment advice</span></footer>
+      <footer><a className="brand" href="#top"><span>BORO</span></a><p>Public-data real estate intelligence · ACS 2020–2024 · FHFA through {PRICING_HISTORY_META.latestPeriod}</p><span>Screening signal · not investment advice</span></footer>
     </main>
   );
 }

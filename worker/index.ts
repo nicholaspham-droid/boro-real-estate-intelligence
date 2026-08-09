@@ -430,9 +430,9 @@ function safeEqual(left: string, right: string) {
 }
 
 function reviewLoginHtml() {
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Private review · Borocast</title><style>
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Private review · BORO</title><style>
   *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#071a38;color:#fff;font-family:Arial,sans-serif}main{width:min(92vw,470px);padding:48px;border:1px solid #304762;background:#0b2244;box-shadow:0 30px 90px #020b1b}i{display:block;width:12px;height:12px;margin-bottom:35px;border-radius:50%;background:#d9ff55;box-shadow:0 0 0 8px rgba(217,255,85,.08)}span{color:#70dfcc;font-size:10px;font-weight:900;letter-spacing:.13em}h1{margin:15px 0 16px;font-size:42px;line-height:.95;letter-spacing:-.055em}p{margin:0 0 28px;color:#a7b6c9;font-size:13px;line-height:1.65}label{display:block;color:#8fa0b6;font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}input{width:100%;height:50px;margin:9px 0 12px;padding:0 14px;border:1px solid #405674;background:#071a38;color:white;font:inherit;outline:0}input:focus{border-color:#d9ff55}button{width:100%;height:50px;border:0;background:#d9ff55;color:#071a38;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}button:disabled{opacity:.6}b{display:block;min-height:16px;margin-top:14px;color:#ff958d;font-size:10px}@media(max-width:520px){main{padding:35px 26px}h1{font-size:36px}}
-  </style></head><body><main><i></i><span>BOROCAST · INVITED REVIEW</span><h1>Private B-school<br>MVP review</h1><p>Enter the shared review password to explore the market-intelligence workbench and leave structured feedback.</p><form><label for="password">Review password</label><input id="password" name="password" type="password" autocomplete="current-password" autofocus required><button>Enter private MVP →</button><b role="alert"></b></form></main><script>
+  </style></head><body><main><i></i><span>BORO · INVITED REVIEW</span><h1>Private B-school<br>MVP review</h1><p>Enter the shared review password to explore the real estate intelligence workbench and leave structured feedback.</p><form><label for="password">Review password</label><input id="password" name="password" type="password" autocomplete="current-password" autofocus required><button>Enter private MVP →</button><b role="alert"></b></form></main><script>
   const form=document.querySelector('form'),button=document.querySelector('button'),error=document.querySelector('b');form.addEventListener('submit',async(event)=>{event.preventDefault();button.disabled=true;error.textContent='';try{const response=await fetch('/api/review/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:form.password.value})});const result=await response.json();if(!response.ok)throw new Error(result.error||'Could not sign in.');location.reload()}catch(reason){error.textContent=reason.message||'Could not sign in.';button.disabled=false}});
   </script></body></html>`;
 }
@@ -788,7 +788,7 @@ const worker = {
       if (!address1 || !address2) return Response.json({ error: "address1 and address2 are required" }, { status: 400 });
       try {
         const property = await fetchAttomProperty(env.ATTOM_API_KEY, address1, address2);
-        return Response.json({ provider: "ATTOM", retrievedAt: new Date().toISOString(), property, use: "Independent vendor cross-check. Borocast does not substitute ATTOM's AVM for its public-record anchors or average correlated estimates blindly." }, { headers: { "Cache-Control": "private, no-store" } });
+        return Response.json({ provider: "ATTOM", retrievedAt: new Date().toISOString(), property, use: "Independent vendor cross-check. BORO does not substitute ATTOM's AVM for its public-record anchors or average correlated estimates blindly." }, { headers: { "Cache-Control": "private, no-store" } });
       } catch (error) {
         return Response.json({ error: error instanceof Error ? error.message : "ATTOM property not found" }, { status: 502, headers: { "Cache-Control": "private, no-store" } });
       }
@@ -816,7 +816,7 @@ const worker = {
         }
       }));
       const matched = records.filter((record) => record.status === "matched").length;
-      return Response.json({ provider: "ATTOM", retrievedAt: new Date().toISOString(), marketIds, requested: records.length, matched, failed: records.length - matched, records, boundary: "This audit measures vendor availability and agreement. It does not retrain or average into the Borocast public-record model." }, { headers: { "Cache-Control": "private, no-store" } });
+      return Response.json({ provider: "ATTOM", retrievedAt: new Date().toISOString(), marketIds, requested: records.length, matched, failed: records.length - matched, records, boundary: "This audit measures vendor availability and agreement. It does not retrain or average into the BORO public-record model." }, { headers: { "Cache-Control": "private, no-store" } });
     }
 
     if (url.pathname === "/api/public-safety/local") {
