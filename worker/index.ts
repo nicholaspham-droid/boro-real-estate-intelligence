@@ -17,6 +17,7 @@ interface Env {
   ATTOM_API_KEY?: string;
   RENTCAST_API_KEY?: string;
   REVIEW_PASSWORD?: string;
+  FEEDBACK_ADMIN_PASSWORD?: string;
   IMAGES: {
     input(stream: ReadableStream): {
       transform(options: Record<string, unknown>): {
@@ -385,18 +386,40 @@ async function carySafety(lat: number, lng: number, from: string, to: string) {
 // const imageConfig: ImageConfig = { dangerouslyAllowSVG: true };
 
 const REVIEW_COOKIE = "borocast_review";
+const FEEDBACK_ADMIN_COOKIE = "borocast_feedback_admin";
 
-function reviewCookieValue(request: Request) {
+const FEEDBACK_BUCKETS = [
+  { id: "data_trust", label: "Data trust", lane: "model_review" },
+  { id: "data_coverage", label: "Missing data", lane: "data_pipeline" },
+  { id: "model_scoring", label: "Score / model", lane: "model_review" },
+  { id: "ux_navigation", label: "Navigation", lane: "product_ux" },
+  { id: "map_visualization", label: "Map / charts", lane: "product_ux" },
+  { id: "property_workflow", label: "Property workflow", lane: "product_ux" },
+  { id: "performance_error", label: "Bug / performance", lane: "engineering" },
+  { id: "value_proposition", label: "Unclear value", lane: "product_strategy" },
+] as const;
+const FEEDBACK_BUCKET_IDS = new Set<string>(FEEDBACK_BUCKETS.map((item) => item.id));
+const FEEDBACK_STATUSES = new Set(["new", "reviewing", "actioned", "closed"]);
+const FEEDBACK_LANES = new Set(["untriaged", "model_review", "data_pipeline", "product_ux", "engineering", "product_strategy"]);
+
+function cookieValue(request: Request, name: string) {
   const cookie = request.headers.get("Cookie") ?? "";
-  const match = cookie.split(";").map((part) => part.trim()).find((part) => part.startsWith(`${REVIEW_COOKIE}=`));
-  return match ? decodeURIComponent(match.slice(REVIEW_COOKIE.length + 1)) : "";
+  const match = cookie.split(";").map((part) => part.trim()).find((part) => part.startsWith(`${name}=`));
+  return match ? decodeURIComponent(match.slice(name.length + 1)) : "";
 }
 
-async function reviewToken(password: string) {
-  const bytes = new TextEncoder().encode(`borocast-private-review-v1:${password}`);
+function reviewCookieValue(request: Request) {
+  return cookieValue(request, REVIEW_COOKIE);
+}
+
+async function authToken(scope: string, password: string) {
+  const bytes = new TextEncoder().encode(`borocast-${scope}:${password}`);
   const digest = await crypto.subtle.digest("SHA-256", bytes);
   return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
+
+function reviewToken(password: string) { return authToken("private-review-v1", password); }
+function feedbackAdminToken(password: string) { return authToken("feedback-admin-v1", password); }
 
 function safeEqual(left: string, right: string) {
   const length = Math.max(left.length, right.length);
@@ -420,6 +443,22 @@ function limitedText(value: unknown, maximum: number) {
 function rating(value: unknown) {
   const parsed = Number(value);
   return Number.isInteger(parsed) && parsed >= 1 && parsed <= 5 ? parsed : null;
+}
+
+function feedbackModes(value: unknown) {
+  if (!Array.isArray(value)) return [];
+  return [...new Set(value.map((item) => limitedText(item, 40)).filter((item) => FEEDBACK_BUCKET_IDS.has(item)))].slice(0, FEEDBACK_BUCKETS.length);
+}
+
+function suggestedImpactLane(modes: string[]) {
+  for (const lane of ["model_review", "data_pipeline", "engineering", "product_ux", "product_strategy"]) {
+    if (modes.some((mode) => FEEDBACK_BUCKETS.find((bucket) => bucket.id === mode)?.lane === lane)) return lane;
+  }
+  return "untriaged";
+}
+
+function parseStoredModes(value: unknown) {
+  try { return feedbackModes(JSON.parse(typeof value === "string" ? value : "[]")); } catch { return []; }
 }
 
 const worker = {
@@ -450,6 +489,56 @@ const worker = {
       }
     }
 
+    if (url.pathname === "/api/review/admin/login") {
+      if (request.method !== "POST") return Response.json({ error: "Method not allowed" }, { status: 405 });
+      if (!env.FEEDBACK_ADMIN_PASSWORD) return Response.json({ error: "Owner repository access is not configured." }, { status: 503 });
+      let body: { password?: unknown } = {};
+      try { body = await request.json() as typeof body; } catch { return Response.json({ error: "Enter the owner password." }, { status: 400 }); }
+      if (!safeEqual(limitedText(body.password, 256), env.FEEDBACK_ADMIN_PASSWORD)) return Response.json({ error: "That owner password does not match." }, { status: 401, headers: { "Cache-Control": "no-store" } });
+      const token = await feedbackAdminToken(env.FEEDBACK_ADMIN_PASSWORD);
+      return Response.json({ ok: true }, { headers: { "Cache-Control": "no-store", "Set-Cookie": `${FEEDBACK_ADMIN_COOKIE}=${encodeURIComponent(token)}; Path=/; Max-Age=1209600; HttpOnly; Secure; SameSite=Lax` } });
+    }
+
+    if (url.pathname === "/api/review/repository" || url.pathname.startsWith("/api/review/repository/")) {
+      if (!env.FEEDBACK_ADMIN_PASSWORD) return Response.json({ error: "Owner repository access is not configured." }, { status: 503 });
+      const expectedAdmin = await feedbackAdminToken(env.FEEDBACK_ADMIN_PASSWORD);
+      if (!safeEqual(cookieValue(request, FEEDBACK_ADMIN_COOKIE), expectedAdmin)) return Response.json({ error: "Owner repository authentication required." }, { status: 401, headers: { "Cache-Control": "no-store" } });
+      if (!env.DB) return Response.json({ error: "Feedback storage is not configured." }, { status: 503 });
+
+      if (url.pathname === "/api/review/repository" && request.method === "GET") {
+        const result = await env.DB.prepare(`SELECT id, created_at, reviewer_name, reviewer_email, usefulness, trust, clarity,
+          most_valuable, confusing, next_feature, notes, feature_area, failure_modes, reviewer_intent, triage_status, impact_lane
+          FROM review_feedback ORDER BY created_at DESC LIMIT 500`).all() as { results?: Array<Record<string, unknown>> };
+        const entries = (result.results ?? []).map((row) => ({
+          id: Number(row.id), createdAt: String(row.created_at), reviewerName: row.reviewer_name ? String(row.reviewer_name) : null,
+          reviewerEmail: row.reviewer_email ? String(row.reviewer_email) : null, usefulness: Number(row.usefulness), trust: Number(row.trust), clarity: Number(row.clarity),
+          mostValuable: String(row.most_valuable), confusing: String(row.confusing), nextFeature: String(row.next_feature), notes: row.notes ? String(row.notes) : null,
+          featureArea: String(row.feature_area || "overall"), failureModes: parseStoredModes(row.failure_modes), reviewerIntent: String(row.reviewer_intent || "maybe"),
+          triageStatus: String(row.triage_status || "new"), impactLane: String(row.impact_lane || "untriaged"),
+        }));
+        const average = (key: "usefulness" | "trust" | "clarity") => entries.length ? entries.reduce((sum, entry) => sum + entry[key], 0) / entries.length : 0;
+        const buckets = FEEDBACK_BUCKETS.map((bucket) => ({ ...bucket, count: entries.filter((entry) => entry.failureModes.includes(bucket.id)).length }));
+        return Response.json({
+          entries,
+          summary: { total: entries.length, averageUsefulness: average("usefulness"), averageTrust: average("trust"), averageClarity: average("clarity"), modelReviewCount: entries.filter((entry) => entry.impactLane === "model_review" || entry.trust <= 2).length, wouldUseCount: entries.filter((entry) => entry.reviewerIntent === "yes").length },
+          buckets,
+        }, { headers: { "Cache-Control": "private, no-store" } });
+      }
+
+      const entryId = Number(url.pathname.slice("/api/review/repository/".length));
+      if (request.method !== "PATCH" || !Number.isInteger(entryId) || entryId < 1) return Response.json({ error: "Unknown repository operation." }, { status: 405 });
+      let body: Record<string, unknown>;
+      try { body = await request.json() as Record<string, unknown>; } catch { return Response.json({ error: "Invalid triage update." }, { status: 400 }); }
+      const triageStatus = body.triageStatus === undefined ? null : limitedText(body.triageStatus, 30);
+      const impactLane = body.impactLane === undefined ? null : limitedText(body.impactLane, 40);
+      if (triageStatus !== null && !FEEDBACK_STATUSES.has(triageStatus)) return Response.json({ error: "Unknown triage status." }, { status: 400 });
+      if (impactLane !== null && !FEEDBACK_LANES.has(impactLane)) return Response.json({ error: "Unknown impact lane." }, { status: 400 });
+      if (triageStatus === null && impactLane === null) return Response.json({ error: "No triage change supplied." }, { status: 400 });
+      if (triageStatus !== null) await env.DB.prepare("UPDATE review_feedback SET triage_status = ? WHERE id = ?").bind(triageStatus, entryId).run();
+      if (impactLane !== null) await env.DB.prepare("UPDATE review_feedback SET impact_lane = ? WHERE id = ?").bind(impactLane, entryId).run();
+      return Response.json({ ok: true }, { headers: { "Cache-Control": "no-store" } });
+    }
+
     if (url.pathname === "/api/review/feedback") {
       if (request.method !== "POST") return Response.json({ error: "Method not allowed" }, { status: 405 });
       if (!env.DB) return Response.json({ error: "Feedback storage is not configured." }, { status: 503 });
@@ -461,11 +550,15 @@ const worker = {
       const mostValuable = limitedText(body.mostValuable, 1500);
       const confusing = limitedText(body.confusing, 1500);
       const nextFeature = limitedText(body.nextFeature, 1500);
+      const featureArea = limitedText(body.featureArea, 60) || "overall";
+      const failureModes = feedbackModes(body.failureModes);
+      const reviewerIntent = ["yes", "maybe", "no"].includes(limitedText(body.reviewerIntent, 10)) ? limitedText(body.reviewerIntent, 10) : "maybe";
+      const impactLane = suggestedImpactLane(failureModes);
       if (usefulness === null || trust === null || clarity === null) return Response.json({ error: "All three ratings must be between 1 and 5." }, { status: 400 });
       if (!mostValuable || !confusing || !nextFeature) return Response.json({ error: "Please answer the three product questions." }, { status: 400 });
       await env.DB.prepare(`INSERT INTO review_feedback
-        (created_at, reviewer_name, reviewer_email, usefulness, trust, clarity, most_valuable, confusing, next_feature, notes, source_path)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+        (created_at, reviewer_name, reviewer_email, usefulness, trust, clarity, most_valuable, confusing, next_feature, notes, source_path, feature_area, failure_modes, reviewer_intent, triage_status, impact_lane)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
         .bind(
           new Date().toISOString(),
           limitedText(body.reviewerName, 120) || null,
@@ -478,6 +571,11 @@ const worker = {
           nextFeature,
           limitedText(body.notes, 2500) || null,
           limitedText(body.sourcePath, 240) || null,
+          featureArea,
+          JSON.stringify(failureModes),
+          reviewerIntent,
+          "new",
+          impactLane,
         ).run();
       return Response.json({ ok: true }, { status: 201, headers: { "Cache-Control": "no-store" } });
     }

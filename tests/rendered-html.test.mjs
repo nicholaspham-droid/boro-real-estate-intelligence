@@ -143,6 +143,9 @@ test("authenticated reviewers can save structured feedback to D1", async () => {
       usefulness: 5,
       trust: 4,
       clarity: 4,
+      featureArea: "market_explorer",
+      failureModes: ["data_trust", "model_scoring"],
+      reviewerIntent: "yes",
       mostValuable: "The local price history comparison.",
       confusing: "The competency score needs one more example.",
       nextFeature: "A saved shortlist.",
@@ -155,6 +158,47 @@ test("authenticated reviewers can save structured feedback to D1", async () => {
   assert.equal(inserted[1], "Maya");
   assert.equal(inserted[3], 5);
   assert.equal(inserted[6], "The local price history comparison.");
+  assert.equal(inserted[11], "market_explorer");
+  assert.equal(inserted[12], JSON.stringify(["data_trust", "model_scoring"]));
+  assert.equal(inserted[15], "model_review");
+});
+
+test("owner repository groups feedback by failure mode and protects triage updates", async () => {
+  const worker = await loadWorker();
+  let updated = null;
+  const db = {
+    prepare(sql) {
+      if (/SELECT id, created_at/.test(sql)) return { all: async () => ({ results: [{
+        id: 7, created_at: "2026-08-09T00:00:00.000Z", reviewer_name: "Maya", reviewer_email: "maya@example.com",
+        usefulness: 5, trust: 2, clarity: 4, most_valuable: "Local histories", confusing: "Weighting logic",
+        next_feature: "Saved lists", notes: null, feature_area: "market_explorer", failure_modes: JSON.stringify(["data_trust", "model_scoring"]),
+        reviewer_intent: "yes", triage_status: "new", impact_lane: "model_review",
+      }] }) };
+      if (/UPDATE review_feedback/.test(sql)) return { bind: (...values) => ({ run: async () => { updated = values; return { success: true }; } }) };
+      throw new Error(`Unexpected SQL: ${sql}`);
+    },
+  };
+  const protectedEnv = { ...env, DB: db, REVIEW_PASSWORD: "test-review-password", FEEDBACK_ADMIN_PASSWORD: "owner-password" };
+  const reviewLogin = await worker.fetch(new Request("http://localhost/api/review/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: "test-review-password" }) }), protectedEnv, ctx);
+  const reviewCookie = reviewLogin.headers.get("set-cookie").split(";")[0];
+  const locked = await worker.fetch(new Request("http://localhost/api/review/repository", { headers: { Cookie: reviewCookie } }), protectedEnv, ctx);
+  assert.equal(locked.status, 401);
+
+  const adminLogin = await worker.fetch(new Request("http://localhost/api/review/admin/login", { method: "POST", headers: { "Content-Type": "application/json", Cookie: reviewCookie }, body: JSON.stringify({ password: "owner-password" }) }), protectedEnv, ctx);
+  assert.equal(adminLogin.status, 200);
+  const adminCookie = adminLogin.headers.get("set-cookie").split(";")[0];
+  const cookies = `${reviewCookie}; ${adminCookie}`;
+  const repository = await worker.fetch(new Request("http://localhost/api/review/repository", { headers: { Cookie: cookies } }), protectedEnv, ctx);
+  assert.equal(repository.status, 200);
+  const payload = await repository.json();
+  assert.equal(payload.summary.total, 1);
+  assert.equal(payload.summary.modelReviewCount, 1);
+  assert.equal(payload.summary.wouldUseCount, 1);
+  assert.equal(payload.buckets.find((item) => item.id === "model_scoring").count, 1);
+
+  const patchResponse = await worker.fetch(new Request("http://localhost/api/review/repository/7", { method: "PATCH", headers: { "Content-Type": "application/json", Cookie: cookies }, body: JSON.stringify({ triageStatus: "reviewing" }) }), protectedEnv, ctx);
+  assert.equal(patchResponse.status, 200);
+  assert.deepEqual(updated, ["reviewing", 7]);
 });
 
 test("public-safety API validates geography before contacting a local agency feed", async () => {

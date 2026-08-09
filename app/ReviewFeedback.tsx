@@ -12,8 +12,20 @@ const RATING_FIELDS: Array<{ name: RatingName; label: string; low: string; high:
 
 const INITIAL_RATINGS: Record<RatingName, number> = { usefulness: 0, trust: 0, clarity: 0 };
 
+const FAILURE_MODES = [
+  ["data_trust", "Data trust"],
+  ["data_coverage", "Missing data"],
+  ["model_scoring", "Score / model"],
+  ["ux_navigation", "Navigation"],
+  ["map_visualization", "Map / charts"],
+  ["property_workflow", "Property workflow"],
+  ["performance_error", "Bug / performance"],
+  ["value_proposition", "Unclear value"],
+] as const;
+
 export function ReviewFeedback() {
   const [ratings, setRatings] = useState(INITIAL_RATINGS);
+  const [failureModes, setFailureModes] = useState<string[]>([]);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [message, setMessage] = useState("");
 
@@ -32,6 +44,9 @@ export function ReviewFeedback() {
       reviewerName: values.get("reviewerName"),
       reviewerEmail: values.get("reviewerEmail"),
       ...ratings,
+      featureArea: values.get("featureArea"),
+      failureModes,
+      reviewerIntent: values.get("reviewerIntent"),
       mostValuable: values.get("mostValuable"),
       confusing: values.get("confusing"),
       nextFeature: values.get("nextFeature"),
@@ -48,6 +63,7 @@ export function ReviewFeedback() {
       if (!response.ok) throw new Error(result.error ?? "Feedback could not be saved.");
       form.reset();
       setRatings(INITIAL_RATINGS);
+      setFailureModes([]);
       setStatus("sent");
     } catch (error) {
       setStatus("error");
@@ -94,6 +110,11 @@ export function ReviewFeedback() {
             </div>
           ))}
         </fieldset>
+        <div className="review-classify">
+          <label><span>Where were you when this feedback formed?</span><select name="featureArea" defaultValue="overall"><option value="overall">Across the product</option><option value="overview">Overview</option><option value="market_explorer">Market Explorer</option><option value="top_areas">Top Areas</option><option value="deal_studio">Deal Studio</option><option value="properties">Properties</option><option value="data_coverage">Data Coverage</option></select></label>
+          <fieldset><legend>Where did the experience break down? <i>Choose any that apply</i></legend><div>{FAILURE_MODES.map(([id, label]) => <button key={id} type="button" aria-pressed={failureModes.includes(id)} onClick={() => setFailureModes((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id])}>{label}</button>)}</div></fieldset>
+          <fieldset className="review-intent"><legend>Would you use a stronger version?</legend><div><label><input type="radio" name="reviewerIntent" value="yes" /> Yes</label><label><input type="radio" name="reviewerIntent" value="maybe" defaultChecked /> Maybe</label><label><input type="radio" name="reviewerIntent" value="no" /> No</label></div></fieldset>
+        </div>
         <div className="review-prompts">
           <label><span>What was most valuable?</span><textarea name="mostValuable" required maxLength={1500} placeholder="A screen, comparison, score, or insight…" /></label>
           <label><span>What felt confusing or untrustworthy?</span><textarea name="confusing" required maxLength={1500} placeholder="A data gap, claim, interaction, or missing explanation…" /></label>
