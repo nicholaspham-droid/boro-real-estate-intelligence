@@ -56,14 +56,16 @@ test("server-renders the national Borocast workbench and verified registry", asy
   assert.match(html, /MODEL GOVERNANCE CHECK/);
   assert.match(html, /Out-of-time validation/);
   assert.match(html, /Bring an independent AVM into the evidence stack/);
-  assert.match(html, /MAP-FIRST PROPERTY EXPLORER/);
+  assert.match(html, /Raleigh live-listing pilot map/);
   assert.match(html, /ATTOM MARKET AUDIT · SIX CONTROL ADDRESSES/);
   assert.match(html, /RENTCAST · LISTING \+ RENT CHANNEL/);
   assert.match(html, /FREE-TIER MVP · RALEIGH LIVE LISTINGS/);
   assert.match(html, /Twelve listings\. Three evidence bands\. One API request/);
   assert.match(html, /Raleigh is the only live-listing market enabled/);
+  assert.match(html, /Raleigh live-listing pilot map/);
+  assert.match(html, /Map ready · load listings to add scored pins/);
   assert.match(html, /Historical model library/);
-  assert.match(html, /Chicago and Philadelphia have recorded-property evidence/);
+  assert.match(html, /Chicago and Philadelphia also open their recorded-evidence maps/);
   assert.match(html, /Market Explorer/);
   assert.match(html, /Deal Studio/);
   assert.match(html, /FEATURE AVAILABILITY · NO EMPTY MARKETS/);
@@ -112,8 +114,55 @@ test("RentCast adapter stays server-side and closes property evidence without a 
   const lookup = await worker.fetch(new Request("http://localhost/api/integrations/rentcast/property?address=123%20Main%20St"), env, ctx);
   assert.equal(lookup.status, 503);
 
-  const pilot = await worker.fetch(new Request("http://localhost/api/integrations/rentcast/pilot?market=raleigh"), env, ctx);
+  const pilot = await worker.fetch(new Request("http://localhost/api/listings/raleigh"), env, ctx);
   assert.equal(pilot.status, 503);
+});
+
+test("Raleigh listing route returns a twelve-property comparison set from one upstream response", async () => {
+  const originalFetch = globalThis.fetch;
+  const now = new Date().toISOString();
+  const mockListings = Array.from({ length: 50 }, (_, index) => ({
+    id: `raleigh-${index}`,
+    formattedAddress: `${100 + index} Test Ave, Raleigh, NC 276${String(index % 10).padStart(2, "0")}`,
+    addressLine1: `${100 + index} Test Ave`,
+    city: "Raleigh",
+    state: "NC",
+    zipCode: `276${String(index % 10).padStart(2, "0")}`,
+    latitude: 35.72 + index * .002,
+    longitude: -78.72 + index * .002,
+    propertyType: "Single Family",
+    bedrooms: 3 + index % 3,
+    bathrooms: 2 + index % 2,
+    squareFootage: 1300 + index * 31,
+    yearBuilt: 1980 + index % 40,
+    status: "Active",
+    price: 250000 + index * 12500,
+    daysOnMarket: index * 11,
+    lastSeenDate: now,
+    mlsName: "Test MLS",
+    mlsNumber: `MLS-${index}`,
+  }));
+  globalThis.fetch = async (input, init) => {
+    if (String(input).startsWith("https://api.rentcast.io/v1/listings/sale")) {
+      assert.equal(init.headers["X-Api-Key"], "test-key");
+      return new Response(JSON.stringify(mockListings), { status: 200, headers: { "Content-Type": "application/json", "X-Total-Count": "1036" } });
+    }
+    return originalFetch(input, init);
+  };
+  try {
+    const worker = await loadWorker();
+    const response = await worker.fetch(new Request("http://localhost/api/listings/raleigh"), { ...env, RENTCAST_API_KEY: "test-key" }, ctx);
+    assert.equal(response.status, 200);
+    const payload = await response.json();
+    assert.equal(payload.requestCost, 1);
+    assert.equal(payload.scoredCandidateCount, 50);
+    assert.equal(payload.candidateCount, 1036);
+    assert.equal(payload.listings.length, 12);
+    assert.ok(payload.listings.some((listing) => listing.priority === "low"));
+    assert.ok(payload.listings.every((listing) => listing.scoreBreakdown.length === 5));
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
 
 test("property-data APIs expose health and market evidence", async () => {

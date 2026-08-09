@@ -128,7 +128,13 @@ async function fetchRaleighListingPilot(apiKey: string) {
   endpoint.searchParams.set("limit", "50");
   endpoint.searchParams.set("includeTotalCount", "true");
   const response = await fetch(endpoint, { headers: { Accept: "application/json", "X-Api-Key": apiKey } });
-  const payload = await response.json() as RentCastListing[] | { message?: string };
+  const responseBody = await response.text();
+  let payload: RentCastListing[] | { message?: string };
+  try {
+    payload = JSON.parse(responseBody) as RentCastListing[] | { message?: string };
+  } catch {
+    throw new Error(`Listing provider returned an unreadable response (${response.status})`);
+  }
   if (!response.ok || !Array.isArray(payload)) {
     throw new Error(!Array.isArray(payload) && payload.message ? payload.message : `RentCast request failed (${response.status})`);
   }
@@ -519,15 +525,15 @@ const worker = {
         provider: "RentCast",
         connected: Boolean(env.RENTCAST_API_KEY),
         endpoint: "/api/integrations/rentcast/property?address=...",
-        pilotEndpoint: "/api/integrations/rentcast/pilot?market=raleigh",
+        pilotEndpoint: "/api/listings/raleigh",
         capabilities: ["active sale listing", "active rental listing", "rent estimate", "rental comps", "one-call Raleigh listing pilot"],
         privacy: "The API key stays server-side. Owner and listing-contact fields are not returned.",
       }, { headers: { "Cache-Control": "private, no-store" } });
     }
 
-    if (url.pathname === "/api/integrations/rentcast/pilot") {
+    if (url.pathname === "/api/listings/raleigh" || url.pathname === "/api/integrations/rentcast/pilot") {
       if (!env.RENTCAST_API_KEY) return Response.json({ error: "RentCast is not configured" }, { status: 503, headers: { "Cache-Control": "private, no-store" } });
-      const market = url.searchParams.get("market")?.trim().toLowerCase() ?? "raleigh";
+      const market = url.pathname === "/api/listings/raleigh" ? "raleigh" : url.searchParams.get("market")?.trim().toLowerCase() ?? "raleigh";
       if (market !== "raleigh") return Response.json({ error: "The free-tier MVP pilot is limited to Raleigh." }, { status: 400 });
       try {
         const pilot = await fetchRaleighListingPilot(env.RENTCAST_API_KEY);
