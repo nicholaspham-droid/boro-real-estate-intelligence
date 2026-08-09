@@ -125,7 +125,7 @@ async function fetchRaleighListingPilot(apiKey: string) {
   endpoint.searchParams.set("status", "Active");
   endpoint.searchParams.set("propertyType", "Single Family");
   endpoint.searchParams.set("price", "150000:1250000");
-  endpoint.searchParams.set("limit", "30");
+  endpoint.searchParams.set("limit", "50");
   endpoint.searchParams.set("includeTotalCount", "true");
   const response = await fetch(endpoint, { headers: { Accept: "application/json", "X-Api-Key": apiKey } });
   const payload = await response.json() as RentCastListing[] | { message?: string };
@@ -135,15 +135,22 @@ async function fetchRaleighListingPilot(apiKey: string) {
 
   const usable = payload.filter((listing) => listing.id && listing.formattedAddress && listing.price && listing.squareFootage && listing.latitude && listing.longitude);
   const medianPpsf = medianNumber(usable.map((listing) => listing.price! / listing.squareFootage!));
-  const evaluated = usable.map((listing) => {
+  const scored = usable.map((listing) => {
     const ppsf = listing.price! / listing.squareFootage!;
     const dom = listing.daysOnMarket ?? 0;
     const freshnessDays = daysSince(listing.lastSeenDate);
     const valueSignal = bounded(50 + (medianPpsf - ppsf) / Math.max(1, medianPpsf) * 120, 20, 92);
-    const negotiability = dom >= 21 && dom <= 90 ? 86 : dom > 90 ? 72 : dom >= 7 ? 64 : 46;
+    const negotiability = dom >= 21 && dom <= 90 ? 88 : dom <= 180 && dom > 90 ? 64 : dom <= 365 && dom > 180 ? 44 : dom > 365 ? 24 : dom >= 7 ? 64 : 46;
     const freshness = freshnessDays <= 1 ? 100 : freshnessDays <= 3 ? 86 : freshnessDays <= 7 ? 68 : 42;
     const completeness = [listing.bedrooms, listing.bathrooms, listing.squareFootage, listing.yearBuilt, listing.mlsName, listing.mlsNumber].filter((value) => value !== null && value !== undefined && value !== "").length / 6 * 100;
-    const score = Math.round(valueSignal * .30 + negotiability * .22 + freshness * .20 + completeness * .13 + 82 * .15);
+    const components = {
+      value: Math.round(valueSignal),
+      marketTime: Math.round(negotiability),
+      freshness: Math.round(freshness),
+      completeness: Math.round(completeness),
+      marketContext: 82,
+    };
+    const score = Math.round(components.value * .30 + components.marketTime * .22 + components.freshness * .20 + components.completeness * .13 + components.marketContext * .15);
     const reasons = [
       ppsf <= medianPpsf ? `${Math.round((1 - ppsf / medianPpsf) * 100)}% below pilot median price/sf` : `${Math.round((ppsf / medianPpsf - 1) * 100)}% above pilot median price/sf`,
       `${dom} days on market`,
@@ -174,15 +181,65 @@ async function fetchRaleighListingPilot(apiKey: string) {
       mlsName: listing.mlsName ?? null,
       mlsNumber: listing.mlsNumber ?? null,
       screeningScore: score,
-      priority: score >= 75 ? "high" : score >= 62 ? "medium" : "low",
+      components,
       reasons,
     };
-  }).sort((a, b) => b.screeningScore - a.screeningScore).slice(0, 5);
+  }).sort((a, b) => b.screeningScore - a.screeningScore);
+
+  const baselineScore = Math.round(medianNumber(scored.map((listing) => listing.screeningScore)));
+  const componentBaselines = {
+    value: Math.round(medianNumber(scored.map((listing) => listing.components.value))),
+    marketTime: Math.round(medianNumber(scored.map((listing) => listing.components.marketTime))),
+    freshness: Math.round(medianNumber(scored.map((listing) => listing.components.freshness))),
+    completeness: Math.round(medianNumber(scored.map((listing) => listing.components.completeness))),
+    marketContext: 82,
+  };
+  const enriched = scored.map((listing) => {
+    const deltaFromBaseline = listing.screeningScore - baselineScore;
+    const belowCount = scored.filter((candidate) => candidate.screeningScore < listing.screeningScore).length;
+    const percentile = scored.length <= 1 ? 100 : Math.round(belowCount / (scored.length - 1) * 100);
+    return {
+      ...listing,
+      deltaFromBaseline,
+      percentile,
+      priority: deltaFromBaseline >= 7 && percentile >= 65 ? "high" as const : deltaFromBaseline <= -7 || percentile <= 30 ? "low" as const : "medium" as const,
+      scoreBreakdown: [
+        { key: "value", label: "Relative price / sf", weight: 30, score: listing.components.value, baseline: componentBaselines.value, weightedPoints: Math.round(listing.components.value * .30 * 10) / 10 },
+        { key: "marketTime", label: "Market time", weight: 22, score: listing.components.marketTime, baseline: componentBaselines.marketTime, weightedPoints: Math.round(listing.components.marketTime * .22 * 10) / 10 },
+        { key: "freshness", label: "Listing freshness", weight: 20, score: listing.components.freshness, baseline: componentBaselines.freshness, weightedPoints: Math.round(listing.components.freshness * .20 * 10) / 10 },
+        { key: "completeness", label: "Field completeness", weight: 13, score: listing.components.completeness, baseline: componentBaselines.completeness, weightedPoints: Math.round(listing.components.completeness * .13 * 10) / 10 },
+        { key: "marketContext", label: "Raleigh data competency", weight: 15, score: listing.components.marketContext, baseline: componentBaselines.marketContext, weightedPoints: Math.round(listing.components.marketContext * .15 * 10) / 10 },
+      ],
+    };
+  });
+
+  const selectedIds = new Set<string>();
+  const comparisonSet: typeof enriched = [];
+  const add = (listing: (typeof enriched)[number] | undefined) => {
+    if (listing && !selectedIds.has(listing.id)) {
+      selectedIds.add(listing.id);
+      comparisonSet.push(listing);
+    }
+  };
+  enriched.slice(0, 4).forEach(add);
+  [...enriched].sort((a, b) => Math.abs(a.deltaFromBaseline) - Math.abs(b.deltaFromBaseline)).slice(0, 8).forEach((listing) => {
+    if (comparisonSet.length < 8) add(listing);
+  });
+  enriched.slice(-8).reverse().forEach((listing) => {
+    if (comparisonSet.length < 12) add(listing);
+  });
+  enriched.forEach((listing) => {
+    if (comparisonSet.length < 12) add(listing);
+  });
+  comparisonSet.sort((a, b) => b.screeningScore - a.screeningScore);
 
   return {
-    listings: evaluated,
+    listings: comparisonSet,
     candidateCount: Number(response.headers.get("X-Total-Count")) || payload.length,
+    scoredCandidateCount: scored.length,
     medianPricePerSqft: Math.round(medianPpsf),
+    baselineScore,
+    componentBaselines,
   };
 }
 
@@ -480,7 +537,7 @@ const worker = {
           retrievedAt: new Date().toISOString(),
           requestCost: 1,
           ...pilot,
-          methodology: "Five active single-family listings are ranked from a recently observed candidate pool using relative price/sf, days on market, freshness, field completeness and Raleigh's validated market competency.",
+          methodology: "Twelve active single-family listings span the leading, baseline and higher-diligence portions of one 50-record candidate sample. The score weights relative price/sf 30%, market time 22%, freshness 20%, field completeness 13% and Raleigh data competency 15%.",
           boundary: "This is a live-listing screen, not a valuation or recommendation. Verify status, source rights, condition, taxes, insurance, title, concessions and full deal inputs before underwriting.",
         }, { headers: { "Cache-Control": "private, max-age=21600" } });
       } catch (error) {

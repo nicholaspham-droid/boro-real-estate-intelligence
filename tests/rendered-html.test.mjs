@@ -60,7 +60,10 @@ test("server-renders the national Borocast workbench and verified registry", asy
   assert.match(html, /ATTOM MARKET AUDIT · SIX CONTROL ADDRESSES/);
   assert.match(html, /RENTCAST · LISTING \+ RENT CHANNEL/);
   assert.match(html, /FREE-TIER MVP · RALEIGH LIVE LISTINGS/);
-  assert.match(html, /Five listings\. One API request/);
+  assert.match(html, /Twelve listings\. Three evidence bands\. One API request/);
+  assert.match(html, /Raleigh is the only live-listing market enabled/);
+  assert.match(html, /Historical model library/);
+  assert.match(html, /Chicago and Philadelphia have recorded-property evidence/);
   assert.match(html, /Market Explorer/);
   assert.match(html, /Deal Studio/);
   assert.match(html, /FEATURE AVAILABILITY · NO EMPTY MARKETS/);

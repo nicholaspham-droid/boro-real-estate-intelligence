@@ -77,13 +77,13 @@ export const PRODUCT_FEATURES: ProductFeatureCoverage[] = [
   },
   {
     id: "listings",
-    label: "Licensed active listings",
+    label: "Active listing screen",
     shortLabel: "Listings",
-    description: "Active asking price, status, days on market and listing history from an approved listing system.",
-    marketIds: [],
-    href: "#quality",
-    freshness: "Not yet licensed",
-    boundary: "No market appears until contractual rights and a production feed are verified.",
+    description: "Active asking price, status, days on market and source identifiers from the connected RentCast feed.",
+    marketIds: ["raleigh"],
+    href: "#valuation",
+    freshness: "Live lookup · six-hour cache",
+    boundary: "Raleigh only in the free-tier MVP. Listing evidence is not a valuation or investment recommendation.",
   },
 ];
 
