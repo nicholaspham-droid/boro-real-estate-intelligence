@@ -43,8 +43,23 @@ interface AttomProperty {
 }
 
 type RentCastListing = {
+  id?: string;
+  formattedAddress?: string;
+  addressLine1?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  county?: string;
+  latitude?: number;
+  longitude?: number;
+  propertyType?: string;
+  bedrooms?: number;
+  bathrooms?: number;
+  squareFootage?: number;
+  yearBuilt?: number;
   status?: string;
   price?: number;
+  listingType?: string;
   listedDate?: string;
   lastSeenDate?: string;
   daysOnMarket?: number;
@@ -85,6 +100,90 @@ async function rentCastRequest<T>(apiKey: string, path: string, address: string)
   const payload = await response.json() as T | { message?: string };
   if (!response.ok) throw new Error("message" in payload && payload.message ? payload.message : `RentCast request failed (${response.status})`);
   return payload as T;
+}
+
+function bounded(value: number, minimum = 0, maximum = 100) {
+  return Math.min(maximum, Math.max(minimum, value));
+}
+
+function medianNumber(values: number[]) {
+  const sorted = values.filter(Number.isFinite).sort((a, b) => a - b);
+  if (!sorted.length) return 0;
+  const middle = Math.floor(sorted.length / 2);
+  return sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
+}
+
+function daysSince(value?: string) {
+  if (!value) return 365;
+  return Math.max(0, Math.round((Date.now() - new Date(value).getTime()) / 86_400_000));
+}
+
+async function fetchRaleighListingPilot(apiKey: string) {
+  const endpoint = new URL("https://api.rentcast.io/v1/listings/sale");
+  endpoint.searchParams.set("city", "Raleigh");
+  endpoint.searchParams.set("state", "NC");
+  endpoint.searchParams.set("status", "Active");
+  endpoint.searchParams.set("propertyType", "Single Family");
+  endpoint.searchParams.set("price", "150000:1250000");
+  endpoint.searchParams.set("limit", "30");
+  endpoint.searchParams.set("includeTotalCount", "true");
+  const response = await fetch(endpoint, { headers: { Accept: "application/json", "X-Api-Key": apiKey } });
+  const payload = await response.json() as RentCastListing[] | { message?: string };
+  if (!response.ok || !Array.isArray(payload)) {
+    throw new Error(!Array.isArray(payload) && payload.message ? payload.message : `RentCast request failed (${response.status})`);
+  }
+
+  const usable = payload.filter((listing) => listing.id && listing.formattedAddress && listing.price && listing.squareFootage && listing.latitude && listing.longitude);
+  const medianPpsf = medianNumber(usable.map((listing) => listing.price! / listing.squareFootage!));
+  const evaluated = usable.map((listing) => {
+    const ppsf = listing.price! / listing.squareFootage!;
+    const dom = listing.daysOnMarket ?? 0;
+    const freshnessDays = daysSince(listing.lastSeenDate);
+    const valueSignal = bounded(50 + (medianPpsf - ppsf) / Math.max(1, medianPpsf) * 120, 20, 92);
+    const negotiability = dom >= 21 && dom <= 90 ? 86 : dom > 90 ? 72 : dom >= 7 ? 64 : 46;
+    const freshness = freshnessDays <= 1 ? 100 : freshnessDays <= 3 ? 86 : freshnessDays <= 7 ? 68 : 42;
+    const completeness = [listing.bedrooms, listing.bathrooms, listing.squareFootage, listing.yearBuilt, listing.mlsName, listing.mlsNumber].filter((value) => value !== null && value !== undefined && value !== "").length / 6 * 100;
+    const score = Math.round(valueSignal * .30 + negotiability * .22 + freshness * .20 + completeness * .13 + 82 * .15);
+    const reasons = [
+      ppsf <= medianPpsf ? `${Math.round((1 - ppsf / medianPpsf) * 100)}% below pilot median price/sf` : `${Math.round((ppsf / medianPpsf - 1) * 100)}% above pilot median price/sf`,
+      `${dom} days on market`,
+      freshnessDays <= 3 ? "recently observed" : `last observed ${freshnessDays} days ago`,
+    ];
+    return {
+      id: listing.id,
+      address: listing.formattedAddress,
+      addressLine1: listing.addressLine1 ?? listing.formattedAddress,
+      city: listing.city ?? "Raleigh",
+      state: listing.state ?? "NC",
+      zipCode: listing.zipCode ?? null,
+      county: listing.county ?? null,
+      lat: listing.latitude,
+      lng: listing.longitude,
+      propertyType: listing.propertyType ?? "Single Family",
+      bedrooms: listing.bedrooms ?? null,
+      bathrooms: listing.bathrooms ?? null,
+      squareFootage: listing.squareFootage,
+      yearBuilt: listing.yearBuilt ?? null,
+      status: listing.status ?? "Active",
+      price: listing.price,
+      pricePerSqft: Math.round(ppsf),
+      listingType: listing.listingType ?? null,
+      listedDate: listing.listedDate ?? null,
+      lastSeenDate: listing.lastSeenDate ?? null,
+      daysOnMarket: listing.daysOnMarket ?? null,
+      mlsName: listing.mlsName ?? null,
+      mlsNumber: listing.mlsNumber ?? null,
+      screeningScore: score,
+      priority: score >= 75 ? "high" : score >= 62 ? "medium" : "low",
+      reasons,
+    };
+  }).sort((a, b) => b.screeningScore - a.screeningScore).slice(0, 5);
+
+  return {
+    listings: evaluated,
+    candidateCount: Number(response.headers.get("X-Total-Count")) || payload.length,
+    medianPricePerSqft: Math.round(medianPpsf),
+  };
 }
 
 async function fetchAttomProperty(apiKey: string, address1: string, address2: string) {
@@ -363,9 +462,30 @@ const worker = {
         provider: "RentCast",
         connected: Boolean(env.RENTCAST_API_KEY),
         endpoint: "/api/integrations/rentcast/property?address=...",
-        capabilities: ["active sale listing", "active rental listing", "rent estimate", "rental comps"],
+        pilotEndpoint: "/api/integrations/rentcast/pilot?market=raleigh",
+        capabilities: ["active sale listing", "active rental listing", "rent estimate", "rental comps", "one-call Raleigh listing pilot"],
         privacy: "The API key stays server-side. Owner and listing-contact fields are not returned.",
       }, { headers: { "Cache-Control": "private, no-store" } });
+    }
+
+    if (url.pathname === "/api/integrations/rentcast/pilot") {
+      if (!env.RENTCAST_API_KEY) return Response.json({ error: "RentCast is not configured" }, { status: 503, headers: { "Cache-Control": "private, no-store" } });
+      const market = url.searchParams.get("market")?.trim().toLowerCase() ?? "raleigh";
+      if (market !== "raleigh") return Response.json({ error: "The free-tier MVP pilot is limited to Raleigh." }, { status: 400 });
+      try {
+        const pilot = await fetchRaleighListingPilot(env.RENTCAST_API_KEY);
+        return Response.json({
+          provider: "RentCast",
+          market: { id: "raleigh", label: "Raleigh, NC", modelCompetency: 81, integratedCompetency: 82 },
+          retrievedAt: new Date().toISOString(),
+          requestCost: 1,
+          ...pilot,
+          methodology: "Five active single-family listings are ranked from a recently observed candidate pool using relative price/sf, days on market, freshness, field completeness and Raleigh's validated market competency.",
+          boundary: "This is a live-listing screen, not a valuation or recommendation. Verify status, source rights, condition, taxes, insurance, title, concessions and full deal inputs before underwriting.",
+        }, { headers: { "Cache-Control": "private, max-age=21600" } });
+      } catch (error) {
+        return Response.json({ error: error instanceof Error ? error.message : "RentCast pilot lookup failed" }, { status: 502, headers: { "Cache-Control": "private, no-store" } });
+      }
     }
 
     if (url.pathname === "/api/integrations/rentcast/property") {

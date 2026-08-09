@@ -59,6 +59,8 @@ test("server-renders the national Borocast workbench and verified registry", asy
   assert.match(html, /MAP-FIRST PROPERTY EXPLORER/);
   assert.match(html, /ATTOM MARKET AUDIT · SIX CONTROL ADDRESSES/);
   assert.match(html, /RENTCAST · LISTING \+ RENT CHANNEL/);
+  assert.match(html, /FREE-TIER MVP · RALEIGH LIVE LISTINGS/);
+  assert.match(html, /Five listings\. One API request/);
   assert.match(html, /Market Explorer/);
   assert.match(html, /Deal Studio/);
   assert.match(html, /FEATURE AVAILABILITY · NO EMPTY MARKETS/);
@@ -106,6 +108,9 @@ test("RentCast adapter stays server-side and closes property evidence without a 
 
   const lookup = await worker.fetch(new Request("http://localhost/api/integrations/rentcast/property?address=123%20Main%20St"), env, ctx);
   assert.equal(lookup.status, 503);
+
+  const pilot = await worker.fetch(new Request("http://localhost/api/integrations/rentcast/pilot?market=raleigh"), env, ctx);
+  assert.equal(pilot.status, 503);
 });
 
 test("property-data APIs expose health and market evidence", async () => {

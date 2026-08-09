@@ -11,6 +11,7 @@ import { VALUATION_MARKET_IDS, type ProductFeatureId } from "./featureAvailabili
 import { PropertyOpportunityMap } from "./PropertyOpportunityMap";
 import { AttomMarketAudit } from "./AttomMarketAudit";
 import { RentCastEvidence } from "./RentCastEvidence";
+import { RaleighListingPilot } from "./RaleighListingPilot";
 import {
   ACS_AGGREGATION_META,
   BALANCED_WEIGHTS,
@@ -96,7 +97,7 @@ export default function Home() {
   const [priceScope, setPriceScope] = useState<"cluster" | "metro">("cluster");
   const [historyRange, setHistoryRange] = useState<5 | 10 | "full">(10);
   const [selectedLeaderKey, setSelectedLeaderKey] = useState<string | null>(null);
-  const [valuationMarket, setValuationMarket] = useState("chicago");
+  const [valuationMarket, setValuationMarket] = useState("raleigh");
   const [valuationSort, setValuationSort] = useState<"watch" | "confidence" | "gap" | "value">("watch");
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null);
   const [sourceMarketId, setSourceMarketId] = useState(sourceRegistry.sources[0].marketIds[0]);
@@ -339,6 +340,7 @@ export default function Home() {
         <div className="valuation-readiness">
           {liveValuationMarkets.map((item) => <button key={item.id} className={valuationMarket === item.id ? "active" : ""} onClick={() => { setValuationMarket(item.id); setSelectedPropertyId(null); }}><span>LIVE · VALIDATED</span><b>{item.label}</b><i>{item.competency}% integrated competency</i><small>{"sourceCompetency" in item ? `${item.sourceCompetency}% source · ${item.modelCompetency}% model · ${item.diagnostics.sampleSize} historical tests` : ""}</small></button>)}
         </div>
+        <RaleighListingPilot />
         {valuationRows.length > 0 && <PropertyOpportunityMap marketLabel={valuationMarketMeta.label} properties={valuationRows} selectedId={selectedProperty?.id ?? null} onSelect={setSelectedPropertyId} />}
         {valuationRows.length ? <div className="valuation-workbench">
           <div className="valuation-list">
