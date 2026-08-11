@@ -11,7 +11,7 @@ import { VALUATION_MARKET_IDS, type ProductFeatureId } from "./featureAvailabili
 import { PropertyOpportunityMap } from "./PropertyOpportunityMap";
 import { AttomMarketAudit } from "./AttomMarketAudit";
 import { RentCastEvidence } from "./RentCastEvidence";
-import { RaleighListingPilot } from "./RaleighListingPilot";
+import { MarketListingPilot } from "./RaleighListingPilot";
 import { ReviewFeedback } from "./ReviewFeedback";
 import { PortfolioLab } from "./PortfolioLab";
 import {
@@ -349,9 +349,9 @@ export default function Home() {
 
       <div className={`product-view ${activeView === "properties" ? "active" : ""}`} aria-hidden={activeView !== "properties"}>
       <section className="valuation-section" id="valuation">
-        <div className="section-title"><div><p className="eyebrow">PROPERTY VALUATION LAB · MODEL V2</p><h2>Cross-check the property.<br />Keep the uncertainty.</h2></div><p>Qualified recorded sales, local assessments, building facts and FHFA tract-cluster history now resolve to individual properties in three high-intent corridors. Version 2 prevents future-sale leakage, scores comparables by geography and physical similarity, and derives the range from observed backtest error.</p></div>
-        <RaleighListingPilot />
-        <div className="valuation-channel-heading"><div><p className="eyebrow">SEPARATE CHANNEL · RECORDED PUBLIC DATA</p><h3>Historical model library</h3></div><p>These controls change the public-record table below. Chicago and Philadelphia also open their recorded-evidence maps; Raleigh keeps the live-listing map above to avoid loading two maps for the same default view.</p></div>
+        <div className="section-title"><div><p className="eyebrow">PROPERTY VALUATION LAB · MODEL V2.1</p><h2>Cross-check the property.<br />Keep the uncertainty.</h2></div><p>Qualified recorded sales, local assessments, building facts and FHFA tract-cluster history now resolve to individual properties in three high-intent corridors. Version 2.1 prevents future-sale leakage, exposes price-per-square-foot bands and comparable recency, and derives the range from observed regional backtest error.</p></div>
+        <MarketListingPilot />
+        <div className="valuation-channel-heading"><div><p className="eyebrow">SEPARATE CHANNEL · RECORDED PUBLIC DATA</p><h3>Historical model library</h3></div><p>These controls change the public-record table below. The live-listing screen above now covers Raleigh, Chicago and Philadelphia; the historical library preserves each region’s recorded evidence and out-of-time error separately.</p></div>
         <div className="valuation-readiness">
           {liveValuationMarkets.map((item) => <button key={item.id} className={valuationMarket === item.id ? "active" : ""} onClick={() => { setValuationMarket(item.id); setSelectedPropertyId(null); }}><span>PUBLIC RECORD MODEL</span><b>{item.label}</b><i>{item.competency}% integrated competency</i><small>{"sourceCompetency" in item ? `${item.sourceCompetency}% source · ${item.modelCompetency}% model · ${item.diagnostics.sampleSize} historical tests` : ""}</small></button>)}
         </div>

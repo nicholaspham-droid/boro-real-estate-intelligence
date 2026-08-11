@@ -1,12 +1,13 @@
 {
-  "generatedAt": "2026-08-08T01:54:46.041Z",
+  "generatedAt": "2026-08-11T06:48:33.916Z",
   "vintage": "2024",
   "release": "acs2024_5yr",
   "methodology": {
     "geography": "Primary-county census tracts grouped into five reproducible directional market clusters",
     "attributes": "2020-2024 ACS 5-year detailed tables mirrored by Census Reporter",
     "geometry": "U.S. Census Bureau TIGERweb ACS 2024 Census Tracts",
-    "scoreScope": "Cross-sectional factor percentile, not a property-value forecast"
+    "scoreScope": "Cross-sectional factor percentile, not a property-value forecast",
+    "rentDistribution": "25th, 50th and 75th percentiles of tract-level ACS median gross rent, weighted by renter-occupied households; contextual cluster distribution, not unit-level rent comps"
   },
   "tables": [
     "B01003",
@@ -16,6 +17,7 @@
     "B19013",
     "B17001",
     "B25002",
+    "B25003",
     "B25077",
     "B25064"
   ],
@@ -47,7 +49,12 @@
           "povertyPct": 16.527445193916016,
           "vacancyPct": 10.49692946562759,
           "medianHomeValue": 886300,
-          "medianRent": 2147,
+          "rentP25": 1753,
+          "medianRent": 2182,
+          "rentP75": 2858,
+          "rentObservationCount": 824,
+          "renterOccupiedUnits": 1065743,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 75,
           "sampleGeoids": [
@@ -60,7 +67,7 @@
             "demographic": 71,
             "economic": 34,
             "education": 87,
-            "housing": 9
+            "housing": 8
           },
           "acsCompetency": 91
         },
@@ -78,7 +85,12 @@
           "povertyPct": 19.783719304451484,
           "vacancyPct": 4.794774103386933,
           "medianHomeValue": 513100,
-          "medianRent": 1671,
+          "rentP25": 1352,
+          "medianRent": 1546,
+          "rentP75": 1761,
+          "rentObservationCount": 565,
+          "renterOccupiedUnits": 630579,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 73,
           "sampleGeoids": [
@@ -91,7 +103,7 @@
             "demographic": 54,
             "economic": 10,
             "education": 58,
-            "housing": 19
+            "housing": 20
           },
           "acsCompetency": 91
         },
@@ -109,7 +121,12 @@
           "povertyPct": 11.795019067634545,
           "vacancyPct": 5.272175896104703,
           "medianHomeValue": 689900,
-          "medianRent": 2000,
+          "rentP25": 1682,
+          "medianRent": 1904,
+          "rentP75": 2175,
+          "rentObservationCount": 329,
+          "renterOccupiedUnits": 146371,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 77,
           "sampleGeoids": [
@@ -122,7 +139,7 @@
             "demographic": 20,
             "economic": 43,
             "education": 46,
-            "housing": 24
+            "housing": 25
           },
           "acsCompetency": 92
         },
@@ -140,7 +157,12 @@
           "povertyPct": 17.17584050067022,
           "vacancyPct": 8.643038525956555,
           "medianHomeValue": 811300,
-          "medianRent": 1776,
+          "rentP25": 1570,
+          "medianRent": 1737,
+          "rentP75": 1903,
+          "rentObservationCount": 604,
+          "renterOccupiedUnits": 454028,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 75,
           "sampleGeoids": [
@@ -171,7 +193,12 @@
           "povertyPct": 13.010093728483096,
           "vacancyPct": 5.6141777509472455,
           "medianHomeValue": 496700,
-          "medianRent": 1743,
+          "rentP25": 1459,
+          "medianRent": 1682,
+          "rentP75": 2014,
+          "rentObservationCount": 620,
+          "renterOccupiedUnits": 537764,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 78,
           "sampleGeoids": [
@@ -184,7 +211,7 @@
             "demographic": 60,
             "economic": 42,
             "education": 71,
-            "housing": 36
+            "housing": 37
           },
           "acsCompetency": 92
         }
@@ -218,7 +245,12 @@
           "povertyPct": 17.76198165293955,
           "vacancyPct": 6.957662354966319,
           "medianHomeValue": 755000,
-          "medianRent": 1765,
+          "rentP25": 1552,
+          "medianRent": 1806,
+          "rentP75": 2192,
+          "rentObservationCount": 863,
+          "renterOccupiedUnits": 818445,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 77,
           "sampleGeoids": [
@@ -231,7 +263,7 @@
             "demographic": 74,
             "economic": 16,
             "education": 48,
-            "housing": 13
+            "housing": 11
           },
           "acsCompetency": 92
         },
@@ -249,7 +281,12 @@
           "povertyPct": 12.880376379262456,
           "vacancyPct": 4.402692289263293,
           "medianHomeValue": 679000,
-          "medianRent": 2002,
+          "rentP25": 1679,
+          "medianRent": 1868,
+          "rentP75": 2203,
+          "rentObservationCount": 370,
+          "renterOccupiedUnits": 191459,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 79,
           "sampleGeoids": [
@@ -262,7 +299,7 @@
             "demographic": 65,
             "economic": 40,
             "education": 29,
-            "housing": 26
+            "housing": 28
           },
           "acsCompetency": 93
         },
@@ -280,7 +317,12 @@
           "povertyPct": 10.323394407726923,
           "vacancyPct": 4.153644032926118,
           "medianHomeValue": 797000,
-          "medianRent": 2224,
+          "rentP25": 1869,
+          "medianRent": 2135,
+          "rentP75": 2498,
+          "rentObservationCount": 791,
+          "renterOccupiedUnits": 510976,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 83,
           "sampleGeoids": [
@@ -311,7 +353,12 @@
           "povertyPct": 11.178511596455024,
           "vacancyPct": 5.264248914220682,
           "medianHomeValue": 812500,
-          "medianRent": 2152,
+          "rentP25": 1791,
+          "medianRent": 2078,
+          "rentP75": 2564,
+          "rentObservationCount": 751,
+          "renterOccupiedUnits": 555672,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 82,
           "sampleGeoids": [
@@ -342,7 +389,12 @@
           "povertyPct": 11.762424217994159,
           "vacancyPct": 7.351397159596328,
           "medianHomeValue": 1001500,
-          "medianRent": 2396,
+          "rentP25": 2057,
+          "medianRent": 2336,
+          "rentP75": 2779,
+          "rentObservationCount": 306,
+          "renterOccupiedUnits": 244185,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 81,
           "sampleGeoids": [
@@ -355,7 +407,7 @@
             "demographic": 33,
             "economic": 53,
             "education": 93,
-            "housing": 20
+            "housing": 18
           },
           "acsCompetency": 93
         }
@@ -389,7 +441,12 @@
           "povertyPct": 16.593613476877074,
           "vacancyPct": 8.468282279143569,
           "medianHomeValue": 351100,
-          "medianRent": 1372,
+          "rentP25": 1184,
+          "medianRent": 1504,
+          "rentP75": 1970,
+          "rentObservationCount": 555,
+          "renterOccupiedUnits": 469002,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 76,
           "sampleGeoids": [
@@ -402,7 +459,7 @@
             "demographic": 91,
             "economic": 23,
             "education": 80,
-            "housing": 42
+            "housing": 37
           },
           "acsCompetency": 92
         },
@@ -420,7 +477,12 @@
           "povertyPct": 9.5968156915274,
           "vacancyPct": 5.259304172003126,
           "medianHomeValue": 364700,
-          "medianRent": 1541,
+          "rentP25": 1323,
+          "medianRent": 1464,
+          "rentP75": 1682,
+          "rentObservationCount": 345,
+          "renterOccupiedUnits": 192524,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 82,
           "sampleGeoids": [
@@ -433,7 +495,7 @@
             "demographic": 26,
             "economic": 62,
             "education": 88,
-            "housing": 74
+            "housing": 76
           },
           "acsCompetency": 94
         },
@@ -451,7 +513,12 @@
           "povertyPct": 15.051642168912917,
           "vacancyPct": 7.972484467995411,
           "medianHomeValue": 225700,
-          "medianRent": 1252,
+          "rentP25": 1056,
+          "medianRent": 1196,
+          "rentP75": 1328,
+          "rentObservationCount": 398,
+          "renterOccupiedUnits": 180854,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 76,
           "sampleGeoids": [
@@ -482,7 +549,12 @@
           "povertyPct": 7.2504888614458185,
           "vacancyPct": 4.070326856294945,
           "medianHomeValue": 340800,
-          "medianRent": 1573,
+          "rentP25": 1290,
+          "medianRent": 1508,
+          "rentP75": 1800,
+          "rentObservationCount": 683,
+          "renterOccupiedUnits": 291144,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 82,
           "sampleGeoids": [
@@ -495,7 +567,7 @@
             "demographic": 37,
             "economic": 78,
             "education": 78,
-            "housing": 84
+            "housing": 85
           },
           "acsCompetency": 94
         }
@@ -529,7 +601,12 @@
           "povertyPct": 15.893112275682153,
           "vacancyPct": 8.06049424370275,
           "medianHomeValue": 246900,
-          "medianRent": 1418,
+          "rentP25": 1253,
+          "medianRent": 1459,
+          "rentP75": 1773,
+          "rentObservationCount": 421,
+          "renterOccupiedUnits": 343838,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 74,
           "sampleGeoids": [
@@ -542,7 +619,7 @@
             "demographic": 96,
             "economic": 30,
             "education": 39,
-            "housing": 50
+            "housing": 47
           },
           "acsCompetency": 91
         },
@@ -560,7 +637,12 @@
           "povertyPct": 7.19198398181513,
           "vacancyPct": 4.309548010213407,
           "medianHomeValue": 435900,
-          "medianRent": 1977,
+          "rentP25": 1573,
+          "medianRent": 1785,
+          "rentP75": 1980,
+          "rentObservationCount": 454,
+          "renterOccupiedUnits": 314211,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 83,
           "sampleGeoids": [
@@ -573,7 +655,7 @@
             "demographic": 70,
             "economic": 88,
             "education": 91,
-            "housing": 71
+            "housing": 73
           },
           "acsCompetency": 94
         },
@@ -591,7 +673,12 @@
           "povertyPct": 9.785228727595149,
           "vacancyPct": 5.579056337560491,
           "medianHomeValue": 294500,
-          "medianRent": 1726,
+          "rentP25": 1454,
+          "medianRent": 1649,
+          "rentP75": 1834,
+          "rentObservationCount": 65,
+          "renterOccupiedUnits": 29268,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 78,
           "sampleGeoids": [
@@ -622,7 +709,12 @@
           "povertyPct": 11.79327495838044,
           "vacancyPct": 4.008293340080149,
           "medianHomeValue": 282300,
-          "medianRent": 1914,
+          "rentP25": 1598,
+          "medianRent": 1755,
+          "rentP75": 2038,
+          "rentObservationCount": 47,
+          "renterOccupiedUnits": 20590,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 77,
           "sampleGeoids": [
@@ -635,7 +727,7 @@
             "demographic": 72,
             "economic": 40,
             "education": 36,
-            "housing": 68
+            "housing": 71
           },
           "acsCompetency": 92
         },
@@ -653,7 +745,12 @@
           "povertyPct": 11.054708639030213,
           "vacancyPct": 6.455747962558706,
           "medianHomeValue": 311200,
-          "medianRent": 1683,
+          "rentP25": 1318,
+          "medianRent": 1513,
+          "rentP75": 1799,
+          "rentObservationCount": 516,
+          "renterOccupiedUnits": 366971,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 80,
           "sampleGeoids": [
@@ -666,7 +763,7 @@
             "demographic": 82,
             "economic": 57,
             "education": 55,
-            "housing": 63
+            "housing": 66
           },
           "acsCompetency": 93
         }
@@ -700,7 +797,12 @@
           "povertyPct": 20.204264708936318,
           "vacancyPct": 10.10042465337589,
           "medianHomeValue": 248800,
-          "medianRent": 1300,
+          "rentP25": 1099,
+          "medianRent": 1337,
+          "rentP75": 1724,
+          "rentObservationCount": 407,
+          "renterOccupiedUnits": 313284,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 72,
           "sampleGeoids": [
@@ -713,7 +815,7 @@
             "demographic": 82,
             "economic": 8,
             "education": 66,
-            "housing": 39
+            "housing": 36
           },
           "acsCompetency": 90
         },
@@ -731,7 +833,12 @@
           "povertyPct": 12.558260384882404,
           "vacancyPct": 5.8511956023789535,
           "medianHomeValue": 276100,
-          "medianRent": 1560,
+          "rentP25": 1244,
+          "medianRent": 1445,
+          "rentP75": 1721,
+          "rentObservationCount": 368,
+          "renterOccupiedUnits": 219131,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 76,
           "sampleGeoids": [
@@ -744,7 +851,7 @@
             "demographic": 87,
             "economic": 46,
             "education": 45,
-            "housing": 81
+            "housing": 82
           },
           "acsCompetency": 92
         },
@@ -762,7 +869,12 @@
           "povertyPct": 16.727758304668885,
           "vacancyPct": 7.934598456198877,
           "medianHomeValue": 217400,
-          "medianRent": 1328,
+          "rentP25": 1121,
+          "medianRent": 1264,
+          "rentP75": 1425,
+          "rentObservationCount": 164,
+          "renterOccupiedUnits": 104410,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 74,
           "sampleGeoids": [
@@ -775,7 +887,7 @@
             "demographic": 95,
             "economic": 12,
             "education": 4,
-            "housing": 65
+            "housing": 67
           },
           "acsCompetency": 91
         },
@@ -793,7 +905,12 @@
           "povertyPct": 9.532901983580906,
           "vacancyPct": 7.212962489926275,
           "medianHomeValue": 268900,
-          "medianRent": 1555,
+          "rentP25": 1197,
+          "medianRent": 1462,
+          "rentP75": 1812,
+          "rentObservationCount": 164,
+          "renterOccupiedUnits": 79623,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 77,
           "sampleGeoids": [
@@ -806,7 +923,7 @@
             "demographic": 75,
             "economic": 59,
             "education": 47,
-            "housing": 83
+            "housing": 85
           },
           "acsCompetency": 92
         },
@@ -824,7 +941,12 @@
           "povertyPct": 11.694051968691664,
           "vacancyPct": 5.7728577435871795,
           "medianHomeValue": 304300,
-          "medianRent": 1737,
+          "rentP25": 1271,
+          "medianRent": 1543,
+          "rentP75": 1769,
+          "rentObservationCount": 350,
+          "renterOccupiedUnits": 251212,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 79,
           "sampleGeoids": [
@@ -837,7 +959,7 @@
             "demographic": 79,
             "economic": 50,
             "education": 74,
-            "housing": 74
+            "housing": 77
           },
           "acsCompetency": 93
         }
@@ -871,7 +993,12 @@
           "povertyPct": 15.703072153587469,
           "vacancyPct": 11.930534746088453,
           "medianHomeValue": 409900,
-          "medianRent": 1733,
+          "rentP25": 1382,
+          "medianRent": 1771,
+          "rentP75": 1981,
+          "rentObservationCount": 281,
+          "renterOccupiedUnits": 199687,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 75,
           "sampleGeoids": [
@@ -884,7 +1011,7 @@
             "demographic": 76,
             "economic": 39,
             "education": 96,
-            "housing": 34
+            "housing": 31
           },
           "acsCompetency": 91
         },
@@ -902,7 +1029,12 @@
           "povertyPct": 8.253190491167643,
           "vacancyPct": 5.110381800864207,
           "medianHomeValue": 456900,
-          "medianRent": 1871,
+          "rentP25": 1699,
+          "medianRent": 1815,
+          "rentP75": 1978,
+          "rentObservationCount": 284,
+          "renterOccupiedUnits": 159967,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 80,
           "sampleGeoids": [
@@ -933,7 +1065,12 @@
           "povertyPct": 12.02540170345838,
           "vacancyPct": 5.966948975654918,
           "medianHomeValue": 337800,
-          "medianRent": 1824,
+          "rentP25": 1581,
+          "medianRent": 1707,
+          "rentP75": 1885,
+          "rentObservationCount": 247,
+          "renterOccupiedUnits": 118797,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 77,
           "sampleGeoids": [
@@ -946,7 +1083,7 @@
             "demographic": 77,
             "economic": 44,
             "education": 56,
-            "housing": 45
+            "housing": 47
           },
           "acsCompetency": 92
         },
@@ -964,7 +1101,12 @@
           "povertyPct": 17.15833238389627,
           "vacancyPct": 8.34342873621472,
           "medianHomeValue": 226300,
-          "medianRent": 1494,
+          "rentP25": 1269,
+          "medianRent": 1434,
+          "rentP75": 1579,
+          "rentObservationCount": 101,
+          "renterOccupiedUnits": 70893,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 73,
           "sampleGeoids": [
@@ -977,7 +1119,7 @@
             "demographic": 94,
             "economic": 11,
             "education": 19,
-            "housing": 46
+            "housing": 45
           },
           "acsCompetency": 91
         },
@@ -995,7 +1137,12 @@
           "povertyPct": 8.998635251847352,
           "vacancyPct": 6.274145108920417,
           "medianHomeValue": 351800,
-          "medianRent": 1626,
+          "rentP25": 1368,
+          "medianRent": 1495,
+          "rentP75": 1666,
+          "rentObservationCount": 90,
+          "renterOccupiedUnits": 36312,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 77,
           "sampleGeoids": [
@@ -1008,7 +1155,7 @@
             "demographic": 55,
             "economic": 65,
             "education": 75,
-            "housing": 74
+            "housing": 76
           },
           "acsCompetency": 92
         }
@@ -1042,7 +1189,12 @@
           "povertyPct": 13.984090270201166,
           "vacancyPct": 8.722160226581794,
           "medianHomeValue": 675000,
-          "medianRent": 1972,
+          "rentP25": 1624,
+          "medianRent": 2121,
+          "rentP75": 2441,
+          "rentObservationCount": 291,
+          "renterOccupiedUnits": 272473,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 79,
           "sampleGeoids": [
@@ -1055,7 +1207,7 @@
             "demographic": 85,
             "economic": 52,
             "education": 98,
-            "housing": 33
+            "housing": 27
           },
           "acsCompetency": 93
         },
@@ -1073,7 +1225,12 @@
           "povertyPct": 9.742249948409782,
           "vacancyPct": 4.007510743696984,
           "medianHomeValue": 545500,
-          "medianRent": 2117,
+          "rentP25": 1792,
+          "medianRent": 1988,
+          "rentP75": 2266,
+          "rentObservationCount": 241,
+          "renterOccupiedUnits": 157082,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 83,
           "sampleGeoids": [
@@ -1104,7 +1261,12 @@
           "povertyPct": 9.252593511109579,
           "vacancyPct": 4.268168825063457,
           "medianHomeValue": 406300,
-          "medianRent": 1848,
+          "rentP25": 1634,
+          "medianRent": 1820,
+          "rentP75": 2180,
+          "rentObservationCount": 105,
+          "renterOccupiedUnits": 56711,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 81,
           "sampleGeoids": [
@@ -1117,7 +1279,7 @@
             "demographic": 33,
             "economic": 62,
             "education": 65,
-            "housing": 73
+            "housing": 72
           },
           "acsCompetency": 93
         },
@@ -1135,7 +1297,12 @@
           "povertyPct": 7.519545893071286,
           "vacancyPct": 5.022819294894919,
           "medianHomeValue": 531500,
-          "medianRent": 2244,
+          "rentP25": 1725,
+          "medianRent": 2092,
+          "rentP75": 2403,
+          "rentObservationCount": 155,
+          "renterOccupiedUnits": 94917,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 81,
           "sampleGeoids": [
@@ -1148,7 +1315,7 @@
             "demographic": 35,
             "economic": 75,
             "education": 90,
-            "housing": 58
+            "housing": 60
           },
           "acsCompetency": 93
         },
@@ -1166,7 +1333,12 @@
           "povertyPct": 5.8294396882457065,
           "vacancyPct": 3.2745442543475054,
           "medianHomeValue": 757500,
-          "medianRent": 2412,
+          "rentP25": 2019,
+          "medianRent": 2272,
+          "rentP75": 2468,
+          "rentObservationCount": 246,
+          "renterOccupiedUnits": 114486,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 85,
           "sampleGeoids": [
@@ -1179,7 +1351,7 @@
             "demographic": 25,
             "economic": 93,
             "education": 99,
-            "housing": 61
+            "housing": 62
           },
           "acsCompetency": 95
         }
@@ -1213,7 +1385,12 @@
           "povertyPct": 16.540665248465206,
           "vacancyPct": 10.4238377927444,
           "medianHomeValue": 422700,
-          "medianRent": 1770,
+          "rentP25": 1494,
+          "medianRent": 1730,
+          "rentP75": 2165,
+          "rentObservationCount": 414,
+          "renterOccupiedUnits": 327439,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 75,
           "sampleGeoids": [
@@ -1244,7 +1421,12 @@
           "povertyPct": 11.860442847691493,
           "vacancyPct": 10.852665209850775,
           "medianHomeValue": 406300,
-          "medianRent": 1949,
+          "rentP25": 1637,
+          "medianRent": 1861,
+          "rentP75": 2261,
+          "rentObservationCount": 842,
+          "renterOccupiedUnits": 488833,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 79,
           "sampleGeoids": [
@@ -1275,7 +1457,12 @@
           "povertyPct": 16.188230478104227,
           "vacancyPct": 5.024586168411526,
           "medianHomeValue": 426000,
-          "medianRent": 1750,
+          "rentP25": 1362,
+          "medianRent": 1661,
+          "rentP75": 1811,
+          "rentObservationCount": 83,
+          "renterOccupiedUnits": 51093,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 76,
           "sampleGeoids": [
@@ -1288,7 +1475,7 @@
             "demographic": 79,
             "economic": 39,
             "education": 25,
-            "housing": 26
+            "housing": 28
           },
           "acsCompetency": 92
         },
@@ -1306,7 +1493,12 @@
           "povertyPct": 10.87542012140158,
           "vacancyPct": 3.4492968550963288,
           "medianHomeValue": 475600,
-          "medianRent": 2310,
+          "rentP25": 1819,
+          "medianRent": 2125,
+          "rentP75": 2507,
+          "rentObservationCount": 137,
+          "renterOccupiedUnits": 54377,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 77,
           "sampleGeoids": [
@@ -1319,7 +1511,7 @@
             "demographic": 16,
             "economic": 68,
             "education": 62,
-            "housing": 27
+            "housing": 28
           },
           "acsCompetency": 92
         }
@@ -1353,7 +1545,12 @@
           "povertyPct": 23.71094508944119,
           "vacancyPct": 10.214762008571954,
           "medianHomeValue": 195000,
-          "medianRent": 1339,
+          "rentP25": 1157,
+          "medianRent": 1360,
+          "rentP75": 1689,
+          "rentObservationCount": 324,
+          "renterOccupiedUnits": 283834,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 72,
           "sampleGeoids": [
@@ -1384,7 +1581,12 @@
           "povertyPct": 7.321123874353413,
           "vacancyPct": 3.812084707977985,
           "medianHomeValue": 417700,
-          "medianRent": 1544,
+          "rentP25": 1283,
+          "medianRent": 1474,
+          "rentP75": 1791,
+          "rentObservationCount": 317,
+          "renterOccupiedUnits": 139938,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 82,
           "sampleGeoids": [
@@ -1415,7 +1617,12 @@
           "povertyPct": 12.668758872131866,
           "vacancyPct": 3.928406450601459,
           "medianHomeValue": 310600,
+          "rentP25": 1248,
           "medianRent": 1455,
+          "rentP75": 1668,
+          "rentObservationCount": 146,
+          "renterOccupiedUnits": 83095,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 80,
           "sampleGeoids": [
@@ -1428,7 +1635,7 @@
             "demographic": 41,
             "economic": 40,
             "education": 51,
-            "housing": 76
+            "housing": 73
           },
           "acsCompetency": 93
         },
@@ -1446,7 +1653,12 @@
           "povertyPct": 11.139642638489695,
           "vacancyPct": 4.303419618130099,
           "medianHomeValue": 254000,
-          "medianRent": 1410,
+          "rentP25": 1228,
+          "medianRent": 1391,
+          "rentP75": 1625,
+          "rentObservationCount": 61,
+          "renterOccupiedUnits": 31882,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 81,
           "sampleGeoids": [
@@ -1459,7 +1671,7 @@
             "demographic": 51,
             "economic": 45,
             "education": 34,
-            "housing": 91
+            "housing": 90
           },
           "acsCompetency": 93
         },
@@ -1477,7 +1689,12 @@
           "povertyPct": 7.23145920656576,
           "vacancyPct": 4.231298137118285,
           "medianHomeValue": 442200,
-          "medianRent": 1599,
+          "rentP25": 1308,
+          "medianRent": 1632,
+          "rentP75": 1930,
+          "rentObservationCount": 306,
+          "renterOccupiedUnits": 128560,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 82,
           "sampleGeoids": [
@@ -1490,7 +1707,7 @@
             "demographic": 26,
             "economic": 80,
             "education": 89,
-            "housing": 77
+            "housing": 75
           },
           "acsCompetency": 94
         }
@@ -1524,7 +1741,12 @@
           "povertyPct": 17.402797997647212,
           "vacancyPct": 6.856365173969033,
           "medianHomeValue": 343000,
-          "medianRent": 1518,
+          "rentP25": 1280,
+          "medianRent": 1497,
+          "rentP75": 1727,
+          "rentObservationCount": 305,
+          "renterOccupiedUnits": 238469,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 76,
           "sampleGeoids": [
@@ -1537,7 +1759,7 @@
             "demographic": 98,
             "economic": 24,
             "education": 28,
-            "housing": 34
+            "housing": 32
           },
           "acsCompetency": 92
         },
@@ -1555,7 +1777,12 @@
           "povertyPct": 7.783014645786986,
           "vacancyPct": 6.384667014667557,
           "medianHomeValue": 526200,
-          "medianRent": 1945,
+          "rentP25": 1613,
+          "medianRent": 1826,
+          "rentP75": 2166,
+          "rentObservationCount": 181,
+          "renterOccupiedUnits": 92518,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 83,
           "sampleGeoids": [
@@ -1568,7 +1795,7 @@
             "demographic": 30,
             "economic": 81,
             "education": 77,
-            "housing": 39
+            "housing": 40
           },
           "acsCompetency": 94
         },
@@ -1586,7 +1813,12 @@
           "povertyPct": 8.838908122511352,
           "vacancyPct": 8.089793955975766,
           "medianHomeValue": 457300,
-          "medianRent": 1867,
+          "rentP25": 1500,
+          "medianRent": 1758,
+          "rentP75": 2002,
+          "rentObservationCount": 350,
+          "renterOccupiedUnits": 182748,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 81,
           "sampleGeoids": [
@@ -1599,7 +1831,7 @@
             "demographic": 67,
             "economic": 75,
             "education": 67,
-            "housing": 41
+            "housing": 42
           },
           "acsCompetency": 93
         },
@@ -1617,7 +1849,12 @@
           "povertyPct": 10.403279168231764,
           "vacancyPct": 7.676187787905842,
           "medianHomeValue": 400000,
-          "medianRent": 1871,
+          "rentP25": 1482,
+          "medianRent": 1861,
+          "rentP75": 2025,
+          "rentObservationCount": 95,
+          "renterOccupiedUnits": 45309,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 80,
           "sampleGeoids": [
@@ -1630,7 +1867,7 @@
             "demographic": 57,
             "economic": 58,
             "education": 61,
-            "housing": 42
+            "housing": 41
           },
           "acsCompetency": 93
         },
@@ -1648,7 +1885,12 @@
           "povertyPct": 9.13479162969987,
           "vacancyPct": 6.764717151880369,
           "medianHomeValue": 402600,
-          "medianRent": 1938,
+          "rentP25": 1536,
+          "medianRent": 1855,
+          "rentP75": 2044,
+          "rentObservationCount": 157,
+          "renterOccupiedUnits": 73363,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 81,
           "sampleGeoids": [
@@ -1695,7 +1937,12 @@
           "povertyPct": 17.167994472812204,
           "vacancyPct": 10.676482734273007,
           "medianHomeValue": 244200,
+          "rentP25": 985,
           "medianRent": 1218,
+          "rentP75": 1347,
+          "rentObservationCount": 26,
+          "renterOccupiedUnits": 17881,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 76,
           "sampleGeoids": [
@@ -1708,7 +1955,7 @@
             "demographic": 30,
             "economic": 30,
             "education": 27,
-            "housing": 42
+            "housing": 41
           },
           "acsCompetency": 92
         },
@@ -1726,7 +1973,12 @@
           "povertyPct": 18.48779995335076,
           "vacancyPct": 18.41963481794107,
           "medianHomeValue": 234200,
-          "medianRent": 0,
+          "rentP25": 0,
+          "medianRent": 767,
+          "rentP75": 1335,
+          "rentObservationCount": 9,
+          "renterOccupiedUnits": 1723,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 55,
           "sampleGeoids": [
@@ -1739,7 +1991,7 @@
             "demographic": 13,
             "economic": 25,
             "education": 2,
-            "housing": 31
+            "housing": 59
           },
           "acsCompetency": 84
         },
@@ -1757,7 +2009,12 @@
           "povertyPct": 15.761166308031637,
           "vacancyPct": 13.4685151585463,
           "medianHomeValue": 199100,
+          "rentP25": 972,
           "medianRent": 1308,
+          "rentP75": 1579,
+          "rentObservationCount": 18,
+          "renterOccupiedUnits": 5777,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 72,
           "sampleGeoids": [
@@ -1788,7 +2045,12 @@
           "povertyPct": 10.22276675131808,
           "vacancyPct": 10.114223014401816,
           "medianHomeValue": 258500,
-          "medianRent": 1481,
+          "rentP25": 1087,
+          "medianRent": 1306,
+          "rentP75": 1606,
+          "rentObservationCount": 26,
+          "renterOccupiedUnits": 7812,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 78,
           "sampleGeoids": [
@@ -1801,7 +2063,7 @@
             "demographic": 11,
             "economic": 39,
             "education": 5,
-            "housing": 41
+            "housing": 46
           },
           "acsCompetency": 92
         },
@@ -1819,7 +2081,12 @@
           "povertyPct": 13.84153426262934,
           "vacancyPct": 10.279932497628474,
           "medianHomeValue": 264600,
+          "rentP25": 1033,
           "medianRent": 1297,
+          "rentP75": 1746,
+          "rentObservationCount": 12,
+          "renterOccupiedUnits": 3951,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 77,
           "sampleGeoids": [
@@ -1832,7 +2099,7 @@
             "demographic": 7,
             "economic": 17,
             "education": 26,
-            "housing": 30
+            "housing": 28
           },
           "acsCompetency": 92
         }
@@ -1866,7 +2133,12 @@
           "povertyPct": 13.801458112963363,
           "vacancyPct": 16.487964861490795,
           "medianHomeValue": 317800,
-          "medianRent": 1422,
+          "rentP25": 1105,
+          "medianRent": 1311,
+          "rentP75": 1646,
+          "rentObservationCount": 34,
+          "renterOccupiedUnits": 19756,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 80,
           "sampleGeoids": [
@@ -1879,7 +2151,7 @@
             "demographic": 14,
             "economic": 39,
             "education": 37,
-            "housing": 36
+            "housing": 39
           },
           "acsCompetency": 93
         },
@@ -1897,7 +2169,12 @@
           "povertyPct": 14.355150983230285,
           "vacancyPct": 11.208657375714617,
           "medianHomeValue": 227600,
-          "medianRent": 897,
+          "rentP25": 757,
+          "medianRent": 825,
+          "rentP75": 1166,
+          "rentObservationCount": 17,
+          "renterOccupiedUnits": 5243,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 75,
           "sampleGeoids": [
@@ -1910,7 +2187,7 @@
             "demographic": 12,
             "economic": 24,
             "education": 3,
-            "housing": 72
+            "housing": 74
           },
           "acsCompetency": 91
         },
@@ -1928,7 +2205,12 @@
           "povertyPct": 9.174703109300712,
           "vacancyPct": 26.255852188251918,
           "medianHomeValue": 333500,
+          "rentP25": 1149,
           "medianRent": 1390,
+          "rentP75": 1603,
+          "rentObservationCount": 52,
+          "renterOccupiedUnits": 14397,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 80,
           "sampleGeoids": [
@@ -1941,7 +2223,7 @@
             "demographic": 1,
             "economic": 56,
             "education": 44,
-            "housing": 34
+            "housing": 33
           },
           "acsCompetency": 93
         },
@@ -1959,7 +2241,12 @@
           "povertyPct": 17.656937683622825,
           "vacancyPct": 33.50047630852888,
           "medianHomeValue": 251300,
+          "rentP25": 1207,
           "medianRent": 1412,
+          "rentP75": 1674,
+          "rentObservationCount": 5,
+          "renterOccupiedUnits": 1481,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 82,
           "sampleGeoids": [
@@ -1972,7 +2259,7 @@
             "demographic": 3,
             "economic": 15,
             "education": 14,
-            "housing": 35
+            "housing": 33
           },
           "acsCompetency": 94
         },
@@ -1990,7 +2277,12 @@
           "povertyPct": 13.397267494865796,
           "vacancyPct": 7.866434505533879,
           "medianHomeValue": 244400,
-          "medianRent": 1155,
+          "rentP25": 755,
+          "medianRent": 1100,
+          "rentP75": 1184,
+          "rentObservationCount": 12,
+          "renterOccupiedUnits": 5874,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 80,
           "sampleGeoids": [
@@ -2037,7 +2329,12 @@
           "povertyPct": 25.081771555445947,
           "vacancyPct": 11.932164383116287,
           "medianHomeValue": 156400,
-          "medianRent": 1087,
+          "rentP25": 956,
+          "medianRent": 1078,
+          "rentP75": 1177,
+          "rentObservationCount": 25,
+          "renterOccupiedUnits": 13589,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 73,
           "sampleGeoids": [
@@ -2068,7 +2365,12 @@
           "povertyPct": 13.852104134904915,
           "vacancyPct": 5.57758221845237,
           "medianHomeValue": 251700,
-          "medianRent": 1024,
+          "rentP25": 817,
+          "medianRent": 1097,
+          "rentP75": 1177,
+          "rentObservationCount": 15,
+          "renterOccupiedUnits": 5128,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 77,
           "sampleGeoids": [
@@ -2081,7 +2383,7 @@
             "demographic": 61,
             "economic": 46,
             "education": 7,
-            "housing": 71
+            "housing": 67
           },
           "acsCompetency": 92
         },
@@ -2099,7 +2401,12 @@
           "povertyPct": 18.61767681173866,
           "vacancyPct": 10.486274078836747,
           "medianHomeValue": 171400,
-          "medianRent": 941,
+          "rentP25": 807,
+          "medianRent": 992,
+          "rentP75": 1115,
+          "rentObservationCount": 9,
+          "renterOccupiedUnits": 3061,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 77,
           "sampleGeoids": [
@@ -2112,7 +2419,7 @@
             "demographic": 19,
             "economic": 20,
             "education": 15,
-            "housing": 70
+            "housing": 66
           },
           "acsCompetency": 92
         },
@@ -2130,7 +2437,12 @@
           "povertyPct": 9.316614237235044,
           "vacancyPct": 8.201042733722097,
           "medianHomeValue": 235700,
-          "medianRent": 1045,
+          "rentP25": 814,
+          "medianRent": 1082,
+          "rentP75": 1198,
+          "rentObservationCount": 14,
+          "renterOccupiedUnits": 5051,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 76,
           "sampleGeoids": [
@@ -2143,7 +2455,7 @@
             "demographic": 38,
             "economic": 48,
             "education": 18,
-            "housing": 82
+            "housing": 80
           },
           "acsCompetency": 92
         },
@@ -2161,7 +2473,12 @@
           "povertyPct": 10.585773628026311,
           "vacancyPct": 7.1736836917456035,
           "medianHomeValue": 259100,
-          "medianRent": 1193,
+          "rentP25": 1052,
+          "medianRent": 1116,
+          "rentP75": 1267,
+          "rentObservationCount": 24,
+          "renterOccupiedUnits": 8749,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 77,
           "sampleGeoids": [
@@ -2174,7 +2491,7 @@
             "demographic": 65,
             "economic": 63,
             "education": 30,
-            "housing": 76
+            "housing": 78
           },
           "acsCompetency": 92
         }
@@ -2208,7 +2525,12 @@
           "povertyPct": 14.818821031455657,
           "vacancyPct": 12.076495822874657,
           "medianHomeValue": 248300,
-          "medianRent": 1350,
+          "rentP25": 1172,
+          "medianRent": 1335,
+          "rentP75": 1547,
+          "rentObservationCount": 49,
+          "renterOccupiedUnits": 29705,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 77,
           "sampleGeoids": [
@@ -2221,7 +2543,7 @@
             "demographic": 35,
             "economic": 36,
             "education": 20,
-            "housing": 47
+            "housing": 46
           },
           "acsCompetency": 92
         },
@@ -2239,7 +2561,12 @@
           "povertyPct": 11.90829049277983,
           "vacancyPct": 14.201022863085573,
           "medianHomeValue": 295400,
-          "medianRent": 1709,
+          "rentP25": 1533,
+          "medianRent": 1750,
+          "rentP75": 2066,
+          "rentObservationCount": 18,
+          "renterOccupiedUnits": 4519,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 81,
           "sampleGeoids": [
@@ -2252,7 +2579,7 @@
             "demographic": 57,
             "economic": 35,
             "education": 11,
-            "housing": 38
+            "housing": 36
           },
           "acsCompetency": 93
         },
@@ -2270,7 +2597,12 @@
           "povertyPct": 14.950319363057455,
           "vacancyPct": 16.551099009639522,
           "medianHomeValue": 266600,
+          "rentP25": 1078,
           "medianRent": 1289,
+          "rentP75": 1699,
+          "rentObservationCount": 80,
+          "renterOccupiedUnits": 41304,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 77,
           "sampleGeoids": [
@@ -2283,7 +2615,7 @@
             "demographic": 59,
             "economic": 27,
             "education": 8,
-            "housing": 36
+            "housing": 35
           },
           "acsCompetency": 92
         },
@@ -2301,7 +2633,12 @@
           "povertyPct": 14.14714953382863,
           "vacancyPct": 9.035483434690978,
           "medianHomeValue": 283800,
-          "medianRent": 1326,
+          "rentP25": 954,
+          "medianRent": 1319,
+          "rentP75": 1497,
+          "rentObservationCount": 26,
+          "renterOccupiedUnits": 9952,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 77,
           "sampleGeoids": [
@@ -2314,7 +2651,7 @@
             "demographic": 63,
             "economic": 53,
             "education": 13,
-            "housing": 65
+            "housing": 63
           },
           "acsCompetency": 92
         }
@@ -2348,7 +2685,12 @@
           "povertyPct": 11.610351817227505,
           "vacancyPct": 19.911387170684556,
           "medianHomeValue": 270800,
-          "medianRent": 1505,
+          "rentP25": 1066,
+          "medianRent": 1308,
+          "rentP75": 1654,
+          "rentObservationCount": 13,
+          "renterOccupiedUnits": 4809,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 79,
           "sampleGeoids": [
@@ -2361,7 +2703,7 @@
             "demographic": 4,
             "economic": 39,
             "education": 33,
-            "housing": 44
+            "housing": 48
           },
           "acsCompetency": 93
         },
@@ -2379,7 +2721,12 @@
           "povertyPct": 6.874852983623021,
           "vacancyPct": 14.602918417571201,
           "medianHomeValue": 333600,
+          "rentP25": 1442,
           "medianRent": 1584,
+          "rentP75": 1741,
+          "rentObservationCount": 8,
+          "renterOccupiedUnits": 3728,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 82,
           "sampleGeoids": [
@@ -2392,7 +2739,7 @@
             "demographic": 5,
             "economic": 44,
             "education": 10,
-            "housing": 17
+            "housing": 16
           },
           "acsCompetency": 94
         },
@@ -2410,7 +2757,12 @@
           "povertyPct": 7.713155375967612,
           "vacancyPct": 20.965529840805512,
           "medianHomeValue": 475400,
-          "medianRent": 1867,
+          "rentP25": 1129,
+          "medianRent": 1129,
+          "rentP75": 1867,
+          "rentObservationCount": 2,
+          "renterOccupiedUnits": 684,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 84,
           "sampleGeoids": [
@@ -2421,7 +2773,7 @@
             "demographic": 10,
             "economic": 79,
             "education": 32,
-            "housing": 57
+            "housing": 63
           },
           "acsCompetency": 94
         },
@@ -2439,7 +2791,12 @@
           "povertyPct": 10.34086156419908,
           "vacancyPct": 25.20220071543751,
           "medianHomeValue": 328400,
+          "rentP25": 1052,
           "medianRent": 1052,
+          "rentP75": 1052,
+          "rentObservationCount": 3,
+          "renterOccupiedUnits": 392,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 70,
           "sampleGeoids": [
@@ -2451,7 +2808,7 @@
             "demographic": 0,
             "economic": 32,
             "education": 12,
-            "housing": 35
+            "housing": 34
           },
           "acsCompetency": 90
         },
@@ -2469,7 +2826,12 @@
           "povertyPct": 8.405415145222731,
           "vacancyPct": 23.814713092106494,
           "medianHomeValue": 328200,
-          "medianRent": 1363,
+          "rentP25": 1091,
+          "medianRent": 1404,
+          "rentP75": 1600,
+          "rentObservationCount": 20,
+          "renterOccupiedUnits": 5052,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 77,
           "sampleGeoids": [
@@ -2482,7 +2844,7 @@
             "demographic": 2,
             "economic": 52,
             "education": 22,
-            "housing": 27
+            "housing": 23
           },
           "acsCompetency": 92
         }
@@ -2516,7 +2878,12 @@
           "povertyPct": 18.290703362019993,
           "vacancyPct": 10.494708710694177,
           "medianHomeValue": 157100,
-          "medianRent": 1065,
+          "rentP25": 900,
+          "medianRent": 988,
+          "rentP75": 1134,
+          "rentObservationCount": 34,
+          "renterOccupiedUnits": 23527,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 76,
           "sampleGeoids": [
@@ -2529,7 +2896,7 @@
             "demographic": 56,
             "economic": 12,
             "education": 54,
-            "housing": 54
+            "housing": 57
           },
           "acsCompetency": 92
         },
@@ -2547,7 +2914,12 @@
           "povertyPct": 9.551890803260774,
           "vacancyPct": 8.229091103823773,
           "medianHomeValue": 254300,
+          "rentP25": 937,
           "medianRent": 1118,
+          "rentP75": 1258,
+          "rentObservationCount": 20,
+          "renterOccupiedUnits": 5534,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 78,
           "sampleGeoids": [
@@ -2560,7 +2932,7 @@
             "demographic": 39,
             "economic": 67,
             "education": 52,
-            "housing": 89
+            "housing": 88
           },
           "acsCompetency": 92
         },
@@ -2578,7 +2950,12 @@
           "povertyPct": 6.478663485760456,
           "vacancyPct": 5.010136079437926,
           "medianHomeValue": 303100,
+          "rentP25": 938,
           "medianRent": 1098,
+          "rentP75": 1371,
+          "rentObservationCount": 9,
+          "renterOccupiedUnits": 2025,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 81,
           "sampleGeoids": [
@@ -2609,7 +2986,12 @@
           "povertyPct": 6.92367206708794,
           "vacancyPct": 5.634218557645468,
           "medianHomeValue": 302700,
-          "medianRent": 1325,
+          "rentP25": 1204,
+          "medianRent": 1274,
+          "rentP75": 1393,
+          "rentObservationCount": 12,
+          "renterOccupiedUnits": 4382,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 81,
           "sampleGeoids": [
@@ -2640,7 +3022,12 @@
           "povertyPct": 8.223415884227594,
           "vacancyPct": 6.052529290908097,
           "medianHomeValue": 328500,
-          "medianRent": 1427,
+          "rentP25": 1180,
+          "medianRent": 1411,
+          "rentP75": 1593,
+          "rentObservationCount": 43,
+          "renterOccupiedUnits": 26005,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 80,
           "sampleGeoids": [
@@ -2653,7 +3040,7 @@
             "demographic": 53,
             "economic": 81,
             "education": 81,
-            "housing": 76
+            "housing": 75
           },
           "acsCompetency": 93
         }
@@ -2687,7 +3074,12 @@
           "povertyPct": 15.879587754915663,
           "vacancyPct": 8.501178628124357,
           "medianHomeValue": 309600,
-          "medianRent": 1399,
+          "rentP25": 1154,
+          "medianRent": 1398,
+          "rentP75": 1528,
+          "rentObservationCount": 32,
+          "renterOccupiedUnits": 28147,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 79,
           "sampleGeoids": [
@@ -2700,7 +3092,7 @@
             "demographic": 67,
             "economic": 36,
             "education": 73,
-            "housing": 30
+            "housing": 28
           },
           "acsCompetency": 93
         },
@@ -2718,7 +3110,12 @@
           "povertyPct": 13.639093772200539,
           "vacancyPct": 10.859646642204059,
           "medianHomeValue": 225600,
-          "medianRent": 902,
+          "rentP25": 896,
+          "medianRent": 1016,
+          "rentP75": 1396,
+          "rentObservationCount": 13,
+          "renterOccupiedUnits": 5372,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 76,
           "sampleGeoids": [
@@ -2731,7 +3128,7 @@
             "demographic": 44,
             "economic": 26,
             "education": 16,
-            "housing": 75
+            "housing": 70
           },
           "acsCompetency": 92
         },
@@ -2749,7 +3146,12 @@
           "povertyPct": 5.397583133169588,
           "vacancyPct": 11.97392307567694,
           "medianHomeValue": 454900,
-          "medianRent": 2007,
+          "rentP25": 1722,
+          "medianRent": 1967,
+          "rentP75": 2088,
+          "rentObservationCount": 10,
+          "renterOccupiedUnits": 4639,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 84,
           "sampleGeoids": [
@@ -2762,7 +3164,7 @@
             "demographic": 22,
             "economic": 78,
             "education": 86,
-            "housing": 43
+            "housing": 42
           },
           "acsCompetency": 94
         },
@@ -2780,7 +3182,12 @@
           "povertyPct": 8.138332570091892,
           "vacancyPct": 20.335593133768178,
           "medianHomeValue": 428200,
+          "rentP25": 1385,
           "medianRent": 1425,
+          "rentP75": 1455,
+          "rentObservationCount": 24,
+          "renterOccupiedUnits": 8462,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 80,
           "sampleGeoids": [
@@ -2793,7 +3200,7 @@
             "demographic": 8,
             "economic": 64,
             "education": 79,
-            "housing": 37
+            "housing": 35
           },
           "acsCompetency": 93
         },
@@ -2811,7 +3218,12 @@
           "povertyPct": 9.788861053783581,
           "vacancyPct": 19.084272500544177,
           "medianHomeValue": 313400,
+          "rentP25": 1049,
           "medianRent": 1429,
+          "rentP75": 1763,
+          "rentObservationCount": 32,
+          "renterOccupiedUnits": 8880,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 79,
           "sampleGeoids": [
@@ -2824,7 +3236,7 @@
             "demographic": 6,
             "economic": 56,
             "education": 35,
-            "housing": 38
+            "housing": 37
           },
           "acsCompetency": 93
         }
@@ -2858,7 +3270,12 @@
           "povertyPct": 13.272115745488842,
           "vacancyPct": 10.595747144899192,
           "medianHomeValue": 455300,
-          "medianRent": 1472,
+          "rentP25": 1299,
+          "medianRent": 1423,
+          "rentP75": 1688,
+          "rentObservationCount": 10,
+          "renterOccupiedUnits": 6839,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 83,
           "sampleGeoids": [
@@ -2889,7 +3306,12 @@
           "povertyPct": 9.501197366894871,
           "vacancyPct": 14.094352855012064,
           "medianHomeValue": 552000,
+          "rentP25": 1576,
           "medianRent": 1576,
+          "rentP75": 1687,
+          "rentObservationCount": 8,
+          "renterOccupiedUnits": 5254,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 79,
           "sampleGeoids": [
@@ -2902,7 +3324,7 @@
             "demographic": 30,
             "economic": 52,
             "education": 43,
-            "housing": 10
+            "housing": 9
           },
           "acsCompetency": 93
         },
@@ -2920,7 +3342,12 @@
           "povertyPct": 9.453065656628556,
           "vacancyPct": 12.405676323808594,
           "medianHomeValue": 437100,
-          "medianRent": 1453,
+          "rentP25": 1276,
+          "medianRent": 1397,
+          "rentP75": 1584,
+          "rentObservationCount": 11,
+          "renterOccupiedUnits": 5178,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 83,
           "sampleGeoids": [
@@ -2933,7 +3360,7 @@
             "demographic": 64,
             "economic": 64,
             "education": 42,
-            "housing": 25
+            "housing": 26
           },
           "acsCompetency": 94
         },
@@ -2951,7 +3378,12 @@
           "povertyPct": 4.5245350083620375,
           "vacancyPct": 15.831028743310405,
           "medianHomeValue": 692200,
+          "rentP25": 2005,
           "medianRent": 2005,
+          "rentP75": 2005,
+          "rentObservationCount": 2,
+          "renterOccupiedUnits": 1382,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 86,
           "sampleGeoids": [
@@ -2962,7 +3394,7 @@
             "demographic": 99,
             "economic": 91,
             "education": 76,
-            "housing": 27
+            "housing": 25
           },
           "acsCompetency": 95
         },
@@ -2980,7 +3412,12 @@
           "povertyPct": 10.769329980009028,
           "vacancyPct": 24.209386244404264,
           "medianHomeValue": 519600,
+          "rentP25": 1893,
           "medianRent": 1893,
+          "rentP75": 1893,
+          "rentObservationCount": 4,
+          "renterOccupiedUnits": 1139,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 83,
           "sampleGeoids": [
@@ -2993,7 +3430,7 @@
             "demographic": 91,
             "economic": 49,
             "education": 72,
-            "housing": 8
+            "housing": 7
           },
           "acsCompetency": 94
         }
@@ -3027,7 +3464,12 @@
           "povertyPct": 10.798234551227877,
           "vacancyPct": 7.37209163024221,
           "medianHomeValue": 259300,
-          "medianRent": 1249,
+          "rentP25": 1023,
+          "medianRent": 1208,
+          "rentP75": 1366,
+          "rentObservationCount": 32,
+          "renterOccupiedUnits": 27041,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 81,
           "sampleGeoids": [
@@ -3058,7 +3500,12 @@
           "povertyPct": 5.7550577673945265,
           "vacancyPct": 6.975428267511121,
           "medianHomeValue": 329400,
+          "rentP25": 1109,
           "medianRent": 1313,
+          "rentP75": 1485,
+          "rentObservationCount": 21,
+          "renterOccupiedUnits": 10371,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 81,
           "sampleGeoids": [
@@ -3071,7 +3518,7 @@
             "demographic": 62,
             "economic": 88,
             "education": 70,
-            "housing": 88
+            "housing": 87
           },
           "acsCompetency": 93
         },
@@ -3089,7 +3536,12 @@
           "povertyPct": 6.748035573540776,
           "vacancyPct": 16.62124197795418,
           "medianHomeValue": 312500,
+          "rentP25": 1123,
           "medianRent": 1123,
+          "rentP75": 1408,
+          "rentObservationCount": 4,
+          "renterOccupiedUnits": 873,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 78,
           "sampleGeoids": [
@@ -3102,7 +3554,7 @@
             "demographic": 44,
             "economic": 66,
             "education": 24,
-            "housing": 59
+            "housing": 58
           },
           "acsCompetency": 92
         },
@@ -3120,7 +3572,12 @@
           "povertyPct": 15.939369686094626,
           "vacancyPct": 8.249577432805907,
           "medianHomeValue": 309500,
-          "medianRent": 1146,
+          "rentP25": 930,
+          "medianRent": 1018,
+          "rentP75": 1214,
+          "rentObservationCount": 40,
+          "renterOccupiedUnits": 33317,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 79,
           "sampleGeoids": [
@@ -3133,7 +3590,7 @@
             "demographic": 85,
             "economic": 52,
             "education": 69,
-            "housing": 58
+            "housing": 61
           },
           "acsCompetency": 93
         },
@@ -3151,7 +3608,12 @@
           "povertyPct": 8.058738396827792,
           "vacancyPct": 8.436354772311137,
           "medianHomeValue": 257400,
+          "rentP25": 945,
           "medianRent": 1104,
+          "rentP75": 1474,
+          "rentObservationCount": 14,
+          "renterOccupiedUnits": 8448,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 81,
           "sampleGeoids": [
@@ -3198,7 +3660,12 @@
           "povertyPct": 13.14360268904394,
           "vacancyPct": 8.818898774056489,
           "medianHomeValue": 389900,
-          "medianRent": 1559,
+          "rentP25": 1376,
+          "medianRent": 1520,
+          "rentP75": 1722,
+          "rentObservationCount": 98,
+          "renterOccupiedUnits": 95549,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 82,
           "sampleGeoids": [
@@ -3211,7 +3678,7 @@
             "demographic": 87,
             "economic": 51,
             "education": 85,
-            "housing": 37
+            "housing": 36
           },
           "acsCompetency": 94
         },
@@ -3229,7 +3696,12 @@
           "povertyPct": 7.441093818098896,
           "vacancyPct": 6.214544910543489,
           "medianHomeValue": 423300,
-          "medianRent": 1494,
+          "rentP25": 1284,
+          "medianRent": 1508,
+          "rentP75": 1727,
+          "rentObservationCount": 62,
+          "renterOccupiedUnits": 37750,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 80,
           "sampleGeoids": [
@@ -3242,7 +3714,7 @@
             "demographic": 44,
             "economic": 83,
             "education": 92,
-            "housing": 69
+            "housing": 68
           },
           "acsCompetency": 93
         },
@@ -3260,7 +3732,12 @@
           "povertyPct": 9.839472069119937,
           "vacancyPct": 4.5537416908300985,
           "medianHomeValue": 338500,
-          "medianRent": 1526,
+          "rentP25": 916,
+          "medianRent": 1478,
+          "rentP75": 1633,
+          "rentObservationCount": 36,
+          "renterOccupiedUnits": 17815,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 81,
           "sampleGeoids": [
@@ -3273,7 +3750,7 @@
             "demographic": 67,
             "economic": 63,
             "education": 49,
-            "housing": 60
+            "housing": 59
           },
           "acsCompetency": 93
         },
@@ -3291,7 +3768,12 @@
           "povertyPct": 8.196862019748224,
           "vacancyPct": 5.3656808650130685,
           "medianHomeValue": 369100,
-          "medianRent": 1350,
+          "rentP25": 973,
+          "medianRent": 1526,
+          "rentP75": 1717,
+          "rentObservationCount": 57,
+          "renterOccupiedUnits": 19313,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 77,
           "sampleGeoids": [
@@ -3304,7 +3786,7 @@
             "demographic": 43,
             "economic": 80,
             "education": 68,
-            "housing": 77
+            "housing": 72
           },
           "acsCompetency": 92
         },
@@ -3322,7 +3804,12 @@
           "povertyPct": 6.971112256278465,
           "vacancyPct": 5.80253257204089,
           "medianHomeValue": 499700,
-          "medianRent": 1784,
+          "rentP25": 1450,
+          "medianRent": 1662,
+          "rentP75": 1834,
+          "rentObservationCount": 95,
+          "renterOccupiedUnits": 78296,
+          "rentCoverage": 100,
           "coverage": 100,
           "reliability": 84,
           "sampleGeoids": [
@@ -3335,7 +3822,7 @@
             "demographic": 72,
             "economic": 92,
             "education": 100,
-            "housing": 61
+            "housing": 62
           },
           "acsCompetency": 94
         }

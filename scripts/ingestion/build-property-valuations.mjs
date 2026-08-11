@@ -31,12 +31,16 @@ function quantile(values, percentile) {
 }
 
 function weightedMedian(items) {
+  return weightedQuantile(items, .5);
+}
+
+function weightedQuantile(items, percentile) {
   const sorted = items.filter((item) => Number.isFinite(item.value) && item.weight > 0).sort((a, b) => a.value - b.value);
   const total = sorted.reduce((sum, item) => sum + item.weight, 0);
   let cursor = 0;
   for (const item of sorted) {
     cursor += item.weight;
-    if (cursor >= total / 2) return item.value;
+    if (cursor >= total * percentile) return item.value;
   }
   return sorted.at(-1)?.value ?? null;
 }
@@ -261,15 +265,21 @@ function comparableEvidence(subject, candidates, price, targetDate) {
     .sort((a, b) => b.score - a.score);
   const preferred = scored.filter((item) => item.sameType && item.score >= 42);
   const selected = (preferred.length >= 3 ? preferred : scored).slice(0, 12);
-  const ppsf = weightedMedian(selected.map((item) => ({
+  const ppsfEvidence = selected.map((item) => ({
     value: hpiAdjustedSale(item.candidate, price, targetDate) / item.candidate.sqft,
     weight: Math.max(0.1, item.score / 100),
-  })));
+  }));
+  const ppsf = weightedMedian(ppsfEvidence);
   return {
     count: selected.length,
     ppsf,
+    ppsfP25: weightedQuantile(ppsfEvidence, .25),
+    ppsfP75: weightedQuantile(ppsfEvidence, .75),
     nearestMiles: selected.length ? Math.min(...selected.map((item) => item.distance ?? 20)) : null,
     medianMiles: median(selected.map((item) => item.distance).filter((value) => value !== null)),
+    medianAgeMonths: median(selected.map((item) => item.monthsOld)),
+    newestSaleDate: selected.map((item) => item.candidate.saleDate).sort().at(-1) ?? null,
+    oldestSaleDate: selected.map((item) => item.candidate.saleDate).sort().at(0) ?? null,
     sameTypePct: selected.length ? selected.filter((item) => item.sameType).length / selected.length * 100 : 0,
     ids: selected.map((item) => item.candidate.id),
   };
@@ -326,6 +336,7 @@ function modelMarket(records, clusterId) {
     const anchors = [saleAnchor, assessmentAnchor, compAnchor];
     const spread = Math.max(...anchors) - Math.min(...anchors);
     const recency = clamp(100 - ageMonths * 1.6, 20, 100);
+    const recencyBand = ageMonths <= 6 ? "current" : ageMonths <= 18 ? "recent" : ageMonths <= 36 ? "aging" : "stale";
     const completeness = [record.sqft, record.yearBuilt, record.assessedValue, record.lat, record.lng, record.zip].filter(Boolean).length / 6;
     const compQuality = clamp(comps.count / 8 * 50 + comps.sameTypePct * 0.3 + (20 - (comps.medianMiles ?? 20)) * 1.0, 0, 100);
     const agreement = clamp(100 - spread / estimate * 120, 0, 100);
@@ -345,8 +356,10 @@ function modelMarket(records, clusterId) {
         anchors: { hpiAdjustedSale: round(saleAnchor, -3), assessmentCalibrated: round(assessmentAnchor, -3), comparablePpsf: round(compAnchor, -3) },
         weights: { hpiAdjustedSale: saleWeight, assessmentCalibrated: assessmentWeight, comparableSales: compWeight },
         calibrationRatio: round(calibration, 3), comparablePpsf: round(comps.ppsf, 0), clusterEdgeScore: meta.score,
-        comparableQuality: { nearestMiles: round(comps.nearestMiles ?? 0, 1), medianMiles: round(comps.medianMiles ?? 0, 1), sameTypePct: round(comps.sameTypePct, 0), recordIds: comps.ids },
-        diagnostics: { modelVersion: "2.0", marketBacktestSample: diagnostics.sampleSize, marketMedianAbsoluteErrorPct: diagnostics.medianAbsoluteErrorPct, marketP80AbsoluteErrorPct: diagnostics.p80AbsoluteErrorPct },
+        pricePerSqft: { recordedSale: round(record.salePrice / record.sqft, 0), hpiAdjustedSale: round(saleAnchor / record.sqft, 0), assessmentCalibrated: round(assessmentAnchor / record.sqft, 0), comparableP25: round(comps.ppsfP25, 0), comparableMedian: round(comps.ppsf, 0), comparableP75: round(comps.ppsfP75, 0), modelCenter: round(estimate / record.sqft, 0) },
+        recency: { saleAgeMonths: round(ageMonths, 1), score: round(recency, 0), band: recencyBand },
+        comparableQuality: { nearestMiles: round(comps.nearestMiles ?? 0, 1), medianMiles: round(comps.medianMiles ?? 0, 1), medianAgeMonths: round(comps.medianAgeMonths ?? 0, 1), newestSaleDate: comps.newestSaleDate, oldestSaleDate: comps.oldestSaleDate, sameTypePct: round(comps.sameTypePct, 0), recordIds: comps.ids },
+        diagnostics: { modelVersion: "2.1", marketBacktestSample: diagnostics.sampleSize, marketMedianAbsoluteErrorPct: diagnostics.medianAbsoluteErrorPct, marketP80AbsoluteErrorPct: diagnostics.p80AbsoluteErrorPct },
       },
       listing: null,
       vendorEstimates: [],
@@ -371,8 +384,8 @@ const output = {
   generatedAt: new Date().toISOString(),
   asOf: "2026-08-07",
   methodology: {
-    label: "Public-record valuation watch model v2",
-    value: "Recency-weighted prior sale + 20% locally calibrated assessment + 45–65% geographically and physically matched comparable sales",
+    label: "Public-record valuation watch model v2.1",
+    value: "Recency-weighted prior sale + 20% locally calibrated assessment + 45–65% geographically, physically and price-per-square-foot matched comparable sales",
     range: "The larger of the market's out-of-time 80th-percentile error, anchor disagreement, or evidence-quality penalty",
     watchScore: "45% cluster edge + 30% evidence quality + 15% assessment gap signal + 10% sale recency",
     validation: "Out-of-time backtesting uses only sales recorded before each test transaction; no later comparable is allowed into that test",

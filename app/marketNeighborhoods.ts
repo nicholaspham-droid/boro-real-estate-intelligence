@@ -30,7 +30,12 @@ export type NeighborhoodSignal = {
   povertyPct: number | null;
   vacancyPct: number | null;
   medianHomeValue: number | null;
+  rentP25: number | null;
   medianRent: number | null;
+  rentP75: number | null;
+  rentObservationCount: number;
+  renterOccupiedUnits: number;
+  rentCoverage: number;
   sampleGeoids: string[];
   localPricing: (typeof clusterPricingHistory.markets)[number]["clusters"][number] | null;
 };
@@ -96,7 +101,12 @@ export const MARKET_EXPLORERS: MarketExplorer[] = acsAggregations.markets.map((a
       povertyPct: cluster.povertyPct,
       vacancyPct: cluster.vacancyPct,
       medianHomeValue: cluster.medianHomeValue,
+      rentP25: cluster.rentP25,
       medianRent: cluster.medianRent,
+      rentP75: cluster.rentP75,
+      rentObservationCount: cluster.rentObservationCount,
+      renterOccupiedUnits: cluster.renterOccupiedUnits,
+      rentCoverage: cluster.rentCoverage,
       sampleGeoids: cluster.sampleGeoids,
       localPricing,
     };

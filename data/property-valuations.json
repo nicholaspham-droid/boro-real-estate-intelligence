@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-08-08T22:30:29.237Z",
+  "generatedAt": "2026-08-11T06:49:15.623Z",
   "asOf": "2026-08-07",
   "methodology": {
-    "label": "Public-record valuation watch model v2",
-    "value": "Recency-weighted prior sale + 20% locally calibrated assessment + 45–65% geographically and physically matched comparable sales",
+    "label": "Public-record valuation watch model v2.1",
+    "value": "Recency-weighted prior sale + 20% locally calibrated assessment + 45–65% geographically, physically and price-per-square-foot matched comparable sales",
     "range": "The larger of the market's out-of-time 80th-percentile error, anchor disagreement, or evidence-quality penalty",
     "watchScore": "45% cluster edge + 30% evidence quality + 15% assessment gap signal + 10% sale recency",
     "validation": "Out-of-time backtesting uses only sales recorded before each test transaction; no later comparable is allowed into that test",
@@ -17,19 +17,19 @@
       "status": "live",
       "propertyCount": 18,
       "sourceCompetency": 91,
-      "modelCompetency": 59,
-      "competency": 77,
+      "modelCompetency": 73,
+      "competency": 83,
       "diagnostics": {
         "method": "Out-of-time backtest: each sale is estimated only from earlier sales, a locally calibrated assessment, physical similarity and distance",
         "sampleSize": 13,
-        "medianAbsoluteErrorPct": 15,
-        "p80AbsoluteErrorPct": 17.7,
+        "medianAbsoluteErrorPct": 8.6,
+        "p80AbsoluteErrorPct": 18,
         "medianRatio": 1.043,
         "biasPct": 4.3,
-        "coefficientOfDispersion": 12.1,
-        "within10Pct": 46.2,
+        "coefficientOfDispersion": 11.7,
+        "within10Pct": 53.8,
         "within20Pct": 84.6,
-        "modelCompetency": 59
+        "modelCompetency": 73
       }
     },
     {
@@ -43,14 +43,14 @@
       "competency": 65,
       "diagnostics": {
         "method": "Out-of-time backtest: each sale is estimated only from earlier sales, a locally calibrated assessment, physical similarity and distance",
-        "sampleSize": 421,
-        "medianAbsoluteErrorPct": 33.7,
-        "p80AbsoluteErrorPct": 54.6,
-        "medianRatio": 0.939,
-        "biasPct": -6.1,
-        "coefficientOfDispersion": 42.8,
-        "within10Pct": 13.1,
-        "within20Pct": 26.6,
+        "sampleSize": 418,
+        "medianAbsoluteErrorPct": 33.3,
+        "p80AbsoluteErrorPct": 56.1,
+        "medianRatio": 0.923,
+        "biasPct": -7.7,
+        "coefficientOfDispersion": 42.9,
+        "within10Pct": 14.4,
+        "within20Pct": 28.2,
         "modelCompetency": 35
       }
     },
@@ -65,14 +65,14 @@
       "competency": 82,
       "diagnostics": {
         "method": "Out-of-time backtest: each sale is estimated only from earlier sales, a locally calibrated assessment, physical similarity and distance",
-        "sampleSize": 1202,
-        "medianAbsoluteErrorPct": 8.6,
-        "p80AbsoluteErrorPct": 16.9,
+        "sampleSize": 1210,
+        "medianAbsoluteErrorPct": 8.7,
+        "p80AbsoluteErrorPct": 17,
         "medianRatio": 0.997,
         "biasPct": -0.3,
         "coefficientOfDispersion": 11.6,
         "within10Pct": 56.3,
-        "within20Pct": 86,
+        "within20Pct": 85.8,
         "modelCompetency": 81
       }
     },
@@ -162,6 +162,97 @@
   ],
   "properties": [
     {
+      "id": "cook-08214150130000",
+      "marketId": "chicago",
+      "clusterId": "chicago-west",
+      "sourceId": "cook-county",
+      "sourceLabel": "Cook County Assessor",
+      "sourceUrl": "https://datacatalog.cookcountyil.gov/Property-Taxation/Assessor-Parcel-Sales/wvhk-k5uv",
+      "parcelId": "08214150130000",
+      "address": "502 OAKTON ST",
+      "locality": "ELK GROVE VILLAGE, IL, 60007",
+      "zip": "60007",
+      "lat": 42.0223751534,
+      "lng": -87.9834175058,
+      "propertyType": "Single-Family",
+      "yearBuilt": 1957,
+      "sqft": 1465,
+      "lotSqft": 7150,
+      "beds": 3,
+      "baths": 1.5,
+      "saleDate": "2026-02-23",
+      "salePrice": 420000,
+      "assessedValue": 320010,
+      "qualification": "County sale filters passed · Warranty · residential assessment converted from Cook County's 10% level",
+      "clusterName": "Chicago · West Corridor",
+      "model": {
+        "value": 409000,
+        "low": 335000,
+        "high": 483000,
+        "confidence": 88,
+        "watchScore": 79,
+        "valuationGapPct": 27.8,
+        "compCount": 12,
+        "anchors": {
+          "hpiAdjustedSale": 420000,
+          "assessmentCalibrated": 379000,
+          "comparablePpsf": 414000
+        },
+        "weights": {
+          "hpiAdjustedSale": 0.35,
+          "assessmentCalibrated": 0.2,
+          "comparableSales": 0.45
+        },
+        "calibrationRatio": 1.183,
+        "comparablePpsf": 283,
+        "clusterEdgeScore": 70,
+        "pricePerSqft": {
+          "recordedSale": 287,
+          "hpiAdjustedSale": 287,
+          "assessmentCalibrated": 258,
+          "comparableP25": 242,
+          "comparableMedian": 283,
+          "comparableP75": 303,
+          "modelCenter": 279
+        },
+        "recency": {
+          "saleAgeMonths": 5.4,
+          "score": 91,
+          "band": "current"
+        },
+        "comparableQuality": {
+          "nearestMiles": 0,
+          "medianMiles": 0.3,
+          "medianAgeMonths": 10.1,
+          "newestSaleDate": "2026-04-08",
+          "oldestSaleDate": "2025-02-20",
+          "sameTypePct": 100,
+          "recordIds": [
+            "cook-08214090060000",
+            "cook-08214090080000",
+            "cook-08214100190000",
+            "cook-08214110070000",
+            "cook-08214150170000",
+            "cook-08214030100000",
+            "cook-08214060450000",
+            "cook-08214040100000",
+            "cook-08214070320000",
+            "cook-08244100190000",
+            "cook-08243100120000",
+            "cook-08214040090000"
+          ]
+        },
+        "diagnostics": {
+          "modelVersion": "2.1",
+          "marketBacktestSample": 13,
+          "marketMedianAbsoluteErrorPct": 8.6,
+          "marketP80AbsoluteErrorPct": 18
+        }
+      },
+      "listing": null,
+      "vendorEstimates": []
+    },
+    {
       "id": "cook-08214030100000",
       "marketId": "chicago",
       "clusterId": "chicago-west",
@@ -186,17 +277,17 @@
       "qualification": "County sale filters passed · Warranty · residential assessment converted from Cook County's 10% level",
       "clusterName": "Chicago · West Corridor",
       "model": {
-        "value": 374000,
-        "low": 308000,
-        "high": 440000,
-        "confidence": 83,
-        "watchScore": 77,
-        "valuationGapPct": 24.6,
+        "value": 371000,
+        "low": 304000,
+        "high": 437000,
+        "confidence": 88,
+        "watchScore": 78,
+        "valuationGapPct": 23.5,
         "compCount": 12,
         "anchors": {
           "hpiAdjustedSale": 380000,
           "assessmentCalibrated": 355000,
-          "comparablePpsf": 377000
+          "comparablePpsf": 370000
         },
         "weights": {
           "hpiAdjustedSale": 0.35,
@@ -204,11 +295,28 @@
           "comparableSales": 0.45
         },
         "calibrationRatio": 1.183,
-        "comparablePpsf": 292,
+        "comparablePpsf": 287,
         "clusterEdgeScore": 70,
+        "pricePerSqft": {
+          "recordedSale": 295,
+          "hpiAdjustedSale": 295,
+          "assessmentCalibrated": 275,
+          "comparableP25": 275,
+          "comparableMedian": 287,
+          "comparableP75": 303,
+          "modelCenter": 287
+        },
+        "recency": {
+          "saleAgeMonths": 5,
+          "score": 92,
+          "band": "current"
+        },
         "comparableQuality": {
           "nearestMiles": 0.1,
           "medianMiles": 0.3,
+          "medianAgeMonths": 13.2,
+          "newestSaleDate": "2026-03-06",
+          "oldestSaleDate": "2025-01-06",
           "sameTypePct": 100,
           "recordIds": [
             "cook-08214060450000",
@@ -221,15 +329,15 @@
             "cook-08214040090000",
             "cook-08214060390000",
             "cook-08214030190000",
-            "cook-08243160140000",
-            "cook-08214150130000"
+            "cook-08214150130000",
+            "cook-08243100120000"
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
+          "modelVersion": "2.1",
           "marketBacktestSample": 13,
-          "marketMedianAbsoluteErrorPct": 15,
-          "marketP80AbsoluteErrorPct": 17.7
+          "marketMedianAbsoluteErrorPct": 8.6,
+          "marketP80AbsoluteErrorPct": 18
         }
       },
       "listing": null,
@@ -261,10 +369,10 @@
       "clusterName": "Chicago · West Corridor",
       "model": {
         "value": 475000,
-        "low": 391000,
-        "high": 559000,
-        "confidence": 81,
-        "watchScore": 77,
+        "low": 390000,
+        "high": 561000,
+        "confidence": 86,
+        "watchScore": 78,
         "valuationGapPct": 28.4,
         "compCount": 12,
         "anchors": {
@@ -280,178 +388,47 @@
         "calibrationRatio": 1.183,
         "comparablePpsf": 242,
         "clusterEdgeScore": 70,
+        "pricePerSqft": {
+          "recordedSale": 291,
+          "hpiAdjustedSale": 291,
+          "assessmentCalibrated": 238,
+          "comparableP25": 221,
+          "comparableMedian": 242,
+          "comparableP75": 295,
+          "modelCenter": 259
+        },
+        "recency": {
+          "saleAgeMonths": 5.8,
+          "score": 91,
+          "band": "current"
+        },
         "comparableQuality": {
           "nearestMiles": 0,
           "medianMiles": 0.2,
+          "medianAgeMonths": 7.6,
+          "newestSaleDate": "2026-04-29",
+          "oldestSaleDate": "2025-02-20",
           "sameTypePct": 100,
           "recordIds": [
             "cook-08214110220000",
             "cook-08214070250000",
             "cook-08214090080000",
             "cook-08214150130000",
+            "cook-08244100190000",
             "cook-08214110160000",
             "cook-08214090060000",
             "cook-08214100190000",
             "cook-08214030100000",
             "cook-08214110070000",
             "cook-08243100120000",
-            "cook-08214060450000",
-            "cook-08214150170000"
+            "cook-08214060450000"
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
+          "modelVersion": "2.1",
           "marketBacktestSample": 13,
-          "marketMedianAbsoluteErrorPct": 15,
-          "marketP80AbsoluteErrorPct": 17.7
-        }
-      },
-      "listing": null,
-      "vendorEstimates": []
-    },
-    {
-      "id": "cook-08214090080000",
-      "marketId": "chicago",
-      "clusterId": "chicago-west",
-      "sourceId": "cook-county",
-      "sourceLabel": "Cook County Assessor",
-      "sourceUrl": "https://datacatalog.cookcountyil.gov/Property-Taxation/Assessor-Parcel-Sales/wvhk-k5uv",
-      "parcelId": "08214090080000",
-      "address": "15 WILDWOOD RD",
-      "locality": "ELK GROVE VILLAGE, IL, 60007",
-      "zip": "60007",
-      "lat": 42.0259144315,
-      "lng": -87.9797227644,
-      "propertyType": "Single-Family",
-      "yearBuilt": 1957,
-      "sqft": 1592,
-      "lotSqft": 7150,
-      "beds": 3,
-      "baths": 2,
-      "saleDate": "2026-04-08",
-      "salePrice": 380000,
-      "assessedValue": 340010,
-      "qualification": "County sale filters passed · Other · residential assessment converted from Cook County's 10% level",
-      "clusterName": "Chicago · West Corridor",
-      "model": {
-        "value": 419000,
-        "low": 345000,
-        "high": 493000,
-        "confidence": 82,
-        "watchScore": 77,
-        "valuationGapPct": 23.2,
-        "compCount": 12,
-        "anchors": {
-          "hpiAdjustedSale": 380000,
-          "assessmentCalibrated": 402000,
-          "comparablePpsf": 456000
-        },
-        "weights": {
-          "hpiAdjustedSale": 0.35,
-          "assessmentCalibrated": 0.2,
-          "comparableSales": 0.45
-        },
-        "calibrationRatio": 1.183,
-        "comparablePpsf": 287,
-        "clusterEdgeScore": 70,
-        "comparableQuality": {
-          "nearestMiles": 0,
-          "medianMiles": 0.3,
-          "sameTypePct": 100,
-          "recordIds": [
-            "cook-08214150130000",
-            "cook-08214090060000",
-            "cook-08214110220000",
-            "cook-08214100190000",
-            "cook-08214110070000",
-            "cook-08214070250000",
-            "cook-08214030100000",
-            "cook-08214050340000",
-            "cook-08214150170000",
-            "cook-08214060450000",
-            "cook-08214070320000",
-            "cook-08214040100000"
-          ]
-        },
-        "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 13,
-          "marketMedianAbsoluteErrorPct": 15,
-          "marketP80AbsoluteErrorPct": 17.7
-        }
-      },
-      "listing": null,
-      "vendorEstimates": []
-    },
-    {
-      "id": "cook-08214150130000",
-      "marketId": "chicago",
-      "clusterId": "chicago-west",
-      "sourceId": "cook-county",
-      "sourceLabel": "Cook County Assessor",
-      "sourceUrl": "https://datacatalog.cookcountyil.gov/Property-Taxation/Assessor-Parcel-Sales/wvhk-k5uv",
-      "parcelId": "08214150130000",
-      "address": "502 OAKTON ST",
-      "locality": "ELK GROVE VILLAGE, IL, 60007",
-      "zip": "60007",
-      "lat": 42.0223751534,
-      "lng": -87.9834175058,
-      "propertyType": "Single-Family",
-      "yearBuilt": 1957,
-      "sqft": 1465,
-      "lotSqft": 7150,
-      "beds": 3,
-      "baths": 1.5,
-      "saleDate": "2026-02-23",
-      "salePrice": 420000,
-      "assessedValue": 320010,
-      "qualification": "County sale filters passed · Warranty · residential assessment converted from Cook County's 10% level",
-      "clusterName": "Chicago · West Corridor",
-      "model": {
-        "value": 409000,
-        "low": 337000,
-        "high": 482000,
-        "confidence": 83,
-        "watchScore": 77,
-        "valuationGapPct": 27.8,
-        "compCount": 12,
-        "anchors": {
-          "hpiAdjustedSale": 420000,
-          "assessmentCalibrated": 379000,
-          "comparablePpsf": 414000
-        },
-        "weights": {
-          "hpiAdjustedSale": 0.35,
-          "assessmentCalibrated": 0.2,
-          "comparableSales": 0.45
-        },
-        "calibrationRatio": 1.183,
-        "comparablePpsf": 283,
-        "clusterEdgeScore": 70,
-        "comparableQuality": {
-          "nearestMiles": 0,
-          "medianMiles": 0.3,
-          "sameTypePct": 100,
-          "recordIds": [
-            "cook-08214090060000",
-            "cook-08214090080000",
-            "cook-08214100190000",
-            "cook-08214110070000",
-            "cook-08214150170000",
-            "cook-08214030100000",
-            "cook-08214060450000",
-            "cook-08214040100000",
-            "cook-08214070320000",
-            "cook-08243100120000",
-            "cook-08214040090000",
-            "cook-08214060390000"
-          ]
-        },
-        "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 13,
-          "marketMedianAbsoluteErrorPct": 15,
-          "marketP80AbsoluteErrorPct": 17.7
+          "marketMedianAbsoluteErrorPct": 8.6,
+          "marketP80AbsoluteErrorPct": 18
         }
       },
       "listing": null,
@@ -483,10 +460,10 @@
       "clusterName": "Chicago · West Corridor",
       "model": {
         "value": 475000,
-        "low": 391000,
-        "high": 560000,
-        "confidence": 83,
-        "watchScore": 76,
+        "low": 390000,
+        "high": 561000,
+        "confidence": 88,
+        "watchScore": 78,
         "valuationGapPct": 18.9,
         "compCount": 12,
         "anchors": {
@@ -502,9 +479,26 @@
         "calibrationRatio": 1.183,
         "comparablePpsf": 275,
         "clusterEdgeScore": 70,
+        "pricePerSqft": {
+          "recordedSale": 236,
+          "hpiAdjustedSale": 236,
+          "assessmentCalibrated": 256,
+          "comparableP25": 221,
+          "comparableMedian": 275,
+          "comparableP75": 295,
+          "modelCenter": 257
+        },
+        "recency": {
+          "saleAgeMonths": 3.3,
+          "score": 95,
+          "band": "current"
+        },
         "comparableQuality": {
           "nearestMiles": 0.1,
           "medianMiles": 0.2,
+          "medianAgeMonths": 9.5,
+          "newestSaleDate": "2026-04-08",
+          "oldestSaleDate": "2025-02-20",
           "sameTypePct": 100,
           "recordIds": [
             "cook-08214070250000",
@@ -512,61 +506,61 @@
             "cook-08214090080000",
             "cook-08214150130000",
             "cook-08214110160000",
+            "cook-08244100190000",
             "cook-08214090060000",
             "cook-08214100190000",
             "cook-08214110070000",
             "cook-08214030100000",
             "cook-08214150170000",
-            "cook-08214060450000",
-            "cook-08214070320000"
+            "cook-08214060450000"
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
+          "modelVersion": "2.1",
           "marketBacktestSample": 13,
-          "marketMedianAbsoluteErrorPct": 15,
-          "marketP80AbsoluteErrorPct": 17.7
+          "marketMedianAbsoluteErrorPct": 8.6,
+          "marketP80AbsoluteErrorPct": 18
         }
       },
       "listing": null,
       "vendorEstimates": []
     },
     {
-      "id": "cook-08243160140000",
+      "id": "cook-08214090080000",
       "marketId": "chicago",
       "clusterId": "chicago-west",
       "sourceId": "cook-county",
       "sourceLabel": "Cook County Assessor",
       "sourceUrl": "https://datacatalog.cookcountyil.gov/Property-Taxation/Assessor-Parcel-Sales/wvhk-k5uv",
-      "parcelId": "08243160140000",
-      "address": "680 JILL CT",
-      "locality": "DES PLAINES, IL, 60018",
-      "zip": "60018",
-      "lat": 42.02881006,
-      "lng": -87.9381433282,
+      "parcelId": "08214090080000",
+      "address": "15 WILDWOOD RD",
+      "locality": "ELK GROVE VILLAGE, IL, 60007",
+      "zip": "60007",
+      "lat": 42.0259144315,
+      "lng": -87.9797227644,
       "propertyType": "Single-Family",
-      "yearBuilt": 1968,
-      "sqft": 1283,
-      "lotSqft": 7590,
+      "yearBuilt": 1957,
+      "sqft": 1592,
+      "lotSqft": 7150,
       "beds": 3,
-      "baths": 1.5,
-      "saleDate": "2026-04-17",
-      "salePrice": 450000,
+      "baths": 2,
+      "saleDate": "2026-04-08",
+      "salePrice": 380000,
       "assessedValue": 340010,
-      "qualification": "County sale filters passed · Trustee · residential assessment converted from Cook County's 10% level",
+      "qualification": "County sale filters passed · Other · residential assessment converted from Cook County's 10% level",
       "clusterName": "Chicago · West Corridor",
       "model": {
-        "value": 407000,
-        "low": 335000,
-        "high": 479000,
-        "confidence": 82,
-        "watchScore": 76,
-        "valuationGapPct": 19.6,
+        "value": 419000,
+        "low": 343000,
+        "high": 494000,
+        "confidence": 87,
+        "watchScore": 78,
+        "valuationGapPct": 23.2,
         "compCount": 12,
         "anchors": {
-          "hpiAdjustedSale": 450000,
+          "hpiAdjustedSale": 380000,
           "assessmentCalibrated": 402000,
-          "comparablePpsf": 375000
+          "comparablePpsf": 456000
         },
         "weights": {
           "hpiAdjustedSale": 0.35,
@@ -574,32 +568,49 @@
           "comparableSales": 0.45
         },
         "calibrationRatio": 1.183,
-        "comparablePpsf": 292,
+        "comparablePpsf": 287,
         "clusterEdgeScore": 70,
+        "pricePerSqft": {
+          "recordedSale": 239,
+          "hpiAdjustedSale": 239,
+          "assessmentCalibrated": 253,
+          "comparableP25": 242,
+          "comparableMedian": 287,
+          "comparableP75": 303,
+          "modelCenter": 263
+        },
+        "recency": {
+          "saleAgeMonths": 4,
+          "score": 94,
+          "band": "current"
+        },
         "comparableQuality": {
-          "nearestMiles": 0.5,
-          "medianMiles": 2.3,
+          "nearestMiles": 0,
+          "medianMiles": 0.3,
+          "medianAgeMonths": 9.5,
+          "newestSaleDate": "2026-04-29",
+          "oldestSaleDate": "2025-02-20",
           "sameTypePct": 100,
           "recordIds": [
-            "cook-08243100120000",
-            "cook-08214030100000",
-            "cook-08214150170000",
-            "cook-08214070320000",
-            "cook-08214060450000",
-            "cook-08214040100000",
-            "cook-08214030190000",
+            "cook-08214150130000",
+            "cook-08244100190000",
+            "cook-08214090060000",
+            "cook-08214110220000",
             "cook-08214100190000",
             "cook-08214110070000",
-            "cook-08214090060000",
-            "cook-08214040090000",
-            "cook-08214060390000"
+            "cook-08214070250000",
+            "cook-08214030100000",
+            "cook-08214050340000",
+            "cook-08214150170000",
+            "cook-08214060450000",
+            "cook-08214070320000"
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
+          "modelVersion": "2.1",
           "marketBacktestSample": 13,
-          "marketMedianAbsoluteErrorPct": 15,
-          "marketP80AbsoluteErrorPct": 17.7
+          "marketMedianAbsoluteErrorPct": 8.6,
+          "marketP80AbsoluteErrorPct": 18
         }
       },
       "listing": null,
@@ -630,17 +641,17 @@
       "qualification": "County sale filters passed · Warranty · residential assessment converted from Cook County's 10% level",
       "clusterName": "Chicago · West Corridor",
       "model": {
-        "value": 342000,
-        "low": 281000,
+        "value": 340000,
+        "low": 279000,
         "high": 402000,
-        "confidence": 82,
-        "watchScore": 76,
-        "valuationGapPct": 26.5,
+        "confidence": 87,
+        "watchScore": 78,
+        "valuationGapPct": 26,
         "compCount": 12,
         "anchors": {
           "hpiAdjustedSale": 350000,
           "assessmentCalibrated": 319000,
-          "comparablePpsf": 345000
+          "comparablePpsf": 342000
         },
         "weights": {
           "hpiAdjustedSale": 0.35,
@@ -648,11 +659,28 @@
           "comparableSales": 0.45
         },
         "calibrationRatio": 1.183,
-        "comparablePpsf": 295,
+        "comparablePpsf": 292,
         "clusterEdgeScore": 70,
+        "pricePerSqft": {
+          "recordedSale": 299,
+          "hpiAdjustedSale": 299,
+          "assessmentCalibrated": 273,
+          "comparableP25": 275,
+          "comparableMedian": 292,
+          "comparableP75": 335,
+          "modelCenter": 291
+        },
+        "recency": {
+          "saleAgeMonths": 10.5,
+          "score": 83,
+          "band": "recent"
+        },
         "comparableQuality": {
           "nearestMiles": 0,
           "medianMiles": 0.2,
+          "medianAgeMonths": 13.2,
+          "newestSaleDate": "2026-03-09",
+          "oldestSaleDate": "2025-01-06",
           "sameTypePct": 100,
           "recordIds": [
             "cook-08214060390000",
@@ -665,56 +693,56 @@
             "cook-08214100190000",
             "cook-08214110070000",
             "cook-08214090060000",
-            "cook-08243160140000",
-            "cook-08214150130000"
+            "cook-08214150130000",
+            "cook-08243100120000"
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
+          "modelVersion": "2.1",
           "marketBacktestSample": 13,
-          "marketMedianAbsoluteErrorPct": 15,
-          "marketP80AbsoluteErrorPct": 17.7
+          "marketMedianAbsoluteErrorPct": 8.6,
+          "marketP80AbsoluteErrorPct": 18
         }
       },
       "listing": null,
       "vendorEstimates": []
     },
     {
-      "id": "cook-08214150170000",
+      "id": "cook-08244100190000",
       "marketId": "chicago",
       "clusterId": "chicago-west",
       "sourceId": "cook-county",
       "sourceLabel": "Cook County Assessor",
       "sourceUrl": "https://datacatalog.cookcountyil.gov/Property-Taxation/Assessor-Parcel-Sales/wvhk-k5uv",
-      "parcelId": "08214150170000",
-      "address": "510 E OAKTON ST",
-      "locality": "ELK GROVE VILLAGE, IL, 60007",
-      "zip": "60007",
-      "lat": 42.0223761212,
-      "lng": -87.9824592014,
+      "parcelId": "08244100190000",
+      "address": "1426 DANBURY LN",
+      "locality": "DES PLAINES, IL, 60018",
+      "zip": "60018",
+      "lat": 42.0258707152,
+      "lng": -87.9219477947,
       "propertyType": "Single-Family",
-      "yearBuilt": 1957,
-      "sqft": 1291,
-      "lotSqft": 7150,
+      "yearBuilt": 1961,
+      "sqft": 1536,
+      "lotSqft": 7800,
       "beds": 3,
-      "baths": 1.5,
-      "saleDate": "2025-10-30",
-      "salePrice": 355000,
-      "assessedValue": 300010,
+      "baths": 2,
+      "saleDate": "2026-02-24",
+      "salePrice": 493000,
+      "assessedValue": 391710,
       "qualification": "County sale filters passed · Warranty · residential assessment converted from Cook County's 10% level",
       "clusterName": "Chicago · West Corridor",
       "model": {
-        "value": 366000,
-        "low": 302000,
-        "high": 431000,
-        "confidence": 82,
-        "watchScore": 76,
-        "valuationGapPct": 22.1,
+        "value": 455000,
+        "low": 373000,
+        "high": 537000,
+        "confidence": 87,
+        "watchScore": 77,
+        "valuationGapPct": 16.2,
         "compCount": 12,
         "anchors": {
-          "hpiAdjustedSale": 355000,
-          "assessmentCalibrated": 355000,
-          "comparablePpsf": 380000
+          "hpiAdjustedSale": 493000,
+          "assessmentCalibrated": 464000,
+          "comparablePpsf": 422000
         },
         "weights": {
           "hpiAdjustedSale": 0.35,
@@ -722,32 +750,49 @@
           "comparableSales": 0.45
         },
         "calibrationRatio": 1.183,
-        "comparablePpsf": 295,
+        "comparablePpsf": 275,
         "clusterEdgeScore": 70,
+        "pricePerSqft": {
+          "recordedSale": 321,
+          "hpiAdjustedSale": 321,
+          "assessmentCalibrated": 302,
+          "comparableP25": 242,
+          "comparableMedian": 275,
+          "comparableP75": 292,
+          "modelCenter": 296
+        },
+        "recency": {
+          "saleAgeMonths": 5.4,
+          "score": 91,
+          "band": "current"
+        },
         "comparableQuality": {
-          "nearestMiles": 0,
-          "medianMiles": 0.3,
+          "nearestMiles": 0.5,
+          "medianMiles": 3.1,
+          "medianAgeMonths": 9.5,
+          "newestSaleDate": "2026-04-29",
+          "oldestSaleDate": "2025-02-20",
           "sameTypePct": 100,
           "recordIds": [
-            "cook-08214030100000",
-            "cook-08214060450000",
-            "cook-08214040100000",
-            "cook-08214070320000",
+            "cook-08243100120000",
+            "cook-08214090080000",
+            "cook-08214150130000",
+            "cook-08214090060000",
             "cook-08214100190000",
             "cook-08214110070000",
-            "cook-08214090060000",
-            "cook-08214040090000",
-            "cook-08214060390000",
-            "cook-08243160140000",
-            "cook-08214030190000",
-            "cook-08214150130000"
+            "cook-08214030100000",
+            "cook-08214150170000",
+            "cook-08214060450000",
+            "cook-08214070320000",
+            "cook-08214040100000",
+            "cook-08214110220000"
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
+          "modelVersion": "2.1",
           "marketBacktestSample": 13,
-          "marketMedianAbsoluteErrorPct": 15,
-          "marketP80AbsoluteErrorPct": 17.7
+          "marketMedianAbsoluteErrorPct": 8.6,
+          "marketP80AbsoluteErrorPct": 18
         }
       },
       "listing": null,
@@ -778,17 +823,17 @@
       "qualification": "County sale filters passed · Warranty · residential assessment converted from Cook County's 10% level",
       "clusterName": "Chicago · West Corridor",
       "model": {
-        "value": 389000,
-        "low": 321000,
-        "high": 458000,
-        "confidence": 82,
-        "watchScore": 75,
-        "valuationGapPct": 21.7,
+        "value": 386000,
+        "low": 317000,
+        "high": 456000,
+        "confidence": 87,
+        "watchScore": 77,
+        "valuationGapPct": 20.7,
         "compCount": 12,
         "anchors": {
           "hpiAdjustedSale": 400000,
           "assessmentCalibrated": 379000,
-          "comparablePpsf": 386000
+          "comparablePpsf": 379000
         },
         "weights": {
           "hpiAdjustedSale": 0.35,
@@ -796,11 +841,28 @@
           "comparableSales": 0.45
         },
         "calibrationRatio": 1.183,
-        "comparablePpsf": 292,
+        "comparablePpsf": 287,
         "clusterEdgeScore": 70,
+        "pricePerSqft": {
+          "recordedSale": 303,
+          "hpiAdjustedSale": 303,
+          "assessmentCalibrated": 286,
+          "comparableP25": 260,
+          "comparableMedian": 287,
+          "comparableP75": 299,
+          "modelCenter": 292
+        },
+        "recency": {
+          "saleAgeMonths": 9.7,
+          "score": 84,
+          "band": "recent"
+        },
         "comparableQuality": {
           "nearestMiles": 0.1,
           "medianMiles": 0.3,
+          "medianAgeMonths": 13.2,
+          "newestSaleDate": "2026-03-09",
+          "oldestSaleDate": "2025-01-06",
           "sameTypePct": 100,
           "recordIds": [
             "cook-08214110070000",
@@ -814,14 +876,196 @@
             "cook-08214040090000",
             "cook-08214060390000",
             "cook-08214030190000",
-            "cook-08243160140000"
+            "cook-08243100120000"
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
+          "modelVersion": "2.1",
           "marketBacktestSample": 13,
-          "marketMedianAbsoluteErrorPct": 15,
-          "marketP80AbsoluteErrorPct": 17.7
+          "marketMedianAbsoluteErrorPct": 8.6,
+          "marketP80AbsoluteErrorPct": 18
+        }
+      },
+      "listing": null,
+      "vendorEstimates": []
+    },
+    {
+      "id": "cook-08214150170000",
+      "marketId": "chicago",
+      "clusterId": "chicago-west",
+      "sourceId": "cook-county",
+      "sourceLabel": "Cook County Assessor",
+      "sourceUrl": "https://datacatalog.cookcountyil.gov/Property-Taxation/Assessor-Parcel-Sales/wvhk-k5uv",
+      "parcelId": "08214150170000",
+      "address": "510 E OAKTON ST",
+      "locality": "ELK GROVE VILLAGE, IL, 60007",
+      "zip": "60007",
+      "lat": 42.0223761212,
+      "lng": -87.9824592014,
+      "propertyType": "Single-Family",
+      "yearBuilt": 1957,
+      "sqft": 1291,
+      "lotSqft": 7150,
+      "beds": 3,
+      "baths": 1.5,
+      "saleDate": "2025-10-30",
+      "salePrice": 355000,
+      "assessedValue": 300010,
+      "qualification": "County sale filters passed · Warranty · residential assessment converted from Cook County's 10% level",
+      "clusterName": "Chicago · West Corridor",
+      "model": {
+        "value": 365000,
+        "low": 299000,
+        "high": 431000,
+        "confidence": 87,
+        "watchScore": 77,
+        "valuationGapPct": 21.6,
+        "compCount": 12,
+        "anchors": {
+          "hpiAdjustedSale": 355000,
+          "assessmentCalibrated": 355000,
+          "comparablePpsf": 377000
+        },
+        "weights": {
+          "hpiAdjustedSale": 0.35,
+          "assessmentCalibrated": 0.2,
+          "comparableSales": 0.45
+        },
+        "calibrationRatio": 1.183,
+        "comparablePpsf": 292,
+        "clusterEdgeScore": 70,
+        "pricePerSqft": {
+          "recordedSale": 275,
+          "hpiAdjustedSale": 275,
+          "assessmentCalibrated": 275,
+          "comparableP25": 283,
+          "comparableMedian": 292,
+          "comparableP75": 303,
+          "modelCenter": 283
+        },
+        "recency": {
+          "saleAgeMonths": 9.2,
+          "score": 85,
+          "band": "recent"
+        },
+        "comparableQuality": {
+          "nearestMiles": 0,
+          "medianMiles": 0.3,
+          "medianAgeMonths": 13.2,
+          "newestSaleDate": "2026-03-09",
+          "oldestSaleDate": "2025-01-06",
+          "sameTypePct": 100,
+          "recordIds": [
+            "cook-08214030100000",
+            "cook-08214060450000",
+            "cook-08214040100000",
+            "cook-08214070320000",
+            "cook-08214100190000",
+            "cook-08214110070000",
+            "cook-08214090060000",
+            "cook-08214040090000",
+            "cook-08214060390000",
+            "cook-08214030190000",
+            "cook-08214150130000",
+            "cook-08243100120000"
+          ]
+        },
+        "diagnostics": {
+          "modelVersion": "2.1",
+          "marketBacktestSample": 13,
+          "marketMedianAbsoluteErrorPct": 8.6,
+          "marketP80AbsoluteErrorPct": 18
+        }
+      },
+      "listing": null,
+      "vendorEstimates": []
+    },
+    {
+      "id": "cook-08214060450000",
+      "marketId": "chicago",
+      "clusterId": "chicago-west",
+      "sourceId": "cook-county",
+      "sourceLabel": "Cook County Assessor",
+      "sourceUrl": "https://datacatalog.cookcountyil.gov/Property-Taxation/Assessor-Parcel-Sales/wvhk-k5uv",
+      "parcelId": "08214060450000",
+      "address": "38 EVERGREEN ST",
+      "locality": "ELK GROVE VILLAGE, IL, 60007",
+      "zip": "60007",
+      "lat": 42.0257485839,
+      "lng": -87.9837501572,
+      "propertyType": "Single-Family",
+      "yearBuilt": 1957,
+      "sqft": 1291,
+      "lotSqft": 7150,
+      "beds": 3,
+      "baths": 1.5,
+      "saleDate": "2025-06-24",
+      "salePrice": 284750,
+      "assessedValue": 273840,
+      "qualification": "County sale filters passed · Other · residential assessment converted from Cook County's 10% level",
+      "clusterName": "Chicago · West Corridor",
+      "model": {
+        "value": 334000,
+        "low": 274000,
+        "high": 394000,
+        "confidence": 84,
+        "watchScore": 76,
+        "valuationGapPct": 22,
+        "compCount": 12,
+        "anchors": {
+          "hpiAdjustedSale": 285000,
+          "assessmentCalibrated": 324000,
+          "comparablePpsf": 377000
+        },
+        "weights": {
+          "hpiAdjustedSale": 0.35,
+          "assessmentCalibrated": 0.2,
+          "comparableSales": 0.45
+        },
+        "calibrationRatio": 1.183,
+        "comparablePpsf": 292,
+        "clusterEdgeScore": 70,
+        "pricePerSqft": {
+          "recordedSale": 221,
+          "hpiAdjustedSale": 221,
+          "assessmentCalibrated": 251,
+          "comparableP25": 283,
+          "comparableMedian": 292,
+          "comparableP75": 303,
+          "modelCenter": 259
+        },
+        "recency": {
+          "saleAgeMonths": 13.4,
+          "score": 79,
+          "band": "recent"
+        },
+        "comparableQuality": {
+          "nearestMiles": 0.1,
+          "medianMiles": 0.2,
+          "medianAgeMonths": 11.7,
+          "newestSaleDate": "2026-03-09",
+          "oldestSaleDate": "2025-01-06",
+          "sameTypePct": 100,
+          "recordIds": [
+            "cook-08214030100000",
+            "cook-08214150170000",
+            "cook-08214070320000",
+            "cook-08214040100000",
+            "cook-08214100190000",
+            "cook-08214110070000",
+            "cook-08214090060000",
+            "cook-08214040090000",
+            "cook-08214060390000",
+            "cook-08214030190000",
+            "cook-08214150130000",
+            "cook-08243100120000"
+          ]
+        },
+        "diagnostics": {
+          "modelVersion": "2.1",
+          "marketBacktestSample": 13,
+          "marketMedianAbsoluteErrorPct": 8.6,
+          "marketP80AbsoluteErrorPct": 18
         }
       },
       "listing": null,
@@ -853,10 +1097,10 @@
       "clusterName": "Chicago · West Corridor",
       "model": {
         "value": 545000,
-        "low": 449000,
-        "high": 642000,
-        "confidence": 78,
-        "watchScore": 75,
+        "low": 447000,
+        "high": 643000,
+        "confidence": 83,
+        "watchScore": 76,
         "valuationGapPct": 29.8,
         "compCount": 12,
         "anchors": {
@@ -872,9 +1116,26 @@
         "calibrationRatio": 1.183,
         "comparablePpsf": 275,
         "clusterEdgeScore": 70,
+        "pricePerSqft": {
+          "recordedSale": 200,
+          "hpiAdjustedSale": 200,
+          "assessmentCalibrated": 216,
+          "comparableP25": 236,
+          "comparableMedian": 275,
+          "comparableP75": 291,
+          "modelCenter": 237
+        },
+        "recency": {
+          "saleAgeMonths": 15.2,
+          "score": 76,
+          "band": "recent"
+        },
         "comparableQuality": {
           "nearestMiles": 0.1,
           "medianMiles": 0.3,
+          "medianAgeMonths": 9.5,
+          "newestSaleDate": "2026-04-29",
+          "oldestSaleDate": "2025-02-21",
           "sameTypePct": 100,
           "recordIds": [
             "cook-08214110220000",
@@ -892,380 +1153,10 @@
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
+          "modelVersion": "2.1",
           "marketBacktestSample": 13,
-          "marketMedianAbsoluteErrorPct": 15,
-          "marketP80AbsoluteErrorPct": 17.7
-        }
-      },
-      "listing": null,
-      "vendorEstimates": []
-    },
-    {
-      "id": "cook-08243100120000",
-      "marketId": "chicago",
-      "clusterId": "chicago-west",
-      "sourceId": "cook-county",
-      "sourceLabel": "Cook County Assessor",
-      "sourceUrl": "https://datacatalog.cookcountyil.gov/Property-Taxation/Assessor-Parcel-Sales/wvhk-k5uv",
-      "parcelId": "08243100120000",
-      "address": "1525 MARSHALL DR",
-      "locality": "DES PLAINES, IL, 60018",
-      "zip": "60018",
-      "lat": 42.0245877743,
-      "lng": -87.9309256091,
-      "propertyType": "Single-Family",
-      "yearBuilt": 1964,
-      "sqft": 1382,
-      "lotSqft": 7250,
-      "beds": 3,
-      "baths": 1.5,
-      "saleDate": "2026-03-06",
-      "salePrice": 360000,
-      "assessedValue": 370010,
-      "qualification": "County sale filters passed · Warranty · residential assessment converted from Cook County's 10% level",
-      "clusterName": "Chicago · West Corridor",
-      "model": {
-        "value": 395000,
-        "low": 325000,
-        "high": 465000,
-        "confidence": 82,
-        "watchScore": 74,
-        "valuationGapPct": 6.8,
-        "compCount": 12,
-        "anchors": {
-          "hpiAdjustedSale": 360000,
-          "assessmentCalibrated": 438000,
-          "comparablePpsf": 404000
-        },
-        "weights": {
-          "hpiAdjustedSale": 0.35,
-          "assessmentCalibrated": 0.2,
-          "comparableSales": 0.45
-        },
-        "calibrationRatio": 1.183,
-        "comparablePpsf": 292,
-        "clusterEdgeScore": 70,
-        "comparableQuality": {
-          "nearestMiles": 0.5,
-          "medianMiles": 2.7,
-          "sameTypePct": 100,
-          "recordIds": [
-            "cook-08243160140000",
-            "cook-08214090060000",
-            "cook-08214100190000",
-            "cook-08214150130000",
-            "cook-08214110070000",
-            "cook-08214030100000",
-            "cook-08214150170000",
-            "cook-08214060450000",
-            "cook-08214070320000",
-            "cook-08214040100000",
-            "cook-08214030190000",
-            "cook-08214090080000"
-          ]
-        },
-        "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 13,
-          "marketMedianAbsoluteErrorPct": 15,
-          "marketP80AbsoluteErrorPct": 17.7
-        }
-      },
-      "listing": null,
-      "vendorEstimates": []
-    },
-    {
-      "id": "cook-08214040100000",
-      "marketId": "chicago",
-      "clusterId": "chicago-west",
-      "sourceId": "cook-county",
-      "sourceLabel": "Cook County Assessor",
-      "sourceUrl": "https://datacatalog.cookcountyil.gov/Property-Taxation/Assessor-Parcel-Sales/wvhk-k5uv",
-      "parcelId": "08214040100000",
-      "address": "37 WILDWOOD RD",
-      "locality": "ELK GROVE VILLAGE, IL, 60007",
-      "zip": "60007",
-      "lat": 42.024536217,
-      "lng": -87.980586811,
-      "propertyType": "Single-Family",
-      "yearBuilt": 1957,
-      "sqft": 1291,
-      "lotSqft": 7613,
-      "beds": 3,
-      "baths": 1.5,
-      "saleDate": "2025-03-03",
-      "salePrice": 365000,
-      "assessedValue": 310000,
-      "qualification": "County sale filters passed · Warranty · residential assessment converted from Cook County's 10% level",
-      "clusterName": "Chicago · West Corridor",
-      "model": {
-        "value": 372000,
-        "low": 306000,
-        "high": 438000,
-        "confidence": 81,
-        "watchScore": 74,
-        "valuationGapPct": 20.1,
-        "compCount": 12,
-        "anchors": {
-          "hpiAdjustedSale": 365000,
-          "assessmentCalibrated": 367000,
-          "comparablePpsf": 380000
-        },
-        "weights": {
-          "hpiAdjustedSale": 0.35,
-          "assessmentCalibrated": 0.2,
-          "comparableSales": 0.45
-        },
-        "calibrationRatio": 1.183,
-        "comparablePpsf": 295,
-        "clusterEdgeScore": 70,
-        "comparableQuality": {
-          "nearestMiles": 0,
-          "medianMiles": 0.2,
-          "sameTypePct": 100,
-          "recordIds": [
-            "cook-08214030100000",
-            "cook-08214150170000",
-            "cook-08214060450000",
-            "cook-08214070320000",
-            "cook-08214100190000",
-            "cook-08214110070000",
-            "cook-08214090060000",
-            "cook-08214040090000",
-            "cook-08214060390000",
-            "cook-08243160140000",
-            "cook-08214030190000",
-            "cook-08214150130000"
-          ]
-        },
-        "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 13,
-          "marketMedianAbsoluteErrorPct": 15,
-          "marketP80AbsoluteErrorPct": 17.7
-        }
-      },
-      "listing": null,
-      "vendorEstimates": []
-    },
-    {
-      "id": "cook-08214060450000",
-      "marketId": "chicago",
-      "clusterId": "chicago-west",
-      "sourceId": "cook-county",
-      "sourceLabel": "Cook County Assessor",
-      "sourceUrl": "https://datacatalog.cookcountyil.gov/Property-Taxation/Assessor-Parcel-Sales/wvhk-k5uv",
-      "parcelId": "08214060450000",
-      "address": "38 EVERGREEN ST",
-      "locality": "ELK GROVE VILLAGE, IL, 60007",
-      "zip": "60007",
-      "lat": 42.0257485839,
-      "lng": -87.9837501572,
-      "propertyType": "Single-Family",
-      "yearBuilt": 1957,
-      "sqft": 1291,
-      "lotSqft": 7150,
-      "beds": 3,
-      "baths": 1.5,
-      "saleDate": "2025-06-24",
-      "salePrice": 284750,
-      "assessedValue": 273840,
-      "qualification": "County sale filters passed · Other · residential assessment converted from Cook County's 10% level",
-      "clusterName": "Chicago · West Corridor",
-      "model": {
-        "value": 336000,
-        "low": 276000,
-        "high": 395000,
-        "confidence": 79,
-        "watchScore": 74,
-        "valuationGapPct": 22.6,
-        "compCount": 12,
-        "anchors": {
-          "hpiAdjustedSale": 285000,
-          "assessmentCalibrated": 324000,
-          "comparablePpsf": 380000
-        },
-        "weights": {
-          "hpiAdjustedSale": 0.35,
-          "assessmentCalibrated": 0.2,
-          "comparableSales": 0.45
-        },
-        "calibrationRatio": 1.183,
-        "comparablePpsf": 295,
-        "clusterEdgeScore": 70,
-        "comparableQuality": {
-          "nearestMiles": 0.1,
-          "medianMiles": 0.2,
-          "sameTypePct": 100,
-          "recordIds": [
-            "cook-08214030100000",
-            "cook-08214150170000",
-            "cook-08214070320000",
-            "cook-08214040100000",
-            "cook-08214100190000",
-            "cook-08214110070000",
-            "cook-08214090060000",
-            "cook-08214040090000",
-            "cook-08214060390000",
-            "cook-08214030190000",
-            "cook-08243160140000",
-            "cook-08214150130000"
-          ]
-        },
-        "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 13,
-          "marketMedianAbsoluteErrorPct": 15,
-          "marketP80AbsoluteErrorPct": 17.7
-        }
-      },
-      "listing": null,
-      "vendorEstimates": []
-    },
-    {
-      "id": "cook-08214060390000",
-      "marketId": "chicago",
-      "clusterId": "chicago-west",
-      "sourceId": "cook-county",
-      "sourceLabel": "Cook County Assessor",
-      "sourceUrl": "https://datacatalog.cookcountyil.gov/Property-Taxation/Assessor-Parcel-Sales/wvhk-k5uv",
-      "parcelId": "08214060390000",
-      "address": "26 EVERGREEN ST",
-      "locality": "ELK GROVE VILLAGE, IL, 60007",
-      "zip": "60007",
-      "lat": 42.0265605104,
-      "lng": -87.9827112748,
-      "propertyType": "Single-Family",
-      "yearBuilt": 1957,
-      "sqft": 1171,
-      "lotSqft": 10914,
-      "beds": 3,
-      "baths": 2,
-      "saleDate": "2025-04-14",
-      "salePrice": 405000,
-      "assessedValue": 300000,
-      "qualification": "County sale filters passed · Trustee · residential assessment converted from Cook County's 10% level",
-      "clusterName": "Chicago · West Corridor",
-      "model": {
-        "value": 368000,
-        "low": 303000,
-        "high": 433000,
-        "confidence": 79,
-        "watchScore": 74,
-        "valuationGapPct": 22.7,
-        "compCount": 12,
-        "anchors": {
-          "hpiAdjustedSale": 405000,
-          "assessmentCalibrated": 355000,
-          "comparablePpsf": 345000
-        },
-        "weights": {
-          "hpiAdjustedSale": 0.35,
-          "assessmentCalibrated": 0.2,
-          "comparableSales": 0.45
-        },
-        "calibrationRatio": 1.183,
-        "comparablePpsf": 295,
-        "clusterEdgeScore": 70,
-        "comparableQuality": {
-          "nearestMiles": 0.1,
-          "medianMiles": 0.2,
-          "sameTypePct": 100,
-          "recordIds": [
-            "cook-08214040090000",
-            "cook-08214030100000",
-            "cook-08214030190000",
-            "cook-08214060450000",
-            "cook-08214150170000",
-            "cook-08214070320000",
-            "cook-08214040100000",
-            "cook-08214100190000",
-            "cook-08214110070000",
-            "cook-08214090060000",
-            "cook-08243160140000",
-            "cook-08214150130000"
-          ]
-        },
-        "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 13,
-          "marketMedianAbsoluteErrorPct": 15,
-          "marketP80AbsoluteErrorPct": 17.7
-        }
-      },
-      "listing": null,
-      "vendorEstimates": []
-    },
-    {
-      "id": "cook-08214110070000",
-      "marketId": "chicago",
-      "clusterId": "chicago-west",
-      "sourceId": "cook-county",
-      "sourceLabel": "Cook County Assessor",
-      "sourceUrl": "https://datacatalog.cookcountyil.gov/Property-Taxation/Assessor-Parcel-Sales/wvhk-k5uv",
-      "parcelId": "08214110070000",
-      "address": "57 FOREST LN",
-      "locality": "ELK GROVE VILLAGE, IL, 60007",
-      "zip": "60007",
-      "lat": 42.0246324351,
-      "lng": -87.9864860791,
-      "propertyType": "Single-Family",
-      "yearBuilt": 1957,
-      "sqft": 1321,
-      "lotSqft": 7179,
-      "beds": 3,
-      "baths": 2,
-      "saleDate": "2025-07-11",
-      "salePrice": 320000,
-      "assessedValue": 310000,
-      "qualification": "County sale filters passed · Trustee · residential assessment converted from Cook County's 10% level",
-      "clusterName": "Chicago · West Corridor",
-      "model": {
-        "value": 360000,
-        "low": 297000,
-        "high": 424000,
-        "confidence": 80,
-        "watchScore": 74,
-        "valuationGapPct": 16.3,
-        "compCount": 12,
-        "anchors": {
-          "hpiAdjustedSale": 320000,
-          "assessmentCalibrated": 367000,
-          "comparablePpsf": 389000
-        },
-        "weights": {
-          "hpiAdjustedSale": 0.35,
-          "assessmentCalibrated": 0.2,
-          "comparableSales": 0.45
-        },
-        "calibrationRatio": 1.183,
-        "comparablePpsf": 295,
-        "clusterEdgeScore": 70,
-        "comparableQuality": {
-          "nearestMiles": 0.1,
-          "medianMiles": 0.2,
-          "sameTypePct": 100,
-          "recordIds": [
-            "cook-08214100190000",
-            "cook-08214030100000",
-            "cook-08214150170000",
-            "cook-08214060450000",
-            "cook-08214070320000",
-            "cook-08214040100000",
-            "cook-08214090060000",
-            "cook-08214150130000",
-            "cook-08214040090000",
-            "cook-08214060390000",
-            "cook-08214030190000",
-            "cook-08243160140000"
-          ]
-        },
-        "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 13,
-          "marketMedianAbsoluteErrorPct": 15,
-          "marketP80AbsoluteErrorPct": 17.7
+          "marketMedianAbsoluteErrorPct": 8.6,
+          "marketP80AbsoluteErrorPct": 18
         }
       },
       "listing": null,
@@ -1296,17 +1187,17 @@
       "qualification": "County sale filters passed · Warranty · residential assessment converted from Cook County's 10% level",
       "clusterName": "Chicago · West Corridor",
       "model": {
-        "value": 374000,
-        "low": 308000,
-        "high": 440000,
-        "confidence": 80,
-        "watchScore": 74,
-        "valuationGapPct": 24.7,
+        "value": 369000,
+        "low": 303000,
+        "high": 436000,
+        "confidence": 85,
+        "watchScore": 76,
+        "valuationGapPct": 23.2,
         "compCount": 12,
         "anchors": {
           "hpiAdjustedSale": 377000,
           "assessmentCalibrated": 355000,
-          "comparablePpsf": 380000
+          "comparablePpsf": 370000
         },
         "weights": {
           "hpiAdjustedSale": 0.35,
@@ -1314,11 +1205,28 @@
           "comparableSales": 0.45
         },
         "calibrationRatio": 1.183,
-        "comparablePpsf": 295,
+        "comparablePpsf": 287,
         "clusterEdgeScore": 70,
+        "pricePerSqft": {
+          "recordedSale": 292,
+          "hpiAdjustedSale": 292,
+          "assessmentCalibrated": 275,
+          "comparableP25": 275,
+          "comparableMedian": 287,
+          "comparableP75": 303,
+          "modelCenter": 286
+        },
+        "recency": {
+          "saleAgeMonths": 16.4,
+          "score": 74,
+          "band": "recent"
+        },
         "comparableQuality": {
           "nearestMiles": 0.1,
           "medianMiles": 0.2,
+          "medianAgeMonths": 11.7,
+          "newestSaleDate": "2026-03-09",
+          "oldestSaleDate": "2025-01-06",
           "sameTypePct": 100,
           "recordIds": [
             "cook-08214030100000",
@@ -1330,16 +1238,16 @@
             "cook-08214090060000",
             "cook-08214040090000",
             "cook-08214060390000",
-            "cook-08243160140000",
             "cook-08214030190000",
-            "cook-08214150130000"
+            "cook-08214150130000",
+            "cook-08243100120000"
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
+          "modelVersion": "2.1",
           "marketBacktestSample": 13,
-          "marketMedianAbsoluteErrorPct": 15,
-          "marketP80AbsoluteErrorPct": 17.7
+          "marketMedianAbsoluteErrorPct": 8.6,
+          "marketP80AbsoluteErrorPct": 18
         }
       },
       "listing": null,
@@ -1371,10 +1279,10 @@
       "clusterName": "Chicago · West Corridor",
       "model": {
         "value": 450000,
-        "low": 371000,
-        "high": 530000,
-        "confidence": 78,
-        "watchScore": 74,
+        "low": 369000,
+        "high": 531000,
+        "confidence": 83,
+        "watchScore": 76,
         "valuationGapPct": 28.6,
         "compCount": 12,
         "anchors": {
@@ -1390,9 +1298,26 @@
         "calibrationRatio": 1.183,
         "comparablePpsf": 275,
         "clusterEdgeScore": 70,
+        "pricePerSqft": {
+          "recordedSale": 209,
+          "hpiAdjustedSale": 209,
+          "assessmentCalibrated": 222,
+          "comparableP25": 236,
+          "comparableMedian": 275,
+          "comparableP75": 295,
+          "modelCenter": 241
+        },
+        "recency": {
+          "saleAgeMonths": 17.5,
+          "score": 72,
+          "band": "recent"
+        },
         "comparableQuality": {
           "nearestMiles": 0.1,
           "medianMiles": 0.2,
+          "medianAgeMonths": 7.5,
+          "newestSaleDate": "2026-04-29",
+          "oldestSaleDate": "2025-02-20",
           "sameTypePct": 100,
           "recordIds": [
             "cook-08214110220000",
@@ -1401,19 +1326,383 @@
             "cook-08214150130000",
             "cook-08214110160000",
             "cook-08214090060000",
+            "cook-08244100190000",
             "cook-08214100190000",
             "cook-08214110070000",
             "cook-08214030100000",
             "cook-08214150170000",
-            "cook-08214060450000",
-            "cook-08214070320000"
+            "cook-08214060450000"
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
+          "modelVersion": "2.1",
           "marketBacktestSample": 13,
-          "marketMedianAbsoluteErrorPct": 15,
-          "marketP80AbsoluteErrorPct": 17.7
+          "marketMedianAbsoluteErrorPct": 8.6,
+          "marketP80AbsoluteErrorPct": 18
+        }
+      },
+      "listing": null,
+      "vendorEstimates": []
+    },
+    {
+      "id": "cook-08243100120000",
+      "marketId": "chicago",
+      "clusterId": "chicago-west",
+      "sourceId": "cook-county",
+      "sourceLabel": "Cook County Assessor",
+      "sourceUrl": "https://datacatalog.cookcountyil.gov/Property-Taxation/Assessor-Parcel-Sales/wvhk-k5uv",
+      "parcelId": "08243100120000",
+      "address": "1525 MARSHALL DR",
+      "locality": "DES PLAINES, IL, 60018",
+      "zip": "60018",
+      "lat": 42.0245877743,
+      "lng": -87.9309256091,
+      "propertyType": "Single-Family",
+      "yearBuilt": 1964,
+      "sqft": 1382,
+      "lotSqft": 7250,
+      "beds": 3,
+      "baths": 1.5,
+      "saleDate": "2026-03-06",
+      "salePrice": 360000,
+      "assessedValue": 370010,
+      "qualification": "County sale filters passed · Warranty · residential assessment converted from Cook County's 10% level",
+      "clusterName": "Chicago · West Corridor",
+      "model": {
+        "value": 395000,
+        "low": 324000,
+        "high": 466000,
+        "confidence": 87,
+        "watchScore": 75,
+        "valuationGapPct": 6.8,
+        "compCount": 12,
+        "anchors": {
+          "hpiAdjustedSale": 360000,
+          "assessmentCalibrated": 438000,
+          "comparablePpsf": 404000
+        },
+        "weights": {
+          "hpiAdjustedSale": 0.35,
+          "assessmentCalibrated": 0.2,
+          "comparableSales": 0.45
+        },
+        "calibrationRatio": 1.183,
+        "comparablePpsf": 292,
+        "clusterEdgeScore": 70,
+        "pricePerSqft": {
+          "recordedSale": 260,
+          "hpiAdjustedSale": 260,
+          "assessmentCalibrated": 317,
+          "comparableP25": 275,
+          "comparableMedian": 292,
+          "comparableP75": 321,
+          "modelCenter": 286
+        },
+        "recency": {
+          "saleAgeMonths": 5.1,
+          "score": 92,
+          "band": "current"
+        },
+        "comparableQuality": {
+          "nearestMiles": 0.5,
+          "medianMiles": 2.7,
+          "medianAgeMonths": 11.3,
+          "newestSaleDate": "2026-04-08",
+          "oldestSaleDate": "2025-01-06",
+          "sameTypePct": 100,
+          "recordIds": [
+            "cook-08214090060000",
+            "cook-08244100190000",
+            "cook-08214100190000",
+            "cook-08214150130000",
+            "cook-08214110070000",
+            "cook-08214030100000",
+            "cook-08214150170000",
+            "cook-08214060450000",
+            "cook-08214070320000",
+            "cook-08214040100000",
+            "cook-08214030190000",
+            "cook-08214090080000"
+          ]
+        },
+        "diagnostics": {
+          "modelVersion": "2.1",
+          "marketBacktestSample": 13,
+          "marketMedianAbsoluteErrorPct": 8.6,
+          "marketP80AbsoluteErrorPct": 18
+        }
+      },
+      "listing": null,
+      "vendorEstimates": []
+    },
+    {
+      "id": "cook-08214040100000",
+      "marketId": "chicago",
+      "clusterId": "chicago-west",
+      "sourceId": "cook-county",
+      "sourceLabel": "Cook County Assessor",
+      "sourceUrl": "https://datacatalog.cookcountyil.gov/Property-Taxation/Assessor-Parcel-Sales/wvhk-k5uv",
+      "parcelId": "08214040100000",
+      "address": "37 WILDWOOD RD",
+      "locality": "ELK GROVE VILLAGE, IL, 60007",
+      "zip": "60007",
+      "lat": 42.024536217,
+      "lng": -87.980586811,
+      "propertyType": "Single-Family",
+      "yearBuilt": 1957,
+      "sqft": 1291,
+      "lotSqft": 7613,
+      "beds": 3,
+      "baths": 1.5,
+      "saleDate": "2025-03-03",
+      "salePrice": 365000,
+      "assessedValue": 310000,
+      "qualification": "County sale filters passed · Warranty · residential assessment converted from Cook County's 10% level",
+      "clusterName": "Chicago · West Corridor",
+      "model": {
+        "value": 371000,
+        "low": 304000,
+        "high": 438000,
+        "confidence": 86,
+        "watchScore": 75,
+        "valuationGapPct": 19.6,
+        "compCount": 12,
+        "anchors": {
+          "hpiAdjustedSale": 365000,
+          "assessmentCalibrated": 367000,
+          "comparablePpsf": 377000
+        },
+        "weights": {
+          "hpiAdjustedSale": 0.35,
+          "assessmentCalibrated": 0.2,
+          "comparableSales": 0.45
+        },
+        "calibrationRatio": 1.183,
+        "comparablePpsf": 292,
+        "clusterEdgeScore": 70,
+        "pricePerSqft": {
+          "recordedSale": 283,
+          "hpiAdjustedSale": 283,
+          "assessmentCalibrated": 284,
+          "comparableP25": 275,
+          "comparableMedian": 292,
+          "comparableP75": 303,
+          "modelCenter": 287
+        },
+        "recency": {
+          "saleAgeMonths": 17.1,
+          "score": 73,
+          "band": "recent"
+        },
+        "comparableQuality": {
+          "nearestMiles": 0,
+          "medianMiles": 0.2,
+          "medianAgeMonths": 11.7,
+          "newestSaleDate": "2026-03-09",
+          "oldestSaleDate": "2025-01-06",
+          "sameTypePct": 100,
+          "recordIds": [
+            "cook-08214030100000",
+            "cook-08214150170000",
+            "cook-08214060450000",
+            "cook-08214070320000",
+            "cook-08214100190000",
+            "cook-08214110070000",
+            "cook-08214090060000",
+            "cook-08214040090000",
+            "cook-08214060390000",
+            "cook-08214030190000",
+            "cook-08214150130000",
+            "cook-08243100120000"
+          ]
+        },
+        "diagnostics": {
+          "modelVersion": "2.1",
+          "marketBacktestSample": 13,
+          "marketMedianAbsoluteErrorPct": 8.6,
+          "marketP80AbsoluteErrorPct": 18
+        }
+      },
+      "listing": null,
+      "vendorEstimates": []
+    },
+    {
+      "id": "cook-08214060390000",
+      "marketId": "chicago",
+      "clusterId": "chicago-west",
+      "sourceId": "cook-county",
+      "sourceLabel": "Cook County Assessor",
+      "sourceUrl": "https://datacatalog.cookcountyil.gov/Property-Taxation/Assessor-Parcel-Sales/wvhk-k5uv",
+      "parcelId": "08214060390000",
+      "address": "26 EVERGREEN ST",
+      "locality": "ELK GROVE VILLAGE, IL, 60007",
+      "zip": "60007",
+      "lat": 42.0265605104,
+      "lng": -87.9827112748,
+      "propertyType": "Single-Family",
+      "yearBuilt": 1957,
+      "sqft": 1171,
+      "lotSqft": 10914,
+      "beds": 3,
+      "baths": 2,
+      "saleDate": "2025-04-14",
+      "salePrice": 405000,
+      "assessedValue": 300000,
+      "qualification": "County sale filters passed · Trustee · residential assessment converted from Cook County's 10% level",
+      "clusterName": "Chicago · West Corridor",
+      "model": {
+        "value": 367000,
+        "low": 301000,
+        "high": 433000,
+        "confidence": 84,
+        "watchScore": 75,
+        "valuationGapPct": 22.2,
+        "compCount": 12,
+        "anchors": {
+          "hpiAdjustedSale": 405000,
+          "assessmentCalibrated": 355000,
+          "comparablePpsf": 342000
+        },
+        "weights": {
+          "hpiAdjustedSale": 0.35,
+          "assessmentCalibrated": 0.2,
+          "comparableSales": 0.45
+        },
+        "calibrationRatio": 1.183,
+        "comparablePpsf": 292,
+        "clusterEdgeScore": 70,
+        "pricePerSqft": {
+          "recordedSale": 346,
+          "hpiAdjustedSale": 346,
+          "assessmentCalibrated": 303,
+          "comparableP25": 275,
+          "comparableMedian": 292,
+          "comparableP75": 299,
+          "modelCenter": 313
+        },
+        "recency": {
+          "saleAgeMonths": 15.8,
+          "score": 75,
+          "band": "recent"
+        },
+        "comparableQuality": {
+          "nearestMiles": 0.1,
+          "medianMiles": 0.2,
+          "medianAgeMonths": 11.7,
+          "newestSaleDate": "2026-03-09",
+          "oldestSaleDate": "2025-01-06",
+          "sameTypePct": 100,
+          "recordIds": [
+            "cook-08214040090000",
+            "cook-08214030100000",
+            "cook-08214030190000",
+            "cook-08214060450000",
+            "cook-08214150170000",
+            "cook-08214070320000",
+            "cook-08214040100000",
+            "cook-08214100190000",
+            "cook-08214110070000",
+            "cook-08214090060000",
+            "cook-08214150130000",
+            "cook-08243100120000"
+          ]
+        },
+        "diagnostics": {
+          "modelVersion": "2.1",
+          "marketBacktestSample": 13,
+          "marketMedianAbsoluteErrorPct": 8.6,
+          "marketP80AbsoluteErrorPct": 18
+        }
+      },
+      "listing": null,
+      "vendorEstimates": []
+    },
+    {
+      "id": "cook-08214110070000",
+      "marketId": "chicago",
+      "clusterId": "chicago-west",
+      "sourceId": "cook-county",
+      "sourceLabel": "Cook County Assessor",
+      "sourceUrl": "https://datacatalog.cookcountyil.gov/Property-Taxation/Assessor-Parcel-Sales/wvhk-k5uv",
+      "parcelId": "08214110070000",
+      "address": "57 FOREST LN",
+      "locality": "ELK GROVE VILLAGE, IL, 60007",
+      "zip": "60007",
+      "lat": 42.0246324351,
+      "lng": -87.9864860791,
+      "propertyType": "Single-Family",
+      "yearBuilt": 1957,
+      "sqft": 1321,
+      "lotSqft": 7179,
+      "beds": 3,
+      "baths": 2,
+      "saleDate": "2025-07-11",
+      "salePrice": 320000,
+      "assessedValue": 310000,
+      "qualification": "County sale filters passed · Trustee · residential assessment converted from Cook County's 10% level",
+      "clusterName": "Chicago · West Corridor",
+      "model": {
+        "value": 359000,
+        "low": 294000,
+        "high": 424000,
+        "confidence": 85,
+        "watchScore": 75,
+        "valuationGapPct": 15.8,
+        "compCount": 12,
+        "anchors": {
+          "hpiAdjustedSale": 320000,
+          "assessmentCalibrated": 367000,
+          "comparablePpsf": 386000
+        },
+        "weights": {
+          "hpiAdjustedSale": 0.35,
+          "assessmentCalibrated": 0.2,
+          "comparableSales": 0.45
+        },
+        "calibrationRatio": 1.183,
+        "comparablePpsf": 292,
+        "clusterEdgeScore": 70,
+        "pricePerSqft": {
+          "recordedSale": 242,
+          "hpiAdjustedSale": 242,
+          "assessmentCalibrated": 278,
+          "comparableP25": 283,
+          "comparableMedian": 292,
+          "comparableP75": 303,
+          "modelCenter": 272
+        },
+        "recency": {
+          "saleAgeMonths": 12.9,
+          "score": 79,
+          "band": "recent"
+        },
+        "comparableQuality": {
+          "nearestMiles": 0.1,
+          "medianMiles": 0.2,
+          "medianAgeMonths": 12,
+          "newestSaleDate": "2026-03-09",
+          "oldestSaleDate": "2025-01-06",
+          "sameTypePct": 100,
+          "recordIds": [
+            "cook-08214100190000",
+            "cook-08214030100000",
+            "cook-08214150170000",
+            "cook-08214060450000",
+            "cook-08214070320000",
+            "cook-08214040100000",
+            "cook-08214090060000",
+            "cook-08214150130000",
+            "cook-08214040090000",
+            "cook-08214060390000",
+            "cook-08214030190000",
+            "cook-08243100120000"
+          ]
+        },
+        "diagnostics": {
+          "modelVersion": "2.1",
+          "marketBacktestSample": 13,
+          "marketMedianAbsoluteErrorPct": 8.6,
+          "marketP80AbsoluteErrorPct": 18
         }
       },
       "listing": null,
@@ -1445,10 +1734,10 @@
       "clusterName": "Chicago · West Corridor",
       "model": {
         "value": 418000,
-        "low": 344000,
-        "high": 492000,
-        "confidence": 79,
-        "watchScore": 73,
+        "low": 343000,
+        "high": 494000,
+        "confidence": 84,
+        "watchScore": 75,
         "valuationGapPct": 19.5,
         "compCount": 12,
         "anchors": {
@@ -1464,9 +1753,26 @@
         "calibrationRatio": 1.183,
         "comparablePpsf": 283,
         "clusterEdgeScore": 70,
+        "pricePerSqft": {
+          "recordedSale": 335,
+          "hpiAdjustedSale": 335,
+          "assessmentCalibrated": 302,
+          "comparableP25": 260,
+          "comparableMedian": 283,
+          "comparableP75": 295,
+          "modelCenter": 305
+        },
+        "recency": {
+          "saleAgeMonths": 17.5,
+          "score": 72,
+          "band": "recent"
+        },
         "comparableQuality": {
           "nearestMiles": 0,
           "medianMiles": 0.2,
+          "medianAgeMonths": 10.1,
+          "newestSaleDate": "2026-04-08",
+          "oldestSaleDate": "2025-03-03",
           "sameTypePct": 100,
           "recordIds": [
             "cook-08214100190000",
@@ -1484,84 +1790,101 @@
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
+          "modelVersion": "2.1",
           "marketBacktestSample": 13,
-          "marketMedianAbsoluteErrorPct": 15,
-          "marketP80AbsoluteErrorPct": 17.7
+          "marketMedianAbsoluteErrorPct": 8.6,
+          "marketP80AbsoluteErrorPct": 18
         }
       },
       "listing": null,
       "vendorEstimates": []
     },
     {
-      "id": "phl-041334800",
+      "id": "phl-403070400",
       "marketId": "philadelphia",
       "clusterId": "philadelphia-west",
       "sourceId": "philadelphia-opa",
       "sourceLabel": "Philadelphia OPA",
       "sourceUrl": "https://opendataphilly.org/datasets/opa-property-assessments/",
-      "parcelId": "041334800",
-      "address": "1314 N ALLISON ST",
-      "locality": "Philadelphia, PA 19131",
-      "zip": "19131",
-      "lat": 39.97266788019628,
-      "lng": -75.23225446692204,
+      "parcelId": "403070400",
+      "address": "2123 S 68TH ST",
+      "locality": "Philadelphia, PA 19142",
+      "zip": "19142",
+      "lat": 39.92344075047139,
+      "lng": -75.23890644435271,
       "propertyType": "SINGLE FAMILY",
-      "yearBuilt": 1925,
-      "sqft": 1482,
+      "yearBuilt": 1920,
+      "sqft": 1504,
       "lotSqft": null,
-      "beds": 3,
+      "beds": 4,
       "baths": 1,
-      "saleDate": "2026-06-02",
-      "salePrice": 299900,
-      "assessedValue": 132100,
+      "saleDate": "2026-06-03",
+      "salePrice": 220000,
+      "assessedValue": 135400,
       "qualification": "Residential OPA record · price, area and value sanity filters passed",
       "clusterName": "Philadelphia · West Corridor",
       "model": {
-        "value": 232000,
-        "low": 105000,
-        "high": 359000,
-        "confidence": 68,
+        "value": 198000,
+        "low": 87000,
+        "high": 310000,
+        "confidence": 72,
         "watchScore": 77,
-        "valuationGapPct": 75.6,
+        "valuationGapPct": 46.5,
         "compCount": 12,
         "anchors": {
-          "hpiAdjustedSale": 300000,
-          "assessmentCalibrated": 140000,
-          "comparablePpsf": 220000
+          "hpiAdjustedSale": 220000,
+          "assessmentCalibrated": 144000,
+          "comparablePpsf": 206000
         },
         "weights": {
           "hpiAdjustedSale": 0.35,
           "assessmentCalibrated": 0.2,
           "comparableSales": 0.45
         },
-        "calibrationRatio": 1.063,
-        "comparablePpsf": 148,
-        "clusterEdgeScore": 70,
+        "calibrationRatio": 1.066,
+        "comparablePpsf": 137,
+        "clusterEdgeScore": 69,
+        "pricePerSqft": {
+          "recordedSale": 146,
+          "hpiAdjustedSale": 146,
+          "assessmentCalibrated": 96,
+          "comparableP25": 55,
+          "comparableMedian": 137,
+          "comparableP75": 203,
+          "modelCenter": 132
+        },
+        "recency": {
+          "saleAgeMonths": 2.1,
+          "score": 97,
+          "band": "current"
+        },
         "comparableQuality": {
-          "nearestMiles": 0.2,
-          "medianMiles": 0.9,
+          "nearestMiles": 0.1,
+          "medianMiles": 1.4,
+          "medianAgeMonths": 4.3,
+          "newestSaleDate": "2026-06-12",
+          "oldestSaleDate": "2026-02-23",
           "sameTypePct": 100,
           "recordIds": [
-            "phl-442159400",
-            "phl-342006200",
-            "phl-521294300",
-            "phl-341090600",
-            "phl-602151500",
-            "phl-341031300",
-            "phl-602077400",
-            "phl-043030200",
-            "phl-342058900",
-            "phl-603085300",
-            "phl-602007100",
-            "phl-604287500"
+            "phl-401343700",
+            "phl-401349600",
+            "phl-403082200",
+            "phl-463284000",
+            "phl-462057900",
+            "phl-033146300",
+            "phl-511223800",
+            "phl-513134900",
+            "phl-401117500",
+            "phl-511256500",
+            "phl-463054200",
+            "phl-403130700"
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 421,
-          "marketMedianAbsoluteErrorPct": 33.7,
-          "marketP80AbsoluteErrorPct": 54.6
+          "modelVersion": "2.1",
+          "marketBacktestSample": 418,
+          "marketMedianAbsoluteErrorPct": 33.3,
+          "marketP80AbsoluteErrorPct": 56.1
         }
       },
       "listing": null,
@@ -1592,29 +1915,46 @@
       "qualification": "Residential OPA record · price, area and value sanity filters passed",
       "clusterName": "Philadelphia · West Corridor",
       "model": {
-        "value": 130000,
-        "low": 59000,
-        "high": 201000,
-        "confidence": 69,
+        "value": 124000,
+        "low": 54000,
+        "high": 193000,
+        "confidence": 70,
         "watchScore": 77,
-        "valuationGapPct": 61.3,
+        "valuationGapPct": 53.5,
         "compCount": 12,
         "anchors": {
           "hpiAdjustedSale": 120000,
           "assessmentCalibrated": 86000,
-          "comparablePpsf": 158000
+          "comparablePpsf": 144000
         },
         "weights": {
           "hpiAdjustedSale": 0.35,
           "assessmentCalibrated": 0.2,
           "comparableSales": 0.45
         },
-        "calibrationRatio": 1.063,
-        "comparablePpsf": 180,
-        "clusterEdgeScore": 70,
+        "calibrationRatio": 1.066,
+        "comparablePpsf": 164,
+        "clusterEdgeScore": 69,
+        "pricePerSqft": {
+          "recordedSale": 136,
+          "hpiAdjustedSale": 136,
+          "assessmentCalibrated": 98,
+          "comparableP25": 116,
+          "comparableMedian": 164,
+          "comparableP75": 196,
+          "modelCenter": 141
+        },
+        "recency": {
+          "saleAgeMonths": 2.6,
+          "score": 96,
+          "band": "current"
+        },
         "comparableQuality": {
           "nearestMiles": 0.2,
-          "medianMiles": 0.8,
+          "medianMiles": 0.9,
+          "medianAgeMonths": 3,
+          "newestSaleDate": "2026-06-10",
+          "oldestSaleDate": "2026-02-27",
           "sameTypePct": 100,
           "recordIds": [
             "phl-041012600",
@@ -1624,314 +1964,18 @@
             "phl-341183500",
             "phl-511097700",
             "phl-604125400",
+            "phl-604133600",
             "phl-041209800",
-            "phl-043058600",
             "phl-402031400",
-            "phl-041096300",
-            "phl-514286400"
+            "phl-514286400",
+            "phl-463268000"
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 421,
-          "marketMedianAbsoluteErrorPct": 33.7,
-          "marketP80AbsoluteErrorPct": 54.6
-        }
-      },
-      "listing": null,
-      "vendorEstimates": []
-    },
-    {
-      "id": "phl-513083500",
-      "marketId": "philadelphia",
-      "clusterId": "philadelphia-west",
-      "sourceId": "philadelphia-opa",
-      "sourceLabel": "Philadelphia OPA",
-      "sourceUrl": "https://opendataphilly.org/datasets/opa-property-assessments/",
-      "parcelId": "513083500",
-      "address": "5455 THOMAS AVE",
-      "locality": "Philadelphia, PA 19143",
-      "zip": "19143",
-      "lat": 39.94509866572078,
-      "lng": -75.23337980263553,
-      "propertyType": "SINGLE FAMILY",
-      "yearBuilt": 1920,
-      "sqft": 1320,
-      "lotSqft": null,
-      "beds": 3,
-      "baths": 1,
-      "saleDate": "2026-05-21",
-      "salePrice": 290600,
-      "assessedValue": 150900,
-      "qualification": "Residential OPA record · price, area and value sanity filters passed",
-      "clusterName": "Philadelphia · West Corridor",
-      "model": {
-        "value": 224000,
-        "low": 102000,
-        "high": 346000,
-        "confidence": 69,
-        "watchScore": 77,
-        "valuationGapPct": 48.3,
-        "compCount": 12,
-        "anchors": {
-          "hpiAdjustedSale": 291000,
-          "assessmentCalibrated": 160000,
-          "comparablePpsf": 200000
-        },
-        "weights": {
-          "hpiAdjustedSale": 0.35,
-          "assessmentCalibrated": 0.2,
-          "comparableSales": 0.45
-        },
-        "calibrationRatio": 1.063,
-        "comparablePpsf": 152,
-        "clusterEdgeScore": 70,
-        "comparableQuality": {
-          "nearestMiles": 0,
-          "medianMiles": 0.4,
-          "sameTypePct": 100,
-          "recordIds": [
-            "phl-513088900",
-            "phl-463093500",
-            "phl-401356100",
-            "phl-403132500",
-            "phl-032140100",
-            "phl-033175900",
-            "phl-403037500",
-            "phl-513274800",
-            "phl-513000900",
-            "phl-513131500",
-            "phl-511143400",
-            "phl-463237400"
-          ]
-        },
-        "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 421,
-          "marketMedianAbsoluteErrorPct": 33.7,
-          "marketP80AbsoluteErrorPct": 54.6
-        }
-      },
-      "listing": null,
-      "vendorEstimates": []
-    },
-    {
-      "id": "phl-604146700",
-      "marketId": "philadelphia",
-      "clusterId": "philadelphia-west",
-      "sourceId": "philadelphia-opa",
-      "sourceLabel": "Philadelphia OPA",
-      "sourceUrl": "https://opendataphilly.org/datasets/opa-property-assessments/",
-      "parcelId": "604146700",
-      "address": "5845 LUDLOW ST",
-      "locality": "Philadelphia, PA 19139",
-      "zip": "19139",
-      "lat": 39.96105563367657,
-      "lng": -75.23828994507886,
-      "propertyType": "SINGLE FAMILY",
-      "yearBuilt": 1925,
-      "sqft": 1120,
-      "lotSqft": null,
-      "beds": 3,
-      "baths": 1,
-      "saleDate": "2026-05-20",
-      "salePrice": 147000,
-      "assessedValue": 97600,
-      "qualification": "Residential OPA record · price, area and value sanity filters passed",
-      "clusterName": "Philadelphia · West Corridor",
-      "model": {
-        "value": 170000,
-        "low": 77000,
-        "high": 263000,
-        "confidence": 68,
-        "watchScore": 77,
-        "valuationGapPct": 74,
-        "compCount": 12,
-        "anchors": {
-          "hpiAdjustedSale": 147000,
-          "assessmentCalibrated": 104000,
-          "comparablePpsf": 217000
-        },
-        "weights": {
-          "hpiAdjustedSale": 0.35,
-          "assessmentCalibrated": 0.2,
-          "comparableSales": 0.45
-        },
-        "calibrationRatio": 1.063,
-        "comparablePpsf": 194,
-        "clusterEdgeScore": 70,
-        "comparableQuality": {
-          "nearestMiles": 0,
-          "medianMiles": 0.6,
-          "sameTypePct": 100,
-          "recordIds": [
-            "phl-604146300",
-            "phl-032103200",
-            "phl-463018400",
-            "phl-463247600",
-            "phl-342203100",
-            "phl-032147700",
-            "phl-604274100",
-            "phl-463081000",
-            "phl-341080700",
-            "phl-604106100",
-            "phl-463065700",
-            "phl-042161500"
-          ]
-        },
-        "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 421,
-          "marketMedianAbsoluteErrorPct": 33.7,
-          "marketP80AbsoluteErrorPct": 54.6
-        }
-      },
-      "listing": null,
-      "vendorEstimates": []
-    },
-    {
-      "id": "phl-514207710",
-      "marketId": "philadelphia",
-      "clusterId": "philadelphia-west",
-      "sourceId": "philadelphia-opa",
-      "sourceLabel": "Philadelphia OPA",
-      "sourceUrl": "https://opendataphilly.org/datasets/opa-property-assessments/",
-      "parcelId": "514207710",
-      "address": "1828 S VOGDES ST",
-      "locality": "Philadelphia, PA 19143",
-      "zip": "19143",
-      "lat": 39.93441209582531,
-      "lng": -75.22045620742138,
-      "propertyType": "SINGLE FAMILY",
-      "yearBuilt": 1920,
-      "sqft": 960,
-      "lotSqft": null,
-      "beds": 3,
-      "baths": 1,
-      "saleDate": "2026-05-15",
-      "salePrice": 155000,
-      "assessedValue": 70100,
-      "qualification": "Residential OPA record · price, area and value sanity filters passed",
-      "clusterName": "Philadelphia · West Corridor",
-      "model": {
-        "value": 119000,
-        "low": 54000,
-        "high": 183000,
-        "confidence": 68,
-        "watchScore": 77,
-        "valuationGapPct": 69.3,
-        "compCount": 12,
-        "anchors": {
-          "hpiAdjustedSale": 155000,
-          "assessmentCalibrated": 74000,
-          "comparablePpsf": 110000
-        },
-        "weights": {
-          "hpiAdjustedSale": 0.35,
-          "assessmentCalibrated": 0.2,
-          "comparableSales": 0.45
-        },
-        "calibrationRatio": 1.063,
-        "comparablePpsf": 115,
-        "clusterEdgeScore": 70,
-        "comparableQuality": {
-          "nearestMiles": 0.2,
-          "medianMiles": 1.1,
-          "sameTypePct": 100,
-          "recordIds": [
-            "phl-514252400",
-            "phl-401037500",
-            "phl-514187405",
-            "phl-403049000",
-            "phl-602015400",
-            "phl-514186100",
-            "phl-463268000",
-            "phl-511101700",
-            "phl-401178700",
-            "phl-603113300",
-            "phl-041096300",
-            "phl-406186100"
-          ]
-        },
-        "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 421,
-          "marketMedianAbsoluteErrorPct": 33.7,
-          "marketP80AbsoluteErrorPct": 54.6
-        }
-      },
-      "listing": null,
-      "vendorEstimates": []
-    },
-    {
-      "id": "phl-401356100",
-      "marketId": "philadelphia",
-      "clusterId": "philadelphia-west",
-      "sourceId": "philadelphia-opa",
-      "sourceLabel": "Philadelphia OPA",
-      "sourceUrl": "https://opendataphilly.org/datasets/opa-property-assessments/",
-      "parcelId": "401356100",
-      "address": "6312 PASCHALL AVE",
-      "locality": "Philadelphia, PA 19142",
-      "zip": "19142",
-      "lat": 39.92594961544005,
-      "lng": -75.23071667416801,
-      "propertyType": "SINGLE FAMILY",
-      "yearBuilt": 1920,
-      "sqft": 1320,
-      "lotSqft": null,
-      "beds": 3,
-      "baths": 1,
-      "saleDate": "2026-05-13",
-      "salePrice": 200000,
-      "assessedValue": 134700,
-      "qualification": "Residential OPA record · price, area and value sanity filters passed",
-      "clusterName": "Philadelphia · West Corridor",
-      "model": {
-        "value": 193000,
-        "low": 87000,
-        "high": 298000,
-        "confidence": 72,
-        "watchScore": 77,
-        "valuationGapPct": 42.9,
-        "compCount": 12,
-        "anchors": {
-          "hpiAdjustedSale": 200000,
-          "assessmentCalibrated": 143000,
-          "comparablePpsf": 209000
-        },
-        "weights": {
-          "hpiAdjustedSale": 0.35,
-          "assessmentCalibrated": 0.2,
-          "comparableSales": 0.45
-        },
-        "calibrationRatio": 1.063,
-        "comparablePpsf": 158,
-        "clusterEdgeScore": 70,
-        "comparableQuality": {
-          "nearestMiles": 0.3,
-          "medianMiles": 1,
-          "sameTypePct": 100,
-          "recordIds": [
-            "phl-403132500",
-            "phl-403037500",
-            "phl-513083500",
-            "phl-401227200",
-            "phl-401226900",
-            "phl-513088900",
-            "phl-513274800",
-            "phl-463093500",
-            "phl-514120000",
-            "phl-033175900",
-            "phl-513131500",
-            "phl-511143400"
-          ]
-        },
-        "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 421,
-          "marketMedianAbsoluteErrorPct": 33.7,
-          "marketP80AbsoluteErrorPct": 54.6
+          "modelVersion": "2.1",
+          "marketBacktestSample": 418,
+          "marketMedianAbsoluteErrorPct": 33.3,
+          "marketP80AbsoluteErrorPct": 56.1
         }
       },
       "listing": null,
@@ -1963,11 +2007,11 @@
       "clusterName": "Philadelphia · West Corridor",
       "model": {
         "value": 224000,
-        "low": 102000,
-        "high": 346000,
-        "confidence": 69,
+        "low": 98000,
+        "high": 350000,
+        "confidence": 70,
         "watchScore": 77,
-        "valuationGapPct": 58.7,
+        "valuationGapPct": 58.8,
         "compCount": 12,
         "anchors": {
           "hpiAdjustedSale": 270000,
@@ -1979,19 +2023,36 @@
           "assessmentCalibrated": 0.2,
           "comparableSales": 0.45
         },
-        "calibrationRatio": 1.063,
+        "calibrationRatio": 1.066,
         "comparablePpsf": 194,
-        "clusterEdgeScore": 70,
+        "clusterEdgeScore": 69,
+        "pricePerSqft": {
+          "recordedSale": 237,
+          "hpiAdjustedSale": 237,
+          "assessmentCalibrated": 132,
+          "comparableP25": 107,
+          "comparableMedian": 194,
+          "comparableP75": 232,
+          "modelCenter": 196
+        },
+        "recency": {
+          "saleAgeMonths": 3,
+          "score": 95,
+          "band": "current"
+        },
         "comparableQuality": {
           "nearestMiles": 0,
-          "medianMiles": 0.4,
+          "medianMiles": 0.5,
+          "medianAgeMonths": 3.4,
+          "newestSaleDate": "2026-06-05",
+          "oldestSaleDate": "2026-02-17",
           "sameTypePct": 100,
           "recordIds": [
             "phl-604113700",
             "phl-604274100",
             "phl-463200700",
             "phl-513168100",
-            "phl-463018400",
+            "phl-511051800",
             "phl-463247600",
             "phl-463148700",
             "phl-511168100",
@@ -2002,84 +2063,10 @@
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 421,
-          "marketMedianAbsoluteErrorPct": 33.7,
-          "marketP80AbsoluteErrorPct": 54.6
-        }
-      },
-      "listing": null,
-      "vendorEstimates": []
-    },
-    {
-      "id": "phl-513131500",
-      "marketId": "philadelphia",
-      "clusterId": "philadelphia-west",
-      "sourceId": "philadelphia-opa",
-      "sourceLabel": "Philadelphia OPA",
-      "sourceUrl": "https://opendataphilly.org/datasets/opa-property-assessments/",
-      "parcelId": "513131500",
-      "address": "1125 S 55TH ST",
-      "locality": "Philadelphia, PA 19143",
-      "zip": "19143",
-      "lat": 39.94272950945534,
-      "lng": -75.22865494371148,
-      "propertyType": "SINGLE FAMILY",
-      "yearBuilt": 1920,
-      "sqft": 1260,
-      "lotSqft": null,
-      "beds": 3,
-      "baths": 2,
-      "saleDate": "2026-05-07",
-      "salePrice": 270000,
-      "assessedValue": 137200,
-      "qualification": "Residential OPA record · price, area and value sanity filters passed",
-      "clusterName": "Philadelphia · West Corridor",
-      "model": {
-        "value": 229000,
-        "low": 104000,
-        "high": 354000,
-        "confidence": 69,
-        "watchScore": 77,
-        "valuationGapPct": 66.9,
-        "compCount": 12,
-        "anchors": {
-          "hpiAdjustedSale": 270000,
-          "assessmentCalibrated": 146000,
-          "comparablePpsf": 234000
-        },
-        "weights": {
-          "hpiAdjustedSale": 0.35,
-          "assessmentCalibrated": 0.2,
-          "comparableSales": 0.45
-        },
-        "calibrationRatio": 1.063,
-        "comparablePpsf": 186,
-        "clusterEdgeScore": 70,
-        "comparableQuality": {
-          "nearestMiles": 0.1,
-          "medianMiles": 0.5,
-          "sameTypePct": 100,
-          "recordIds": [
-            "phl-463111600",
-            "phl-463120200",
-            "phl-032094500",
-            "phl-462054000",
-            "phl-513000900",
-            "phl-511046100",
-            "phl-462054700",
-            "phl-512041500",
-            "phl-512035900",
-            "phl-511067300",
-            "phl-511143400",
-            "phl-034131000"
-          ]
-        },
-        "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 421,
-          "marketMedianAbsoluteErrorPct": 33.7,
-          "marketP80AbsoluteErrorPct": 54.6
+          "modelVersion": "2.1",
+          "marketBacktestSample": 418,
+          "marketMedianAbsoluteErrorPct": 33.3,
+          "marketP80AbsoluteErrorPct": 56.1
         }
       },
       "listing": null,
@@ -2111,11 +2098,11 @@
       "clusterName": "Philadelphia · West Corridor",
       "model": {
         "value": 200000,
-        "low": 91000,
-        "high": 309000,
+        "low": 88000,
+        "high": 312000,
         "confidence": 70,
         "watchScore": 77,
-        "valuationGapPct": 59.4,
+        "valuationGapPct": 59.5,
         "compCount": 12,
         "anchors": {
           "hpiAdjustedSale": 237000,
@@ -2127,33 +2114,50 @@
           "assessmentCalibrated": 0.2,
           "comparableSales": 0.45
         },
-        "calibrationRatio": 1.063,
+        "calibrationRatio": 1.066,
         "comparablePpsf": 152,
-        "clusterEdgeScore": 70,
+        "clusterEdgeScore": 69,
+        "pricePerSqft": {
+          "recordedSale": 180,
+          "hpiAdjustedSale": 180,
+          "assessmentCalibrated": 101,
+          "comparableP25": 91,
+          "comparableMedian": 152,
+          "comparableP75": 159,
+          "modelCenter": 151
+        },
+        "recency": {
+          "saleAgeMonths": 3.1,
+          "score": 95,
+          "band": "current"
+        },
         "comparableQuality": {
           "nearestMiles": 0.1,
           "medianMiles": 1,
+          "medianAgeMonths": 3.5,
+          "newestSaleDate": "2026-06-12",
+          "oldestSaleDate": "2026-03-06",
           "sameTypePct": 100,
           "recordIds": [
             "phl-403037500",
             "phl-401356100",
+            "phl-403316100",
             "phl-513083500",
+            "phl-463115100",
             "phl-401227200",
             "phl-401226900",
             "phl-513088900",
             "phl-513274800",
             "phl-033175900",
             "phl-463093500",
-            "phl-514120000",
-            "phl-403078800",
-            "phl-513131500"
+            "phl-514120000"
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 421,
-          "marketMedianAbsoluteErrorPct": 33.7,
-          "marketP80AbsoluteErrorPct": 54.6
+          "modelVersion": "2.1",
+          "marketBacktestSample": 418,
+          "marketMedianAbsoluteErrorPct": 33.3,
+          "marketP80AbsoluteErrorPct": 56.1
         }
       },
       "listing": null,
@@ -2185,15 +2189,15 @@
       "clusterName": "Philadelphia · West Corridor",
       "model": {
         "value": 215000,
-        "low": 98000,
-        "high": 333000,
+        "low": 95000,
+        "high": 336000,
         "confidence": 71,
         "watchScore": 77,
-        "valuationGapPct": 50.4,
+        "valuationGapPct": 50.5,
         "compCount": 12,
         "anchors": {
           "hpiAdjustedSale": 213000,
-          "assessmentCalibrated": 152000,
+          "assessmentCalibrated": 153000,
           "comparablePpsf": 246000
         },
         "weights": {
@@ -2201,17 +2205,34 @@
           "assessmentCalibrated": 0.2,
           "comparableSales": 0.45
         },
-        "calibrationRatio": 1.063,
+        "calibrationRatio": 1.066,
         "comparablePpsf": 180,
-        "clusterEdgeScore": 70,
+        "clusterEdgeScore": 69,
+        "pricePerSqft": {
+          "recordedSale": 155,
+          "hpiAdjustedSale": 155,
+          "assessmentCalibrated": 112,
+          "comparableP25": 90,
+          "comparableMedian": 180,
+          "comparableP75": 193,
+          "modelCenter": 158
+        },
+        "recency": {
+          "saleAgeMonths": 3.1,
+          "score": 95,
+          "band": "current"
+        },
         "comparableQuality": {
           "nearestMiles": 0.2,
           "medianMiles": 0.8,
+          "medianAgeMonths": 4.3,
+          "newestSaleDate": "2026-05-29",
+          "oldestSaleDate": "2026-02-24",
           "sameTypePct": 100,
           "recordIds": [
             "phl-342239100",
             "phl-522078300",
-            "phl-342128200",
+            "phl-342275000",
             "phl-342319700",
             "phl-521350200",
             "phl-344066900",
@@ -2224,84 +2245,10 @@
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 421,
-          "marketMedianAbsoluteErrorPct": 33.7,
-          "marketP80AbsoluteErrorPct": 54.6
-        }
-      },
-      "listing": null,
-      "vendorEstimates": []
-    },
-    {
-      "id": "phl-512035900",
-      "marketId": "philadelphia",
-      "clusterId": "philadelphia-west",
-      "sourceId": "philadelphia-opa",
-      "sourceLabel": "Philadelphia OPA",
-      "sourceUrl": "https://opendataphilly.org/datasets/opa-property-assessments/",
-      "parcelId": "512035900",
-      "address": "5321 UPLAND ST",
-      "locality": "Philadelphia, PA 19143",
-      "zip": "19143",
-      "lat": 39.93855639295342,
-      "lng": -75.22001819225756,
-      "propertyType": "SINGLE FAMILY",
-      "yearBuilt": 1925,
-      "sqft": 1250,
-      "lotSqft": null,
-      "beds": 3,
-      "baths": 1,
-      "saleDate": "2026-04-28",
-      "salePrice": 216300,
-      "assessedValue": 130900,
-      "qualification": "Residential OPA record · price, area and value sanity filters passed",
-      "clusterName": "Philadelphia · West Corridor",
-      "model": {
-        "value": 193000,
-        "low": 88000,
-        "high": 298000,
-        "confidence": 71,
-        "watchScore": 77,
-        "valuationGapPct": 47.3,
-        "compCount": 12,
-        "anchors": {
-          "hpiAdjustedSale": 216000,
-          "assessmentCalibrated": 139000,
-          "comparablePpsf": 198000
-        },
-        "weights": {
-          "hpiAdjustedSale": 0.35,
-          "assessmentCalibrated": 0.2,
-          "comparableSales": 0.45
-        },
-        "calibrationRatio": 1.063,
-        "comparablePpsf": 159,
-        "clusterEdgeScore": 70,
-        "comparableQuality": {
-          "nearestMiles": 0,
-          "medianMiles": 0.6,
-          "sameTypePct": 100,
-          "recordIds": [
-            "phl-512041500",
-            "phl-512035400",
-            "phl-034131000",
-            "phl-511067300",
-            "phl-511046100",
-            "phl-463111600",
-            "phl-602121300",
-            "phl-463120200",
-            "phl-511010000",
-            "phl-513131500",
-            "phl-511008800",
-            "phl-513000900"
-          ]
-        },
-        "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 421,
-          "marketMedianAbsoluteErrorPct": 33.7,
-          "marketP80AbsoluteErrorPct": 54.6
+          "modelVersion": "2.1",
+          "marketBacktestSample": 418,
+          "marketMedianAbsoluteErrorPct": 33.3,
+          "marketP80AbsoluteErrorPct": 56.1
         }
       },
       "listing": null,
@@ -2333,15 +2280,15 @@
       "clusterName": "Philadelphia · West Corridor",
       "model": {
         "value": 198000,
-        "low": 90000,
-        "high": 306000,
+        "low": 87000,
+        "high": 309000,
         "confidence": 70,
         "watchScore": 77,
-        "valuationGapPct": 51.3,
+        "valuationGapPct": 51.4,
         "compCount": 12,
         "anchors": {
           "hpiAdjustedSale": 232000,
-          "assessmentCalibrated": 139000,
+          "assessmentCalibrated": 140000,
           "comparablePpsf": 198000
         },
         "weights": {
@@ -2349,477 +2296,1233 @@
           "assessmentCalibrated": 0.2,
           "comparableSales": 0.45
         },
-        "calibrationRatio": 1.063,
+        "calibrationRatio": 1.066,
         "comparablePpsf": 174,
-        "clusterEdgeScore": 70,
+        "clusterEdgeScore": 69,
+        "pricePerSqft": {
+          "recordedSale": 204,
+          "hpiAdjustedSale": 204,
+          "assessmentCalibrated": 122,
+          "comparableP25": 105,
+          "comparableMedian": 174,
+          "comparableP75": 237,
+          "modelCenter": 174
+        },
+        "recency": {
+          "saleAgeMonths": 3.3,
+          "score": 95,
+          "band": "current"
+        },
         "comparableQuality": {
           "nearestMiles": 0.2,
-          "medianMiles": 0.4,
+          "medianMiles": 0.5,
+          "medianAgeMonths": 3.5,
+          "newestSaleDate": "2026-06-05",
+          "oldestSaleDate": "2026-02-17",
           "sameTypePct": 100,
           "recordIds": [
             "phl-604106100",
             "phl-604113700",
             "phl-463200700",
             "phl-604146700",
-            "phl-463018400",
             "phl-604146300",
             "phl-031170300",
             "phl-513168100",
             "phl-463247600",
             "phl-463148700",
             "phl-031192700",
+            "phl-511051800",
             "phl-032103200"
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 421,
-          "marketMedianAbsoluteErrorPct": 33.7,
-          "marketP80AbsoluteErrorPct": 54.6
+          "modelVersion": "2.1",
+          "marketBacktestSample": 418,
+          "marketMedianAbsoluteErrorPct": 33.3,
+          "marketP80AbsoluteErrorPct": 56.1
         }
       },
       "listing": null,
       "vendorEstimates": []
     },
     {
-      "id": "phl-034013700",
+      "id": "phl-341183500",
       "marketId": "philadelphia",
       "clusterId": "philadelphia-west",
       "sourceId": "philadelphia-opa",
       "sourceLabel": "Philadelphia OPA",
       "sourceUrl": "https://opendataphilly.org/datasets/opa-property-assessments/",
-      "parcelId": "034013700",
-      "address": "5812 CEDARHURST ST",
-      "locality": "Philadelphia, PA 19143",
-      "zip": "19143",
-      "lat": 39.94500606018272,
-      "lng": -75.24008283147255,
+      "parcelId": "341183500",
+      "address": "150 N ROBINSON ST",
+      "locality": "Philadelphia, PA 19139",
+      "zip": "19139",
+      "lat": 39.965029503220286,
+      "lng": -75.24366604912129,
       "propertyType": "SINGLE FAMILY",
       "yearBuilt": 1925,
-      "sqft": 1360,
+      "sqft": 832,
       "lotSqft": null,
       "beds": 3,
       "baths": 1,
-      "saleDate": "2026-04-28",
-      "salePrice": 229900,
-      "assessedValue": 154200,
+      "saleDate": "2026-04-13",
+      "salePrice": 149900,
+      "assessedValue": 89600,
       "qualification": "Residential OPA record · price, area and value sanity filters passed",
       "clusterName": "Philadelphia · West Corridor",
       "model": {
-        "value": 221000,
-        "low": 100000,
-        "high": 342000,
-        "confidence": 72,
+        "value": 133000,
+        "low": 58000,
+        "high": 208000,
+        "confidence": 71,
         "watchScore": 77,
-        "valuationGapPct": 43.3,
+        "valuationGapPct": 48.5,
         "compCount": 12,
         "anchors": {
-          "hpiAdjustedSale": 230000,
-          "assessmentCalibrated": 164000,
-          "comparablePpsf": 239000
+          "hpiAdjustedSale": 150000,
+          "assessmentCalibrated": 96000,
+          "comparablePpsf": 137000
         },
         "weights": {
           "hpiAdjustedSale": 0.35,
           "assessmentCalibrated": 0.2,
           "comparableSales": 0.45
         },
-        "calibrationRatio": 1.063,
-        "comparablePpsf": 176,
-        "clusterEdgeScore": 70,
+        "calibrationRatio": 1.066,
+        "comparablePpsf": 164,
+        "clusterEdgeScore": 69,
+        "pricePerSqft": {
+          "recordedSale": 180,
+          "hpiAdjustedSale": 180,
+          "assessmentCalibrated": 115,
+          "comparableP25": 128,
+          "comparableMedian": 164,
+          "comparableP75": 196,
+          "modelCenter": 160
+        },
+        "recency": {
+          "saleAgeMonths": 3.8,
+          "score": 94,
+          "band": "current"
+        },
         "comparableQuality": {
           "nearestMiles": 0.2,
-          "medianMiles": 0.4,
+          "medianMiles": 0.9,
+          "medianAgeMonths": 2.6,
+          "newestSaleDate": "2026-06-10",
+          "oldestSaleDate": "2026-03-16",
           "sameTypePct": 100,
           "recordIds": [
-            "phl-033171500",
-            "phl-463215900",
-            "phl-513274800",
-            "phl-032059100",
-            "phl-033175900",
-            "phl-511122800",
-            "phl-513088900",
-            "phl-463093500",
-            "phl-033063200",
-            "phl-463237400",
-            "phl-033009800",
-            "phl-603006700"
+            "phl-343062600",
+            "phl-604133600",
+            "phl-604125400",
+            "phl-042043250",
+            "phl-344387900",
+            "phl-514286400",
+            "phl-511238800",
+            "phl-041012600",
+            "phl-511240500",
+            "phl-511097700",
+            "phl-041020900",
+            "phl-041209800"
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 421,
-          "marketMedianAbsoluteErrorPct": 33.7,
-          "marketP80AbsoluteErrorPct": 54.6
+          "modelVersion": "2.1",
+          "marketBacktestSample": 418,
+          "marketMedianAbsoluteErrorPct": 33.3,
+          "marketP80AbsoluteErrorPct": 56.1
         }
       },
       "listing": null,
       "vendorEstimates": []
     },
     {
-      "id": "phl-463031300",
+      "id": "phl-401003500",
       "marketId": "philadelphia",
       "clusterId": "philadelphia-west",
       "sourceId": "philadelphia-opa",
       "sourceLabel": "Philadelphia OPA",
       "sourceUrl": "https://opendataphilly.org/datasets/opa-property-assessments/",
-      "parcelId": "463031300",
-      "address": "5612 RODMAN ST",
+      "parcelId": "401003500",
+      "address": "1940 S 57TH ST",
       "locality": "Philadelphia, PA 19143",
       "zip": "19143",
-      "lat": 39.95192905201042,
-      "lng": -75.23525001806047,
+      "lat": 39.93582004444377,
+      "lng": -75.2264784843802,
       "propertyType": "SINGLE FAMILY",
       "yearBuilt": 1925,
-      "sqft": 1020,
+      "sqft": 1450,
       "lotSqft": null,
-      "beds": 3,
-      "baths": 1,
-      "saleDate": "2026-04-21",
-      "salePrice": 155000,
-      "assessedValue": 127200,
+      "beds": 5,
+      "baths": 2,
+      "saleDate": "2026-03-27",
+      "salePrice": 215000,
+      "assessedValue": 131000,
       "qualification": "Residential OPA record · price, area and value sanity filters passed",
       "clusterName": "Philadelphia · West Corridor",
       "model": {
-        "value": 196000,
+        "value": 202000,
         "low": 89000,
-        "high": 302000,
-        "confidence": 69,
+        "high": 315000,
+        "confidence": 71,
         "watchScore": 77,
-        "valuationGapPct": 53.7,
+        "valuationGapPct": 54.2,
+        "compCount": 12,
+        "anchors": {
+          "hpiAdjustedSale": 215000,
+          "assessmentCalibrated": 140000,
+          "comparablePpsf": 220000
+        },
+        "weights": {
+          "hpiAdjustedSale": 0.35,
+          "assessmentCalibrated": 0.2,
+          "comparableSales": 0.45
+        },
+        "calibrationRatio": 1.066,
+        "comparablePpsf": 151,
+        "clusterEdgeScore": 69,
+        "pricePerSqft": {
+          "recordedSale": 148,
+          "hpiAdjustedSale": 148,
+          "assessmentCalibrated": 96,
+          "comparableP25": 102,
+          "comparableMedian": 151,
+          "comparableP75": 179,
+          "modelCenter": 139
+        },
+        "recency": {
+          "saleAgeMonths": 4.4,
+          "score": 93,
+          "band": "current"
+        },
+        "comparableQuality": {
+          "nearestMiles": 0.3,
+          "medianMiles": 1,
+          "medianAgeMonths": 4,
+          "newestSaleDate": "2026-06-12",
+          "oldestSaleDate": "2026-02-24",
+          "sameTypePct": 100,
+          "recordIds": [
+            "phl-512013600",
+            "phl-511256500",
+            "phl-401117500",
+            "phl-513119000",
+            "phl-032133700",
+            "phl-604287500",
+            "phl-511250100",
+            "phl-602007500",
+            "phl-461010100",
+            "phl-602007100",
+            "phl-463104500",
+            "phl-462094200"
+          ]
+        },
+        "diagnostics": {
+          "modelVersion": "2.1",
+          "marketBacktestSample": 418,
+          "marketMedianAbsoluteErrorPct": 33.3,
+          "marketP80AbsoluteErrorPct": 56.1
+        }
+      },
+      "listing": null,
+      "vendorEstimates": []
+    },
+    {
+      "id": "phl-512017700",
+      "marketId": "philadelphia",
+      "clusterId": "philadelphia-west",
+      "sourceId": "philadelphia-opa",
+      "sourceLabel": "Philadelphia OPA",
+      "sourceUrl": "https://opendataphilly.org/datasets/opa-property-assessments/",
+      "parcelId": "512017700",
+      "address": "1623 S 54TH ST",
+      "locality": "Philadelphia, PA 19143",
+      "zip": "19143",
+      "lat": 39.938213019549174,
+      "lng": -75.22080917455678,
+      "propertyType": "SINGLE FAMILY",
+      "yearBuilt": 1920,
+      "sqft": 1640,
+      "lotSqft": null,
+      "beds": 4,
+      "baths": 1,
+      "saleDate": "2026-06-12",
+      "salePrice": 140000,
+      "assessedValue": 150300,
+      "qualification": "Residential OPA record · price, area and value sanity filters passed",
+      "clusterName": "Philadelphia · West Corridor",
+      "model": {
+        "value": 224000,
+        "low": 99000,
+        "high": 350000,
+        "confidence": 67,
+        "watchScore": 76,
+        "valuationGapPct": 49.3,
+        "compCount": 12,
+        "anchors": {
+          "hpiAdjustedSale": 140000,
+          "assessmentCalibrated": 160000,
+          "comparablePpsf": 319000
+        },
+        "weights": {
+          "hpiAdjustedSale": 0.35,
+          "assessmentCalibrated": 0.2,
+          "comparableSales": 0.45
+        },
+        "calibrationRatio": 1.066,
+        "comparablePpsf": 194,
+        "clusterEdgeScore": 69,
+        "pricePerSqft": {
+          "recordedSale": 85,
+          "hpiAdjustedSale": 85,
+          "assessmentCalibrated": 98,
+          "comparableP25": 68,
+          "comparableMedian": 194,
+          "comparableP75": 219,
+          "modelCenter": 137
+        },
+        "recency": {
+          "saleAgeMonths": 1.8,
+          "score": 97,
+          "band": "current"
+        },
+        "comparableQuality": {
+          "nearestMiles": 0.6,
+          "medianMiles": 0.9,
+          "medianAgeMonths": 3.2,
+          "newestSaleDate": "2026-06-10",
+          "oldestSaleDate": "2026-02-17",
+          "sameTypePct": 100,
+          "recordIds": [
+            "phl-401096100",
+            "phl-462104100",
+            "phl-034070200",
+            "phl-513044900",
+            "phl-602083800",
+            "phl-603153100",
+            "phl-462152000",
+            "phl-463187200",
+            "phl-601061900",
+            "phl-033050400",
+            "phl-601083300",
+            "phl-513134900"
+          ]
+        },
+        "diagnostics": {
+          "modelVersion": "2.1",
+          "marketBacktestSample": 418,
+          "marketMedianAbsoluteErrorPct": 33.3,
+          "marketP80AbsoluteErrorPct": 56.1
+        }
+      },
+      "listing": null,
+      "vendorEstimates": []
+    },
+    {
+      "id": "phl-031089200",
+      "marketId": "philadelphia",
+      "clusterId": "philadelphia-west",
+      "sourceId": "philadelphia-opa",
+      "sourceLabel": "Philadelphia OPA",
+      "sourceUrl": "https://opendataphilly.org/datasets/opa-property-assessments/",
+      "parcelId": "031089200",
+      "address": "6139 LOCUST ST",
+      "locality": "Philadelphia, PA 19139",
+      "zip": "19139",
+      "lat": 39.95836150594504,
+      "lng": -75.24475036101781,
+      "propertyType": "SINGLE FAMILY",
+      "yearBuilt": 1925,
+      "sqft": 1410,
+      "lotSqft": null,
+      "beds": 3,
+      "baths": 1,
+      "saleDate": "2026-06-10",
+      "salePrice": 175000,
+      "assessedValue": 101800,
+      "qualification": "Residential OPA record · price, area and value sanity filters passed",
+      "clusterName": "Philadelphia · West Corridor",
+      "model": {
+        "value": 184000,
+        "low": 81000,
+        "high": 287000,
+        "confidence": 69,
+        "watchScore": 76,
+        "valuationGapPct": 80.9,
+        "compCount": 12,
+        "anchors": {
+          "hpiAdjustedSale": 175000,
+          "assessmentCalibrated": 109000,
+          "comparablePpsf": 225000
+        },
+        "weights": {
+          "hpiAdjustedSale": 0.35,
+          "assessmentCalibrated": 0.2,
+          "comparableSales": 0.45
+        },
+        "calibrationRatio": 1.066,
+        "comparablePpsf": 160,
+        "clusterEdgeScore": 69,
+        "pricePerSqft": {
+          "recordedSale": 124,
+          "hpiAdjustedSale": 124,
+          "assessmentCalibrated": 77,
+          "comparableP25": 137,
+          "comparableMedian": 160,
+          "comparableP75": 206,
+          "modelCenter": 131
+        },
+        "recency": {
+          "saleAgeMonths": 1.9,
+          "score": 97,
+          "band": "current"
+        },
+        "comparableQuality": {
+          "nearestMiles": 0,
+          "medianMiles": 0.6,
+          "medianAgeMonths": 4.1,
+          "newestSaleDate": "2026-05-14",
+          "oldestSaleDate": "2026-03-06",
+          "sameTypePct": 100,
+          "recordIds": [
+            "phl-031088500",
+            "phl-033063200",
+            "phl-604211100",
+            "phl-462094200",
+            "phl-604287500",
+            "phl-341031300",
+            "phl-033171500",
+            "phl-342318400",
+            "phl-032059100",
+            "phl-042143950",
+            "phl-032133700",
+            "phl-342006200"
+          ]
+        },
+        "diagnostics": {
+          "modelVersion": "2.1",
+          "marketBacktestSample": 418,
+          "marketMedianAbsoluteErrorPct": 33.3,
+          "marketP80AbsoluteErrorPct": 56.1
+        }
+      },
+      "listing": null,
+      "vendorEstimates": []
+    },
+    {
+      "id": "phl-514177400",
+      "marketId": "philadelphia",
+      "clusterId": "philadelphia-west",
+      "sourceId": "philadelphia-opa",
+      "sourceLabel": "Philadelphia OPA",
+      "sourceUrl": "https://opendataphilly.org/datasets/opa-property-assessments/",
+      "parcelId": "514177400",
+      "address": "1615 S CONESTOGA ST",
+      "locality": "Philadelphia, PA 19143",
+      "zip": "19143",
+      "lat": 39.93777196623165,
+      "lng": -75.22205760952932,
+      "propertyType": "SINGLE FAMILY",
+      "yearBuilt": 1925,
+      "sqft": 990,
+      "lotSqft": null,
+      "beds": 3,
+      "baths": 1,
+      "saleDate": "2026-06-05",
+      "salePrice": 80000,
+      "assessedValue": 75800,
+      "qualification": "Residential OPA record · price, area and value sanity filters passed",
+      "clusterName": "Philadelphia · West Corridor",
+      "model": {
+        "value": 125000,
+        "low": 55000,
+        "high": 195000,
+        "confidence": 67,
+        "watchScore": 76,
+        "valuationGapPct": 64.9,
+        "compCount": 12,
+        "anchors": {
+          "hpiAdjustedSale": 80000,
+          "assessmentCalibrated": 81000,
+          "comparablePpsf": 180000
+        },
+        "weights": {
+          "hpiAdjustedSale": 0.35,
+          "assessmentCalibrated": 0.2,
+          "comparableSales": 0.45
+        },
+        "calibrationRatio": 1.066,
+        "comparablePpsf": 181,
+        "clusterEdgeScore": 69,
+        "pricePerSqft": {
+          "recordedSale": 81,
+          "hpiAdjustedSale": 81,
+          "assessmentCalibrated": 82,
+          "comparableP25": 106,
+          "comparableMedian": 181,
+          "comparableP75": 265,
+          "modelCenter": 126
+        },
+        "recency": {
+          "saleAgeMonths": 2.1,
+          "score": 97,
+          "band": "current"
+        },
+        "comparableQuality": {
+          "nearestMiles": 0.1,
+          "medianMiles": 0.9,
+          "medianAgeMonths": 4.8,
+          "newestSaleDate": "2026-06-09",
+          "oldestSaleDate": "2026-02-17",
+          "sameTypePct": 100,
+          "recordIds": [
+            "phl-514187405",
+            "phl-514252400",
+            "phl-513024510",
+            "phl-513070300",
+            "phl-513062200",
+            "phl-514139900",
+            "phl-406186100",
+            "phl-603113300",
+            "phl-604286000",
+            "phl-514207710",
+            "phl-512058900",
+            "phl-403167400"
+          ]
+        },
+        "diagnostics": {
+          "modelVersion": "2.1",
+          "marketBacktestSample": 418,
+          "marketMedianAbsoluteErrorPct": 33.3,
+          "marketP80AbsoluteErrorPct": 56.1
+        }
+      },
+      "listing": null,
+      "vendorEstimates": []
+    },
+    {
+      "id": "phl-041334800",
+      "marketId": "philadelphia",
+      "clusterId": "philadelphia-west",
+      "sourceId": "philadelphia-opa",
+      "sourceLabel": "Philadelphia OPA",
+      "sourceUrl": "https://opendataphilly.org/datasets/opa-property-assessments/",
+      "parcelId": "041334800",
+      "address": "1314 N ALLISON ST",
+      "locality": "Philadelphia, PA 19131",
+      "zip": "19131",
+      "lat": 39.97266788019628,
+      "lng": -75.23225446692204,
+      "propertyType": "SINGLE FAMILY",
+      "yearBuilt": 1925,
+      "sqft": 1482,
+      "lotSqft": null,
+      "beds": 3,
+      "baths": 1,
+      "saleDate": "2026-06-02",
+      "salePrice": 299900,
+      "assessedValue": 132100,
+      "qualification": "Residential OPA record · price, area and value sanity filters passed",
+      "clusterName": "Philadelphia · West Corridor",
+      "model": {
+        "value": 234000,
+        "low": 103000,
+        "high": 365000,
+        "confidence": 68,
+        "watchScore": 76,
+        "valuationGapPct": 77.2,
+        "compCount": 12,
+        "anchors": {
+          "hpiAdjustedSale": 300000,
+          "assessmentCalibrated": 141000,
+          "comparablePpsf": 224000
+        },
+        "weights": {
+          "hpiAdjustedSale": 0.35,
+          "assessmentCalibrated": 0.2,
+          "comparableSales": 0.45
+        },
+        "calibrationRatio": 1.066,
+        "comparablePpsf": 151,
+        "clusterEdgeScore": 69,
+        "pricePerSqft": {
+          "recordedSale": 202,
+          "hpiAdjustedSale": 202,
+          "assessmentCalibrated": 95,
+          "comparableP25": 100,
+          "comparableMedian": 151,
+          "comparableP75": 158,
+          "modelCenter": 158
+        },
+        "recency": {
+          "saleAgeMonths": 2.2,
+          "score": 97,
+          "band": "current"
+        },
+        "comparableQuality": {
+          "nearestMiles": 0.2,
+          "medianMiles": 0.9,
+          "medianAgeMonths": 4.1,
+          "newestSaleDate": "2026-06-12",
+          "oldestSaleDate": "2026-02-19",
+          "sameTypePct": 100,
+          "recordIds": [
+            "phl-442159400",
+            "phl-342006200",
+            "phl-521294300",
+            "phl-341090600",
+            "phl-602151500",
+            "phl-341031300",
+            "phl-463104500",
+            "phl-043030200",
+            "phl-342058900",
+            "phl-602007500",
+            "phl-603085300",
+            "phl-602007100"
+          ]
+        },
+        "diagnostics": {
+          "modelVersion": "2.1",
+          "marketBacktestSample": 418,
+          "marketMedianAbsoluteErrorPct": 33.3,
+          "marketP80AbsoluteErrorPct": 56.1
+        }
+      },
+      "listing": null,
+      "vendorEstimates": []
+    },
+    {
+      "id": "phl-441062000",
+      "marketId": "philadelphia",
+      "clusterId": "philadelphia-west",
+      "sourceId": "philadelphia-opa",
+      "sourceLabel": "Philadelphia OPA",
+      "sourceUrl": "https://opendataphilly.org/datasets/opa-property-assessments/",
+      "parcelId": "441062000",
+      "address": "26 N 50TH ST",
+      "locality": "Philadelphia, PA 19139",
+      "zip": "19139",
+      "lat": 39.96045149233929,
+      "lng": -75.22107898161755,
+      "propertyType": "SINGLE FAMILY",
+      "yearBuilt": 1917,
+      "sqft": 2643,
+      "lotSqft": null,
+      "beds": 0,
+      "baths": 0,
+      "saleDate": "2026-05-29",
+      "salePrice": 239900,
+      "assessedValue": 253500,
+      "qualification": "Residential OPA record · price, area and value sanity filters passed",
+      "clusterName": "Philadelphia · West Corridor",
+      "model": {
+        "value": 456000,
+        "low": 200000,
+        "high": 712000,
+        "confidence": 66,
+        "watchScore": 76,
+        "valuationGapPct": 80,
+        "compCount": 12,
+        "anchors": {
+          "hpiAdjustedSale": 240000,
+          "assessmentCalibrated": 270000,
+          "comparablePpsf": 708000
+        },
+        "weights": {
+          "hpiAdjustedSale": 0.35,
+          "assessmentCalibrated": 0.2,
+          "comparableSales": 0.45
+        },
+        "calibrationRatio": 1.066,
+        "comparablePpsf": 268,
+        "clusterEdgeScore": 69,
+        "pricePerSqft": {
+          "recordedSale": 91,
+          "hpiAdjustedSale": 91,
+          "assessmentCalibrated": 102,
+          "comparableP25": 243,
+          "comparableMedian": 268,
+          "comparableP75": 357,
+          "modelCenter": 173
+        },
+        "recency": {
+          "saleAgeMonths": 2.3,
+          "score": 96,
+          "band": "current"
+        },
+        "comparableQuality": {
+          "nearestMiles": 0.5,
+          "medianMiles": 0.7,
+          "medianAgeMonths": 3.6,
+          "newestSaleDate": "2026-06-08",
+          "oldestSaleDate": "2026-03-02",
+          "sameTypePct": 100,
+          "recordIds": [
+            "phl-461061700",
+            "phl-461033600",
+            "phl-511001600",
+            "phl-461085000",
+            "phl-272047700",
+            "phl-461215500",
+            "phl-461215300",
+            "phl-461234700",
+            "phl-461076400",
+            "phl-601031600",
+            "phl-272038900",
+            "phl-272146100"
+          ]
+        },
+        "diagnostics": {
+          "modelVersion": "2.1",
+          "marketBacktestSample": 418,
+          "marketMedianAbsoluteErrorPct": 33.3,
+          "marketP80AbsoluteErrorPct": 56.1
+        }
+      },
+      "listing": null,
+      "vendorEstimates": []
+    },
+    {
+      "id": "phl-513083500",
+      "marketId": "philadelphia",
+      "clusterId": "philadelphia-west",
+      "sourceId": "philadelphia-opa",
+      "sourceLabel": "Philadelphia OPA",
+      "sourceUrl": "https://opendataphilly.org/datasets/opa-property-assessments/",
+      "parcelId": "513083500",
+      "address": "5455 THOMAS AVE",
+      "locality": "Philadelphia, PA 19143",
+      "zip": "19143",
+      "lat": 39.94509866572078,
+      "lng": -75.23337980263553,
+      "propertyType": "SINGLE FAMILY",
+      "yearBuilt": 1920,
+      "sqft": 1320,
+      "lotSqft": null,
+      "beds": 3,
+      "baths": 1,
+      "saleDate": "2026-05-21",
+      "salePrice": 290600,
+      "assessedValue": 150900,
+      "qualification": "Residential OPA record · price, area and value sanity filters passed",
+      "clusterName": "Philadelphia · West Corridor",
+      "model": {
+        "value": 224000,
+        "low": 98000,
+        "high": 349000,
+        "confidence": 69,
+        "watchScore": 76,
+        "valuationGapPct": 48.4,
+        "compCount": 12,
+        "anchors": {
+          "hpiAdjustedSale": 291000,
+          "assessmentCalibrated": 161000,
+          "comparablePpsf": 200000
+        },
+        "weights": {
+          "hpiAdjustedSale": 0.35,
+          "assessmentCalibrated": 0.2,
+          "comparableSales": 0.45
+        },
+        "calibrationRatio": 1.066,
+        "comparablePpsf": 152,
+        "clusterEdgeScore": 69,
+        "pricePerSqft": {
+          "recordedSale": 220,
+          "hpiAdjustedSale": 220,
+          "assessmentCalibrated": 122,
+          "comparableP25": 90,
+          "comparableMedian": 152,
+          "comparableP75": 180,
+          "modelCenter": 170
+        },
+        "recency": {
+          "saleAgeMonths": 2.6,
+          "score": 96,
+          "band": "current"
+        },
+        "comparableQuality": {
+          "nearestMiles": 0,
+          "medianMiles": 0.4,
+          "medianAgeMonths": 3.1,
+          "newestSaleDate": "2026-06-12",
+          "oldestSaleDate": "2026-02-12",
+          "sameTypePct": 100,
+          "recordIds": [
+            "phl-463115100",
+            "phl-513088900",
+            "phl-463093500",
+            "phl-401356100",
+            "phl-403132500",
+            "phl-032140100",
+            "phl-033175900",
+            "phl-403037500",
+            "phl-513274800",
+            "phl-513000900",
+            "phl-513131500",
+            "phl-511143400"
+          ]
+        },
+        "diagnostics": {
+          "modelVersion": "2.1",
+          "marketBacktestSample": 418,
+          "marketMedianAbsoluteErrorPct": 33.3,
+          "marketP80AbsoluteErrorPct": 56.1
+        }
+      },
+      "listing": null,
+      "vendorEstimates": []
+    },
+    {
+      "id": "phl-604146700",
+      "marketId": "philadelphia",
+      "clusterId": "philadelphia-west",
+      "sourceId": "philadelphia-opa",
+      "sourceLabel": "Philadelphia OPA",
+      "sourceUrl": "https://opendataphilly.org/datasets/opa-property-assessments/",
+      "parcelId": "604146700",
+      "address": "5845 LUDLOW ST",
+      "locality": "Philadelphia, PA 19139",
+      "zip": "19139",
+      "lat": 39.96105563367657,
+      "lng": -75.23828994507886,
+      "propertyType": "SINGLE FAMILY",
+      "yearBuilt": 1925,
+      "sqft": 1120,
+      "lotSqft": null,
+      "beds": 3,
+      "baths": 1,
+      "saleDate": "2026-05-20",
+      "salePrice": 147000,
+      "assessedValue": 97600,
+      "qualification": "Residential OPA record · price, area and value sanity filters passed",
+      "clusterName": "Philadelphia · West Corridor",
+      "model": {
+        "value": 140000,
+        "low": 61000,
+        "high": 219000,
+        "confidence": 72,
+        "watchScore": 76,
+        "valuationGapPct": 43.4,
+        "compCount": 12,
+        "anchors": {
+          "hpiAdjustedSale": 147000,
+          "assessmentCalibrated": 104000,
+          "comparablePpsf": 151000
+        },
+        "weights": {
+          "hpiAdjustedSale": 0.35,
+          "assessmentCalibrated": 0.2,
+          "comparableSales": 0.45
+        },
+        "calibrationRatio": 1.066,
+        "comparablePpsf": 134,
+        "clusterEdgeScore": 69,
+        "pricePerSqft": {
+          "recordedSale": 131,
+          "hpiAdjustedSale": 131,
+          "assessmentCalibrated": 93,
+          "comparableP25": 85,
+          "comparableMedian": 134,
+          "comparableP75": 204,
+          "modelCenter": 125
+        },
+        "recency": {
+          "saleAgeMonths": 2.6,
+          "score": 96,
+          "band": "current"
+        },
+        "comparableQuality": {
+          "nearestMiles": 0,
+          "medianMiles": 0.7,
+          "medianAgeMonths": 3.3,
+          "newestSaleDate": "2026-05-28",
+          "oldestSaleDate": "2026-03-02",
+          "sameTypePct": 100,
+          "recordIds": [
+            "phl-604146300",
+            "phl-032103200",
+            "phl-463247600",
+            "phl-342203100",
+            "phl-032147700",
+            "phl-604274100",
+            "phl-463081000",
+            "phl-341080700",
+            "phl-604106100",
+            "phl-463065700",
+            "phl-042161500",
+            "phl-041074800"
+          ]
+        },
+        "diagnostics": {
+          "modelVersion": "2.1",
+          "marketBacktestSample": 418,
+          "marketMedianAbsoluteErrorPct": 33.3,
+          "marketP80AbsoluteErrorPct": 56.1
+        }
+      },
+      "listing": null,
+      "vendorEstimates": []
+    },
+    {
+      "id": "phl-514207710",
+      "marketId": "philadelphia",
+      "clusterId": "philadelphia-west",
+      "sourceId": "philadelphia-opa",
+      "sourceLabel": "Philadelphia OPA",
+      "sourceUrl": "https://opendataphilly.org/datasets/opa-property-assessments/",
+      "parcelId": "514207710",
+      "address": "1828 S VOGDES ST",
+      "locality": "Philadelphia, PA 19143",
+      "zip": "19143",
+      "lat": 39.93441209582531,
+      "lng": -75.22045620742138,
+      "propertyType": "SINGLE FAMILY",
+      "yearBuilt": 1920,
+      "sqft": 960,
+      "lotSqft": null,
+      "beds": 3,
+      "baths": 1,
+      "saleDate": "2026-05-15",
+      "salePrice": 155000,
+      "assessedValue": 70100,
+      "qualification": "Residential OPA record · price, area and value sanity filters passed",
+      "clusterName": "Philadelphia · West Corridor",
+      "model": {
+        "value": 119000,
+        "low": 52000,
+        "high": 185000,
+        "confidence": 68,
+        "watchScore": 76,
+        "valuationGapPct": 69.3,
         "compCount": 12,
         "anchors": {
           "hpiAdjustedSale": 155000,
-          "assessmentCalibrated": 135000,
-          "comparablePpsf": 254000
+          "assessmentCalibrated": 75000,
+          "comparablePpsf": 110000
         },
         "weights": {
           "hpiAdjustedSale": 0.35,
           "assessmentCalibrated": 0.2,
           "comparableSales": 0.45
         },
-        "calibrationRatio": 1.063,
-        "comparablePpsf": 249,
-        "clusterEdgeScore": 70,
+        "calibrationRatio": 1.066,
+        "comparablePpsf": 115,
+        "clusterEdgeScore": 69,
+        "pricePerSqft": {
+          "recordedSale": 161,
+          "hpiAdjustedSale": 161,
+          "assessmentCalibrated": 78,
+          "comparableP25": 91,
+          "comparableMedian": 115,
+          "comparableP75": 181,
+          "modelCenter": 124
+        },
+        "recency": {
+          "saleAgeMonths": 2.8,
+          "score": 96,
+          "band": "current"
+        },
         "comparableQuality": {
           "nearestMiles": 0.2,
-          "medianMiles": 0.6,
+          "medianMiles": 1.1,
+          "medianAgeMonths": 5,
+          "newestSaleDate": "2026-06-05",
+          "oldestSaleDate": "2026-02-13",
           "sameTypePct": 100,
           "recordIds": [
-            "phl-031162400",
-            "phl-514139900",
-            "phl-514106700",
-            "phl-513070300",
-            "phl-513062200",
-            "phl-041099000",
-            "phl-604286000",
-            "phl-604118500",
+            "phl-514252400",
+            "phl-514177400",
+            "phl-514187405",
+            "phl-403049000",
+            "phl-602015400",
+            "phl-463268000",
+            "phl-401178700",
             "phl-603113300",
-            "phl-061238500",
-            "phl-511101700",
-            "phl-342236900"
+            "phl-513024510",
+            "phl-406186100",
+            "phl-513070300",
+            "phl-403059300"
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 421,
-          "marketMedianAbsoluteErrorPct": 33.7,
-          "marketP80AbsoluteErrorPct": 54.6
+          "modelVersion": "2.1",
+          "marketBacktestSample": 418,
+          "marketMedianAbsoluteErrorPct": 33.3,
+          "marketP80AbsoluteErrorPct": 56.1
         }
       },
       "listing": null,
       "vendorEstimates": []
     },
     {
-      "id": "phl-604231800",
+      "id": "phl-401356100",
       "marketId": "philadelphia",
       "clusterId": "philadelphia-west",
       "sourceId": "philadelphia-opa",
       "sourceLabel": "Philadelphia OPA",
       "sourceUrl": "https://opendataphilly.org/datasets/opa-property-assessments/",
-      "parcelId": "604231800",
-      "address": "269 S FRAZIER ST",
-      "locality": "Philadelphia, PA 19139",
-      "zip": "19139",
-      "lat": 39.95643131922947,
-      "lng": -75.23497024676747,
-      "propertyType": "SINGLE FAMILY",
-      "yearBuilt": 1925,
-      "sqft": 1302,
-      "lotSqft": null,
-      "beds": 3,
-      "baths": 1,
-      "saleDate": "2026-03-31",
-      "salePrice": 275000,
-      "assessedValue": 144300,
-      "qualification": "Residential OPA record · price, area and value sanity filters passed",
-      "clusterName": "Philadelphia · West Corridor",
-      "model": {
-        "value": 220000,
-        "low": 100000,
-        "high": 340000,
-        "confidence": 69,
-        "watchScore": 77,
-        "valuationGapPct": 52.4,
-        "compCount": 12,
-        "anchors": {
-          "hpiAdjustedSale": 275000,
-          "assessmentCalibrated": 153000,
-          "comparablePpsf": 207000
-        },
-        "weights": {
-          "hpiAdjustedSale": 0.35,
-          "assessmentCalibrated": 0.2,
-          "comparableSales": 0.45
-        },
-        "calibrationRatio": 1.063,
-        "comparablePpsf": 159,
-        "clusterEdgeScore": 70,
-        "comparableQuality": {
-          "nearestMiles": 0.3,
-          "medianMiles": 0.5,
-          "sameTypePct": 100,
-          "recordIds": [
-            "phl-042035500",
-            "phl-031090900",
-            "phl-032140100",
-            "phl-463093500",
-            "phl-511143400",
-            "phl-603034700",
-            "phl-513000900",
-            "phl-441361600",
-            "phl-603006700",
-            "phl-602093700",
-            "phl-463111600",
-            "phl-511046100"
-          ]
-        },
-        "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 421,
-          "marketMedianAbsoluteErrorPct": 33.7,
-          "marketP80AbsoluteErrorPct": 54.6
-        }
-      },
-      "listing": null,
-      "vendorEstimates": []
-    },
-    {
-      "id": "phl-042183400",
-      "marketId": "philadelphia",
-      "clusterId": "philadelphia-west",
-      "sourceId": "philadelphia-opa",
-      "sourceLabel": "Philadelphia OPA",
-      "sourceUrl": "https://opendataphilly.org/datasets/opa-property-assessments/",
-      "parcelId": "042183400",
-      "address": "5914 CALLOWHILL ST",
-      "locality": "Philadelphia, PA 19151",
-      "zip": "19151",
-      "lat": 39.96779498013073,
-      "lng": -75.23814188772043,
+      "parcelId": "401356100",
+      "address": "6312 PASCHALL AVE",
+      "locality": "Philadelphia, PA 19142",
+      "zip": "19142",
+      "lat": 39.92594961544005,
+      "lng": -75.23071667416801,
       "propertyType": "SINGLE FAMILY",
       "yearBuilt": 1920,
-      "sqft": 980,
+      "sqft": 1320,
       "lotSqft": null,
       "beds": 3,
       "baths": 1,
-      "saleDate": "2026-03-27",
-      "salePrice": 135000,
-      "assessedValue": 93300,
+      "saleDate": "2026-05-13",
+      "salePrice": 200000,
+      "assessedValue": 134700,
       "qualification": "Residential OPA record · price, area and value sanity filters passed",
       "clusterName": "Philadelphia · West Corridor",
       "model": {
-        "value": 147000,
-        "low": 67000,
-        "high": 228000,
-        "confidence": 69,
-        "watchScore": 77,
-        "valuationGapPct": 58.1,
+        "value": 193000,
+        "low": 85000,
+        "high": 301000,
+        "confidence": 72,
+        "watchScore": 76,
+        "valuationGapPct": 43,
         "compCount": 12,
         "anchors": {
-          "hpiAdjustedSale": 135000,
-          "assessmentCalibrated": 99000,
-          "comparablePpsf": 179000
+          "hpiAdjustedSale": 200000,
+          "assessmentCalibrated": 144000,
+          "comparablePpsf": 209000
         },
         "weights": {
           "hpiAdjustedSale": 0.35,
           "assessmentCalibrated": 0.2,
           "comparableSales": 0.45
         },
-        "calibrationRatio": 1.063,
-        "comparablePpsf": 182,
-        "clusterEdgeScore": 70,
+        "calibrationRatio": 1.066,
+        "comparablePpsf": 158,
+        "clusterEdgeScore": 69,
+        "pricePerSqft": {
+          "recordedSale": 152,
+          "hpiAdjustedSale": 152,
+          "assessmentCalibrated": 109,
+          "comparableP25": 91,
+          "comparableMedian": 158,
+          "comparableP75": 180,
+          "modelCenter": 146
+        },
+        "recency": {
+          "saleAgeMonths": 2.8,
+          "score": 95,
+          "band": "current"
+        },
         "comparableQuality": {
-          "nearestMiles": 0.4,
+          "nearestMiles": 0.3,
           "medianMiles": 0.9,
+          "medianAgeMonths": 3.5,
+          "newestSaleDate": "2026-06-12",
+          "oldestSaleDate": "2026-03-06",
           "sameTypePct": 100,
           "recordIds": [
-            "phl-442302300",
-            "phl-043274400",
-            "phl-602015400",
-            "phl-604286000",
-            "phl-604118500",
-            "phl-603113300",
-            "phl-041209800",
-            "phl-041096300",
-            "phl-511101700",
-            "phl-513070300",
-            "phl-513062200",
-            "phl-463268000"
+            "phl-403132500",
+            "phl-403037500",
+            "phl-513083500",
+            "phl-403316100",
+            "phl-463115100",
+            "phl-401227200",
+            "phl-401226900",
+            "phl-513088900",
+            "phl-513274800",
+            "phl-463093500",
+            "phl-514120000",
+            "phl-033175900"
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 421,
-          "marketMedianAbsoluteErrorPct": 33.7,
-          "marketP80AbsoluteErrorPct": 54.6
+          "modelVersion": "2.1",
+          "marketBacktestSample": 418,
+          "marketMedianAbsoluteErrorPct": 33.3,
+          "marketP80AbsoluteErrorPct": 56.1
         }
       },
       "listing": null,
       "vendorEstimates": []
     },
     {
-      "id": "phl-341031300",
+      "id": "phl-033171500",
       "marketId": "philadelphia",
       "clusterId": "philadelphia-west",
       "sourceId": "philadelphia-opa",
       "sourceLabel": "Philadelphia OPA",
       "sourceUrl": "https://opendataphilly.org/datasets/opa-property-assessments/",
-      "parcelId": "341031300",
-      "address": "6136 VINE ST",
-      "locality": "Philadelphia, PA 19139",
-      "zip": "19139",
-      "lat": 39.966779346102896,
-      "lng": -75.24309248152072,
-      "propertyType": "SINGLE FAMILY",
-      "yearBuilt": 1925,
-      "sqft": 1442,
-      "lotSqft": null,
-      "beds": 3,
-      "baths": 1,
-      "saleDate": "2026-03-06",
-      "salePrice": 230000,
-      "assessedValue": 129100,
-      "qualification": "Residential OPA record · price, area and value sanity filters passed",
-      "clusterName": "Philadelphia · West Corridor",
-      "model": {
-        "value": 204000,
-        "low": 93000,
-        "high": 316000,
-        "confidence": 70,
-        "watchScore": 77,
-        "valuationGapPct": 58.1,
-        "compCount": 12,
-        "anchors": {
-          "hpiAdjustedSale": 230000,
-          "assessmentCalibrated": 137000,
-          "comparablePpsf": 214000
-        },
-        "weights": {
-          "hpiAdjustedSale": 0.35,
-          "assessmentCalibrated": 0.2,
-          "comparableSales": 0.45
-        },
-        "calibrationRatio": 1.063,
-        "comparablePpsf": 148,
-        "clusterEdgeScore": 70,
-        "comparableQuality": {
-          "nearestMiles": 0.2,
-          "medianMiles": 0.7,
-          "sameTypePct": 100,
-          "recordIds": [
-            "phl-342006200",
-            "phl-604287500",
-            "phl-342302200",
-            "phl-042143950",
-            "phl-344105500",
-            "phl-602007100",
-            "phl-031118800",
-            "phl-032133700",
-            "phl-041334800",
-            "phl-342318400",
-            "phl-341090600",
-            "phl-463224800"
-          ]
-        },
-        "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 421,
-          "marketMedianAbsoluteErrorPct": 33.7,
-          "marketP80AbsoluteErrorPct": 54.6
-        }
-      },
-      "listing": null,
-      "vendorEstimates": []
-    },
-    {
-      "id": "phl-033192800",
-      "marketId": "philadelphia",
-      "clusterId": "philadelphia-west",
-      "sourceId": "philadelphia-opa",
-      "sourceLabel": "Philadelphia OPA",
-      "sourceUrl": "https://opendataphilly.org/datasets/opa-property-assessments/",
-      "parcelId": "033192800",
-      "address": "935 S 59TH ST",
+      "parcelId": "033171500",
+      "address": "5932 LATONA ST",
       "locality": "Philadelphia, PA 19143",
       "zip": "19143",
-      "lat": 39.946551705136905,
-      "lng": -75.24168411892234,
+      "lat": 39.945253882620335,
+      "lng": -75.24340609721442,
       "propertyType": "SINGLE FAMILY",
-      "yearBuilt": 1916,
-      "sqft": 1472,
+      "yearBuilt": 1925,
+      "sqft": 1384,
       "lotSqft": null,
       "beds": 3,
       "baths": 1,
-      "saleDate": "2026-02-24",
-      "salePrice": 285000,
-      "assessedValue": 164200,
+      "saleDate": "2026-05-13",
+      "salePrice": 255000,
+      "assessedValue": 164000,
       "qualification": "Residential OPA record · price, area and value sanity filters passed",
       "clusterName": "Philadelphia · West Corridor",
       "model": {
-        "value": 253000,
-        "low": 115000,
-        "high": 391000,
-        "confidence": 70,
-        "watchScore": 77,
-        "valuationGapPct": 54.1,
+        "value": 230000,
+        "low": 101000,
+        "high": 358000,
+        "confidence": 72,
+        "watchScore": 76,
+        "valuationGapPct": 39.9,
         "compCount": 12,
         "anchors": {
-          "hpiAdjustedSale": 285000,
-          "assessmentCalibrated": 174000,
-          "comparablePpsf": 263000
+          "hpiAdjustedSale": 255000,
+          "assessmentCalibrated": 175000,
+          "comparablePpsf": 234000
         },
         "weights": {
           "hpiAdjustedSale": 0.35,
           "assessmentCalibrated": 0.2,
           "comparableSales": 0.45
         },
-        "calibrationRatio": 1.063,
-        "comparablePpsf": 179,
-        "clusterEdgeScore": 70,
+        "calibrationRatio": 1.066,
+        "comparablePpsf": 169,
+        "clusterEdgeScore": 69,
+        "pricePerSqft": {
+          "recordedSale": 184,
+          "hpiAdjustedSale": 184,
+          "assessmentCalibrated": 126,
+          "comparableP25": 102,
+          "comparableMedian": 169,
+          "comparableP75": 189,
+          "modelCenter": 166
+        },
+        "recency": {
+          "saleAgeMonths": 2.8,
+          "score": 95,
+          "band": "current"
+        },
         "comparableQuality": {
           "nearestMiles": 0.1,
-          "medianMiles": 0.5,
+          "medianMiles": 0.6,
+          "medianAgeMonths": 3.6,
+          "newestSaleDate": "2026-06-10",
+          "oldestSaleDate": "2026-02-26",
           "sameTypePct": 100,
           "recordIds": [
-            "phl-463284000",
-            "phl-033180900",
-            "phl-033146300",
-            "phl-513119000",
-            "phl-034039800",
-            "phl-463224800",
-            "phl-511223800",
-            "phl-032133700",
-            "phl-511256500",
-            "phl-462057900",
-            "phl-401349600",
-            "phl-604287500"
+            "phl-463215900",
+            "phl-034013700",
+            "phl-033063200",
+            "phl-463237400",
+            "phl-033009800",
+            "phl-604211100",
+            "phl-511250100",
+            "phl-033175900",
+            "phl-031089200",
+            "phl-032059100",
+            "phl-031088500",
+            "phl-462094200"
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 421,
-          "marketMedianAbsoluteErrorPct": 33.7,
-          "marketP80AbsoluteErrorPct": 54.6
+          "modelVersion": "2.1",
+          "marketBacktestSample": 418,
+          "marketMedianAbsoluteErrorPct": 33.3,
+          "marketP80AbsoluteErrorPct": 56.1
+        }
+      },
+      "listing": null,
+      "vendorEstimates": []
+    },
+    {
+      "id": "wake-0459100",
+      "marketId": "raleigh",
+      "clusterId": "raleigh-west",
+      "sourceId": "wake-county",
+      "sourceLabel": "Wake County GIS",
+      "sourceUrl": "https://data.wake.gov/datasets/Wake::parcels/about",
+      "parcelId": "0459100",
+      "address": "226 KENTIGERN DR",
+      "locality": "CARY, NC 27606",
+      "zip": "27606",
+      "lng": -78.74053149125245,
+      "lat": 35.74122142601174,
+      "propertyType": "SINGLFAM",
+      "yearBuilt": 2021,
+      "sqft": 4073,
+      "lotSqft": null,
+      "beds": null,
+      "baths": null,
+      "saleDate": "2026-06-26",
+      "salePrice": 662000,
+      "assessedValue": 608918,
+      "qualification": "Wake parcel record · price, area, use and value sanity filters passed",
+      "clusterName": "Raleigh · West Corridor",
+      "model": {
+        "value": 899000,
+        "low": 743000,
+        "high": 1056000,
+        "confidence": 83,
+        "watchScore": 84,
+        "valuationGapPct": 47.7,
+        "compCount": 12,
+        "anchors": {
+          "hpiAdjustedSale": 662000,
+          "assessmentCalibrated": 639000,
+          "comparablePpsf": 1200000
+        },
+        "weights": {
+          "hpiAdjustedSale": 0.35,
+          "assessmentCalibrated": 0.2,
+          "comparableSales": 0.45
+        },
+        "calibrationRatio": 1.05,
+        "comparablePpsf": 295,
+        "clusterEdgeScore": 76,
+        "pricePerSqft": {
+          "recordedSale": 163,
+          "hpiAdjustedSale": 163,
+          "assessmentCalibrated": 157,
+          "comparableP25": 253,
+          "comparableMedian": 295,
+          "comparableP75": 411,
+          "modelCenter": 221
+        },
+        "recency": {
+          "saleAgeMonths": 1.4,
+          "score": 98,
+          "band": "current"
+        },
+        "comparableQuality": {
+          "nearestMiles": 0.5,
+          "medianMiles": 2.4,
+          "medianAgeMonths": 1.9,
+          "newestSaleDate": "2026-07-29",
+          "oldestSaleDate": "2026-04-30",
+          "sameTypePct": 100,
+          "recordIds": [
+            "wake-0426325",
+            "wake-0462775",
+            "wake-0101514",
+            "wake-0514219",
+            "wake-0380805",
+            "wake-0380828",
+            "wake-0435978",
+            "wake-0076695",
+            "wake-0157850",
+            "wake-0228307",
+            "wake-0435975",
+            "wake-0344414"
+          ]
+        },
+        "diagnostics": {
+          "modelVersion": "2.1",
+          "marketBacktestSample": 1210,
+          "marketMedianAbsoluteErrorPct": 8.7,
+          "marketP80AbsoluteErrorPct": 17
         }
       },
       "listing": null,
@@ -2851,15 +3554,15 @@
       "clusterName": "Raleigh · West Corridor",
       "model": {
         "value": 1296000,
-        "low": 1077000,
-        "high": 1515000,
+        "low": 1076000,
+        "high": 1517000,
         "confidence": 83,
         "watchScore": 84,
-        "valuationGapPct": 59,
+        "valuationGapPct": 59.1,
         "compCount": 12,
         "anchors": {
           "hpiAdjustedSale": 1180000,
-          "assessmentCalibrated": 855000,
+          "assessmentCalibrated": 856000,
           "comparablePpsf": 1582000
         },
         "weights": {
@@ -2867,12 +3570,29 @@
           "assessmentCalibrated": 0.2,
           "comparableSales": 0.45
         },
-        "calibrationRatio": 1.049,
+        "calibrationRatio": 1.05,
         "comparablePpsf": 301,
         "clusterEdgeScore": 76,
+        "pricePerSqft": {
+          "recordedSale": 224,
+          "hpiAdjustedSale": 224,
+          "assessmentCalibrated": 163,
+          "comparableP25": 276,
+          "comparableMedian": 301,
+          "comparableP75": 331,
+          "modelCenter": 247
+        },
+        "recency": {
+          "saleAgeMonths": 2.6,
+          "score": 96,
+          "band": "current"
+        },
         "comparableQuality": {
           "nearestMiles": 2.3,
           "medianMiles": 10.6,
+          "medianAgeMonths": 1.4,
+          "newestSaleDate": "2026-07-22",
+          "oldestSaleDate": "2026-04-30",
           "sameTypePct": 100,
           "recordIds": [
             "wake-0505510",
@@ -2890,10 +3610,10 @@
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 1202,
-          "marketMedianAbsoluteErrorPct": 8.6,
-          "marketP80AbsoluteErrorPct": 16.9
+          "modelVersion": "2.1",
+          "marketBacktestSample": 1210,
+          "marketMedianAbsoluteErrorPct": 8.7,
+          "marketP80AbsoluteErrorPct": 17
         }
       },
       "listing": null,
@@ -2933,7 +3653,7 @@
         "compCount": 12,
         "anchors": {
           "hpiAdjustedSale": 259000,
-          "assessmentCalibrated": 164000,
+          "assessmentCalibrated": 165000,
           "comparablePpsf": 286000
         },
         "weights": {
@@ -2941,12 +3661,29 @@
           "assessmentCalibrated": 0.2,
           "comparableSales": 0.45
         },
-        "calibrationRatio": 1.049,
+        "calibrationRatio": 1.05,
         "comparablePpsf": 285,
         "clusterEdgeScore": 76,
+        "pricePerSqft": {
+          "recordedSale": 257,
+          "hpiAdjustedSale": 257,
+          "assessmentCalibrated": 164,
+          "comparableP25": 271,
+          "comparableMedian": 285,
+          "comparableP75": 302,
+          "modelCenter": 251
+        },
+        "recency": {
+          "saleAgeMonths": 2.6,
+          "score": 96,
+          "band": "current"
+        },
         "comparableQuality": {
           "nearestMiles": 0.8,
           "medianMiles": 4.8,
+          "medianAgeMonths": 1.8,
+          "newestSaleDate": "2026-07-15",
+          "oldestSaleDate": "2026-04-30",
           "sameTypePct": 100,
           "recordIds": [
             "wake-0061704",
@@ -2964,10 +3701,101 @@
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 1202,
-          "marketMedianAbsoluteErrorPct": 8.6,
-          "marketP80AbsoluteErrorPct": 16.9
+          "modelVersion": "2.1",
+          "marketBacktestSample": 1210,
+          "marketMedianAbsoluteErrorPct": 8.7,
+          "marketP80AbsoluteErrorPct": 17
+        }
+      },
+      "listing": null,
+      "vendorEstimates": []
+    },
+    {
+      "id": "wake-0201292",
+      "marketId": "raleigh",
+      "clusterId": "raleigh-west",
+      "sourceId": "wake-county",
+      "sourceLabel": "Wake County GIS",
+      "sourceUrl": "https://data.wake.gov/datasets/Wake::parcels/about",
+      "parcelId": "0201292",
+      "address": "114 LARGE OAKS DR",
+      "locality": "CARY, NC 27518",
+      "zip": "27518",
+      "lng": -78.75317514389118,
+      "lat": 35.735767267443734,
+      "propertyType": "SINGLFAM",
+      "yearBuilt": 1995,
+      "sqft": 5124,
+      "lotSqft": null,
+      "beds": null,
+      "baths": null,
+      "saleDate": "2026-05-05",
+      "salePrice": 1050000,
+      "assessedValue": 822881,
+      "qualification": "Wake parcel record · price, area, use and value sanity filters passed",
+      "clusterName": "Raleigh · West Corridor",
+      "model": {
+        "value": 1235000,
+        "low": 1025000,
+        "high": 1445000,
+        "confidence": 83,
+        "watchScore": 84,
+        "valuationGapPct": 50.1,
+        "compCount": 12,
+        "anchors": {
+          "hpiAdjustedSale": 1050000,
+          "assessmentCalibrated": 864000,
+          "comparablePpsf": 1544000
+        },
+        "weights": {
+          "hpiAdjustedSale": 0.35,
+          "assessmentCalibrated": 0.2,
+          "comparableSales": 0.45
+        },
+        "calibrationRatio": 1.05,
+        "comparablePpsf": 301,
+        "clusterEdgeScore": 76,
+        "pricePerSqft": {
+          "recordedSale": 205,
+          "hpiAdjustedSale": 205,
+          "assessmentCalibrated": 169,
+          "comparableP25": 261,
+          "comparableMedian": 301,
+          "comparableP75": 425,
+          "modelCenter": 241
+        },
+        "recency": {
+          "saleAgeMonths": 3.1,
+          "score": 95,
+          "band": "current"
+        },
+        "comparableQuality": {
+          "nearestMiles": 0.7,
+          "medianMiles": 2.6,
+          "medianAgeMonths": 1.9,
+          "newestSaleDate": "2026-07-16",
+          "oldestSaleDate": "2026-04-30",
+          "sameTypePct": 100,
+          "recordIds": [
+            "wake-0336791",
+            "wake-0157835",
+            "wake-0194915",
+            "wake-0353060",
+            "wake-0194908",
+            "wake-0243367",
+            "wake-0344455",
+            "wake-0344442",
+            "wake-0179378",
+            "wake-0157850",
+            "wake-0490791",
+            "wake-0197841"
+          ]
+        },
+        "diagnostics": {
+          "modelVersion": "2.1",
+          "marketBacktestSample": 1210,
+          "marketMedianAbsoluteErrorPct": 8.7,
+          "marketP80AbsoluteErrorPct": 17
         }
       },
       "listing": null,
@@ -3003,7 +3831,7 @@
         "high": 259000,
         "confidence": 83,
         "watchScore": 84,
-        "valuationGapPct": 50.2,
+        "valuationGapPct": 50.3,
         "compCount": 12,
         "anchors": {
           "hpiAdjustedSale": 170000,
@@ -3015,12 +3843,29 @@
           "assessmentCalibrated": 0.2,
           "comparableSales": 0.45
         },
-        "calibrationRatio": 1.049,
+        "calibrationRatio": 1.05,
         "comparablePpsf": 290,
         "clusterEdgeScore": 76,
+        "pricePerSqft": {
+          "recordedSale": 170,
+          "hpiAdjustedSale": 170,
+          "assessmentCalibrated": 154,
+          "comparableP25": 257,
+          "comparableMedian": 290,
+          "comparableP75": 330,
+          "modelCenter": 221
+        },
+        "recency": {
+          "saleAgeMonths": 3.3,
+          "score": 95,
+          "band": "current"
+        },
         "comparableQuality": {
           "nearestMiles": 0.2,
           "medianMiles": 3.1,
+          "medianAgeMonths": 2.3,
+          "newestSaleDate": "2026-07-06",
+          "oldestSaleDate": "2026-04-27",
           "sameTypePct": 100,
           "recordIds": [
             "wake-0083239",
@@ -3038,84 +3883,10 @@
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 1202,
-          "marketMedianAbsoluteErrorPct": 8.6,
-          "marketP80AbsoluteErrorPct": 16.9
-        }
-      },
-      "listing": null,
-      "vendorEstimates": []
-    },
-    {
-      "id": "wake-0459100",
-      "marketId": "raleigh",
-      "clusterId": "raleigh-west",
-      "sourceId": "wake-county",
-      "sourceLabel": "Wake County GIS",
-      "sourceUrl": "https://data.wake.gov/datasets/Wake::parcels/about",
-      "parcelId": "0459100",
-      "address": "226 KENTIGERN DR",
-      "locality": "CARY, NC 27606",
-      "zip": "27606",
-      "lng": -78.74053149125245,
-      "lat": 35.74122142601174,
-      "propertyType": "SINGLFAM",
-      "yearBuilt": 2021,
-      "sqft": 4073,
-      "lotSqft": null,
-      "beds": null,
-      "baths": null,
-      "saleDate": "2026-06-26",
-      "salePrice": 662000,
-      "assessedValue": 608918,
-      "qualification": "Wake parcel record · price, area, use and value sanity filters passed",
-      "clusterName": "Raleigh · West Corridor",
-      "model": {
-        "value": 884000,
-        "low": 735000,
-        "high": 1033000,
-        "confidence": 83,
-        "watchScore": 83,
-        "valuationGapPct": 45.2,
-        "compCount": 12,
-        "anchors": {
-          "hpiAdjustedSale": 662000,
-          "assessmentCalibrated": 639000,
-          "comparablePpsf": 1165000
-        },
-        "weights": {
-          "hpiAdjustedSale": 0.35,
-          "assessmentCalibrated": 0.2,
-          "comparableSales": 0.45
-        },
-        "calibrationRatio": 1.049,
-        "comparablePpsf": 286,
-        "clusterEdgeScore": 76,
-        "comparableQuality": {
-          "nearestMiles": 0.5,
-          "medianMiles": 2,
-          "sameTypePct": 100,
-          "recordIds": [
-            "wake-0426325",
-            "wake-0462775",
-            "wake-0101514",
-            "wake-0514219",
-            "wake-0380805",
-            "wake-0380828",
-            "wake-0076695",
-            "wake-0157850",
-            "wake-0228307",
-            "wake-0435975",
-            "wake-0344414",
-            "wake-0229995"
-          ]
-        },
-        "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 1202,
-          "marketMedianAbsoluteErrorPct": 8.6,
-          "marketP80AbsoluteErrorPct": 16.9
+          "modelVersion": "2.1",
+          "marketBacktestSample": 1210,
+          "marketMedianAbsoluteErrorPct": 8.7,
+          "marketP80AbsoluteErrorPct": 17
         }
       },
       "listing": null,
@@ -3148,14 +3919,14 @@
       "model": {
         "value": 566000,
         "low": 470000,
-        "high": 661000,
+        "high": 662000,
         "confidence": 86,
         "watchScore": 83,
-        "valuationGapPct": 38.9,
+        "valuationGapPct": 39,
         "compCount": 12,
         "anchors": {
           "hpiAdjustedSale": 538000,
-          "assessmentCalibrated": 427000,
+          "assessmentCalibrated": 428000,
           "comparablePpsf": 649000
         },
         "weights": {
@@ -3163,12 +3934,29 @@
           "assessmentCalibrated": 0.2,
           "comparableSales": 0.45
         },
-        "calibrationRatio": 1.049,
+        "calibrationRatio": 1.05,
         "comparablePpsf": 257,
         "clusterEdgeScore": 76,
+        "pricePerSqft": {
+          "recordedSale": 213,
+          "hpiAdjustedSale": 213,
+          "assessmentCalibrated": 169,
+          "comparableP25": 213,
+          "comparableMedian": 257,
+          "comparableP75": 269,
+          "modelCenter": 224
+        },
+        "recency": {
+          "saleAgeMonths": 1.4,
+          "score": 98,
+          "band": "current"
+        },
         "comparableQuality": {
           "nearestMiles": 0.5,
           "medianMiles": 1.3,
+          "medianAgeMonths": 1.9,
+          "newestSaleDate": "2026-07-07",
+          "oldestSaleDate": "2026-05-04",
           "sameTypePct": 100,
           "recordIds": [
             "wake-0409159",
@@ -3186,10 +3974,10 @@
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 1202,
-          "marketMedianAbsoluteErrorPct": 8.6,
-          "marketP80AbsoluteErrorPct": 16.9
+          "modelVersion": "2.1",
+          "marketBacktestSample": 1210,
+          "marketMedianAbsoluteErrorPct": 8.7,
+          "marketP80AbsoluteErrorPct": 17
         }
       },
       "listing": null,
@@ -3221,8 +4009,8 @@
       "clusterName": "Raleigh · West Corridor",
       "model": {
         "value": 1234000,
-        "low": 1026000,
-        "high": 1443000,
+        "low": 1024000,
+        "high": 1444000,
         "confidence": 86,
         "watchScore": 83,
         "valuationGapPct": 36.7,
@@ -3237,12 +4025,29 @@
           "assessmentCalibrated": 0.2,
           "comparableSales": 0.45
         },
-        "calibrationRatio": 1.049,
+        "calibrationRatio": 1.05,
         "comparablePpsf": 301,
         "clusterEdgeScore": 76,
+        "pricePerSqft": {
+          "recordedSale": 261,
+          "hpiAdjustedSale": 261,
+          "assessmentCalibrated": 206,
+          "comparableP25": 235,
+          "comparableMedian": 301,
+          "comparableP75": 425,
+          "modelCenter": 268
+        },
+        "recency": {
+          "saleAgeMonths": 2.2,
+          "score": 97,
+          "band": "current"
+        },
         "comparableQuality": {
           "nearestMiles": 0.1,
           "medianMiles": 1.4,
+          "medianAgeMonths": 1.7,
+          "newestSaleDate": "2026-07-16",
+          "oldestSaleDate": "2026-04-30",
           "sameTypePct": 100,
           "recordIds": [
             "wake-0194908",
@@ -3260,84 +4065,10 @@
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 1202,
-          "marketMedianAbsoluteErrorPct": 8.6,
-          "marketP80AbsoluteErrorPct": 16.9
-        }
-      },
-      "listing": null,
-      "vendorEstimates": []
-    },
-    {
-      "id": "wake-0201292",
-      "marketId": "raleigh",
-      "clusterId": "raleigh-west",
-      "sourceId": "wake-county",
-      "sourceLabel": "Wake County GIS",
-      "sourceUrl": "https://data.wake.gov/datasets/Wake::parcels/about",
-      "parcelId": "0201292",
-      "address": "114 LARGE OAKS DR",
-      "locality": "CARY, NC 27518",
-      "zip": "27518",
-      "lng": -78.75317514389118,
-      "lat": 35.735767267443734,
-      "propertyType": "SINGLFAM",
-      "yearBuilt": 1995,
-      "sqft": 5124,
-      "lotSqft": null,
-      "beds": null,
-      "baths": null,
-      "saleDate": "2026-05-05",
-      "salePrice": 1050000,
-      "assessedValue": 822881,
-      "qualification": "Wake parcel record · price, area, use and value sanity filters passed",
-      "clusterName": "Raleigh · West Corridor",
-      "model": {
-        "value": 1187000,
-        "low": 986000,
-        "high": 1387000,
-        "confidence": 84,
-        "watchScore": 83,
-        "valuationGapPct": 44.2,
-        "compCount": 12,
-        "anchors": {
-          "hpiAdjustedSale": 1050000,
-          "assessmentCalibrated": 863000,
-          "comparablePpsf": 1436000
-        },
-        "weights": {
-          "hpiAdjustedSale": 0.35,
-          "assessmentCalibrated": 0.2,
-          "comparableSales": 0.45
-        },
-        "calibrationRatio": 1.049,
-        "comparablePpsf": 280,
-        "clusterEdgeScore": 76,
-        "comparableQuality": {
-          "nearestMiles": 0.7,
-          "medianMiles": 2.8,
-          "sameTypePct": 100,
-          "recordIds": [
-            "wake-0336791",
-            "wake-0157835",
-            "wake-0194915",
-            "wake-0353060",
-            "wake-0194908",
-            "wake-0243367",
-            "wake-0170131",
-            "wake-0344455",
-            "wake-0344442",
-            "wake-0179378",
-            "wake-0157850",
-            "wake-0490791"
-          ]
-        },
-        "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 1202,
-          "marketMedianAbsoluteErrorPct": 8.6,
-          "marketP80AbsoluteErrorPct": 16.9
+          "modelVersion": "2.1",
+          "marketBacktestSample": 1210,
+          "marketMedianAbsoluteErrorPct": 8.7,
+          "marketP80AbsoluteErrorPct": 17
         }
       },
       "listing": null,
@@ -3385,12 +4116,29 @@
           "assessmentCalibrated": 0.2,
           "comparableSales": 0.45
         },
-        "calibrationRatio": 1.049,
+        "calibrationRatio": 1.05,
         "comparablePpsf": 292,
         "clusterEdgeScore": 76,
+        "pricePerSqft": {
+          "recordedSale": 286,
+          "hpiAdjustedSale": 286,
+          "assessmentCalibrated": 205,
+          "comparableP25": 271,
+          "comparableMedian": 292,
+          "comparableP75": 299,
+          "modelCenter": 273
+        },
+        "recency": {
+          "saleAgeMonths": 3.4,
+          "score": 95,
+          "band": "current"
+        },
         "comparableQuality": {
           "nearestMiles": 0.1,
           "medianMiles": 2.4,
+          "medianAgeMonths": 2,
+          "newestSaleDate": "2026-07-23",
+          "oldestSaleDate": "2026-04-28",
           "sameTypePct": 100,
           "recordIds": [
             "wake-0246515",
@@ -3408,10 +4156,192 @@
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 1202,
-          "marketMedianAbsoluteErrorPct": 8.6,
-          "marketP80AbsoluteErrorPct": 16.9
+          "modelVersion": "2.1",
+          "marketBacktestSample": 1210,
+          "marketMedianAbsoluteErrorPct": 8.7,
+          "marketP80AbsoluteErrorPct": 17
+        }
+      },
+      "listing": null,
+      "vendorEstimates": []
+    },
+    {
+      "id": "wake-0220166",
+      "marketId": "raleigh",
+      "clusterId": "raleigh-west",
+      "sourceId": "wake-county",
+      "sourceLabel": "Wake County GIS",
+      "sourceUrl": "https://data.wake.gov/datasets/Wake::parcels/about",
+      "parcelId": "0220166",
+      "address": "1211 WATERFORD GREEN DR",
+      "locality": "APEX, NC 27502",
+      "zip": "27502",
+      "lng": -78.81755692936801,
+      "lat": 35.72594781502546,
+      "propertyType": "SINGLFAM",
+      "yearBuilt": 1998,
+      "sqft": 2230,
+      "lotSqft": null,
+      "beds": null,
+      "baths": null,
+      "saleDate": "2026-07-30",
+      "salePrice": 537500,
+      "assessedValue": 428959,
+      "qualification": "Wake parcel record · price, area, use and value sanity filters passed",
+      "clusterName": "Raleigh · West Corridor",
+      "model": {
+        "value": 548000,
+        "low": 455000,
+        "high": 641000,
+        "confidence": 87,
+        "watchScore": 82,
+        "valuationGapPct": 27.7,
+        "compCount": 12,
+        "anchors": {
+          "hpiAdjustedSale": 538000,
+          "assessmentCalibrated": 450000,
+          "comparablePpsf": 599000
+        },
+        "weights": {
+          "hpiAdjustedSale": 0.35,
+          "assessmentCalibrated": 0.2,
+          "comparableSales": 0.45
+        },
+        "calibrationRatio": 1.05,
+        "comparablePpsf": 269,
+        "clusterEdgeScore": 76,
+        "pricePerSqft": {
+          "recordedSale": 241,
+          "hpiAdjustedSale": 241,
+          "assessmentCalibrated": 202,
+          "comparableP25": 234,
+          "comparableMedian": 269,
+          "comparableP75": 284,
+          "modelCenter": 246
+        },
+        "recency": {
+          "saleAgeMonths": 0.3,
+          "score": 100,
+          "band": "current"
+        },
+        "comparableQuality": {
+          "nearestMiles": 0.8,
+          "medianMiles": 2.6,
+          "medianAgeMonths": 1.7,
+          "newestSaleDate": "2026-07-16",
+          "oldestSaleDate": "2026-04-29",
+          "sameTypePct": 100,
+          "recordIds": [
+            "wake-0210126",
+            "wake-0242592",
+            "wake-0255697",
+            "wake-0198031",
+            "wake-0367980",
+            "wake-0359494",
+            "wake-0321247",
+            "wake-0180496",
+            "wake-0217794",
+            "wake-0250752",
+            "wake-0439081",
+            "wake-0348136"
+          ]
+        },
+        "diagnostics": {
+          "modelVersion": "2.1",
+          "marketBacktestSample": 1210,
+          "marketMedianAbsoluteErrorPct": 8.7,
+          "marketP80AbsoluteErrorPct": 17
+        }
+      },
+      "listing": null,
+      "vendorEstimates": []
+    },
+    {
+      "id": "wake-0203414",
+      "marketId": "raleigh",
+      "clusterId": "raleigh-west",
+      "sourceId": "wake-county",
+      "sourceLabel": "Wake County GIS",
+      "sourceUrl": "https://data.wake.gov/datasets/Wake::parcels/about",
+      "parcelId": "0203414",
+      "address": "109 LEBLANC CT",
+      "locality": "CARY, NC 27513",
+      "zip": "27513",
+      "lng": -78.82199226053282,
+      "lat": 35.79125710444739,
+      "propertyType": "SINGLFAM",
+      "yearBuilt": 1996,
+      "sqft": 2810,
+      "lotSqft": null,
+      "beds": null,
+      "baths": null,
+      "saleDate": "2026-07-30",
+      "salePrice": 800000,
+      "assessedValue": 627161,
+      "qualification": "Wake parcel record · price, area, use and value sanity filters passed",
+      "clusterName": "Raleigh · West Corridor",
+      "model": {
+        "value": 781000,
+        "low": 648000,
+        "high": 914000,
+        "confidence": 88,
+        "watchScore": 82,
+        "valuationGapPct": 24.5,
+        "compCount": 12,
+        "anchors": {
+          "hpiAdjustedSale": 800000,
+          "assessmentCalibrated": 659000,
+          "comparablePpsf": 820000
+        },
+        "weights": {
+          "hpiAdjustedSale": 0.35,
+          "assessmentCalibrated": 0.2,
+          "comparableSales": 0.45
+        },
+        "calibrationRatio": 1.05,
+        "comparablePpsf": 292,
+        "clusterEdgeScore": 76,
+        "pricePerSqft": {
+          "recordedSale": 285,
+          "hpiAdjustedSale": 285,
+          "assessmentCalibrated": 234,
+          "comparableP25": 280,
+          "comparableMedian": 292,
+          "comparableP75": 303,
+          "modelCenter": 278
+        },
+        "recency": {
+          "saleAgeMonths": 0.3,
+          "score": 100,
+          "band": "current"
+        },
+        "comparableQuality": {
+          "nearestMiles": 0,
+          "medianMiles": 1.2,
+          "medianAgeMonths": 2,
+          "newestSaleDate": "2026-07-30",
+          "oldestSaleDate": "2026-05-01",
+          "sameTypePct": 100,
+          "recordIds": [
+            "wake-0206251",
+            "wake-0223248",
+            "wake-0198812",
+            "wake-0205345",
+            "wake-0216625",
+            "wake-0272640",
+            "wake-0179059",
+            "wake-0208863",
+            "wake-0196894",
+            "wake-0195101",
+            "wake-0201478",
+            "wake-0213750"
+          ]
+        },
+        "diagnostics": {
+          "modelVersion": "2.1",
+          "marketBacktestSample": 1210,
+          "marketMedianAbsoluteErrorPct": 8.7,
+          "marketP80AbsoluteErrorPct": 17
         }
       },
       "listing": null,
@@ -3443,8 +4373,8 @@
       "clusterName": "Raleigh · West Corridor",
       "model": {
         "value": 683000,
-        "low": 568000,
-        "high": 798000,
+        "low": 567000,
+        "high": 799000,
         "confidence": 87,
         "watchScore": 82,
         "valuationGapPct": 30.8,
@@ -3459,12 +4389,29 @@
           "assessmentCalibrated": 0.2,
           "comparableSales": 0.45
         },
-        "calibrationRatio": 1.049,
+        "calibrationRatio": 1.05,
         "comparablePpsf": 273,
         "clusterEdgeScore": 76,
+        "pricePerSqft": {
+          "recordedSale": 262,
+          "hpiAdjustedSale": 262,
+          "assessmentCalibrated": 205,
+          "comparableP25": 259,
+          "comparableMedian": 273,
+          "comparableP75": 291,
+          "modelCenter": 255
+        },
+        "recency": {
+          "saleAgeMonths": 0.3,
+          "score": 100,
+          "band": "current"
+        },
         "comparableQuality": {
           "nearestMiles": 0.2,
           "medianMiles": 0.5,
+          "medianAgeMonths": 2,
+          "newestSaleDate": "2026-07-30",
+          "oldestSaleDate": "2026-05-04",
           "sameTypePct": 100,
           "recordIds": [
             "wake-0254838",
@@ -3482,84 +4429,101 @@
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 1202,
-          "marketMedianAbsoluteErrorPct": 8.6,
-          "marketP80AbsoluteErrorPct": 16.9
+          "modelVersion": "2.1",
+          "marketBacktestSample": 1210,
+          "marketMedianAbsoluteErrorPct": 8.7,
+          "marketP80AbsoluteErrorPct": 17
         }
       },
       "listing": null,
       "vendorEstimates": []
     },
     {
-      "id": "wake-0220166",
+      "id": "wake-0006086",
       "marketId": "raleigh",
       "clusterId": "raleigh-west",
       "sourceId": "wake-county",
       "sourceLabel": "Wake County GIS",
       "sourceUrl": "https://data.wake.gov/datasets/Wake::parcels/about",
-      "parcelId": "0220166",
-      "address": "1211 WATERFORD GREEN DR",
-      "locality": "APEX, NC 27502",
-      "zip": "27502",
-      "lng": -78.81755692936801,
-      "lat": 35.72594781502546,
+      "parcelId": "0006086",
+      "address": "422 S WEST ST",
+      "locality": "CARY, NC 27511",
+      "zip": "27511",
+      "lng": -78.78634616175688,
+      "lat": 35.781345596491626,
       "propertyType": "SINGLFAM",
-      "yearBuilt": 1998,
-      "sqft": 2230,
+      "yearBuilt": 1955,
+      "sqft": 3336,
       "lotSqft": null,
       "beds": null,
       "baths": null,
-      "saleDate": "2026-07-30",
-      "salePrice": 537500,
-      "assessedValue": 428959,
+      "saleDate": "2026-07-29",
+      "salePrice": 930000,
+      "assessedValue": 685284,
       "qualification": "Wake parcel record · price, area, use and value sanity filters passed",
       "clusterName": "Raleigh · West Corridor",
       "model": {
-        "value": 554000,
-        "low": 461000,
-        "high": 648000,
-        "confidence": 87,
+        "value": 871000,
+        "low": 723000,
+        "high": 1019000,
+        "confidence": 88,
         "watchScore": 82,
-        "valuationGapPct": 29.2,
+        "valuationGapPct": 27.1,
         "compCount": 12,
         "anchors": {
-          "hpiAdjustedSale": 538000,
-          "assessmentCalibrated": 450000,
-          "comparablePpsf": 613000
+          "hpiAdjustedSale": 930000,
+          "assessmentCalibrated": 720000,
+          "comparablePpsf": 892000
         },
         "weights": {
           "hpiAdjustedSale": 0.35,
           "assessmentCalibrated": 0.2,
           "comparableSales": 0.45
         },
-        "calibrationRatio": 1.049,
-        "comparablePpsf": 275,
+        "calibrationRatio": 1.05,
+        "comparablePpsf": 267,
         "clusterEdgeScore": 76,
+        "pricePerSqft": {
+          "recordedSale": 279,
+          "hpiAdjustedSale": 279,
+          "assessmentCalibrated": 216,
+          "comparableP25": 235,
+          "comparableMedian": 267,
+          "comparableP75": 290,
+          "modelCenter": 261
+        },
+        "recency": {
+          "saleAgeMonths": 0.3,
+          "score": 100,
+          "band": "current"
+        },
         "comparableQuality": {
-          "nearestMiles": 0.8,
-          "medianMiles": 2.4,
+          "nearestMiles": 1.3,
+          "medianMiles": 1.9,
+          "medianAgeMonths": 1.6,
+          "newestSaleDate": "2026-07-30",
+          "oldestSaleDate": "2026-05-01",
           "sameTypePct": 100,
           "recordIds": [
-            "wake-0210126",
-            "wake-0215696",
-            "wake-0242592",
-            "wake-0255697",
-            "wake-0198031",
-            "wake-0367980",
-            "wake-0359494",
-            "wake-0321247",
-            "wake-0180496",
-            "wake-0217794",
-            "wake-0250752",
-            "wake-0439081"
+            "wake-0441316",
+            "wake-0120828",
+            "wake-0088423",
+            "wake-0184365",
+            "wake-0185689",
+            "wake-0441320",
+            "wake-0348329",
+            "wake-0046676",
+            "wake-0438255",
+            "wake-0441329",
+            "wake-0249033",
+            "wake-0167333"
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 1202,
-          "marketMedianAbsoluteErrorPct": 8.6,
-          "marketP80AbsoluteErrorPct": 16.9
+          "modelVersion": "2.1",
+          "marketBacktestSample": 1210,
+          "marketMedianAbsoluteErrorPct": 8.7,
+          "marketP80AbsoluteErrorPct": 17
         }
       },
       "listing": null,
@@ -3590,16 +4554,16 @@
       "qualification": "Wake parcel record · price, area, use and value sanity filters passed",
       "clusterName": "Raleigh · West Corridor",
       "model": {
-        "value": 972000,
-        "low": 808000,
-        "high": 1137000,
+        "value": 973000,
+        "low": 807000,
+        "high": 1138000,
         "confidence": 86,
         "watchScore": 82,
-        "valuationGapPct": 31.6,
+        "valuationGapPct": 31.7,
         "compCount": 12,
         "anchors": {
           "hpiAdjustedSale": 860000,
-          "assessmentCalibrated": 775000,
+          "assessmentCalibrated": 776000,
           "comparablePpsf": 1148000
         },
         "weights": {
@@ -3607,17 +4571,35 @@
           "assessmentCalibrated": 0.2,
           "comparableSales": 0.45
         },
-        "calibrationRatio": 1.049,
+        "calibrationRatio": 1.05,
         "comparablePpsf": 310,
         "clusterEdgeScore": 76,
+        "pricePerSqft": {
+          "recordedSale": 232,
+          "hpiAdjustedSale": 232,
+          "assessmentCalibrated": 209,
+          "comparableP25": 234,
+          "comparableMedian": 310,
+          "comparableP75": 371,
+          "modelCenter": 263
+        },
+        "recency": {
+          "saleAgeMonths": 0.7,
+          "score": 99,
+          "band": "current"
+        },
         "comparableQuality": {
-          "nearestMiles": 0.4,
-          "medianMiles": 2.6,
+          "nearestMiles": 0.1,
+          "medianMiles": 2.3,
+          "medianAgeMonths": 1.5,
+          "newestSaleDate": "2026-07-24",
+          "oldestSaleDate": "2026-05-14",
           "sameTypePct": 100,
           "recordIds": [
             "wake-0284750",
             "wake-0258755",
             "wake-0240822",
+            "wake-0249033",
             "wake-0194549",
             "wake-0327539",
             "wake-0251715",
@@ -3625,15 +4607,14 @@
             "wake-0210454",
             "wake-0321318",
             "wake-0327243",
-            "wake-0167297",
-            "wake-0348418"
+            "wake-0167297"
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 1202,
-          "marketMedianAbsoluteErrorPct": 8.6,
-          "marketP80AbsoluteErrorPct": 16.9
+          "modelVersion": "2.1",
+          "marketBacktestSample": 1210,
+          "marketMedianAbsoluteErrorPct": 8.7,
+          "marketP80AbsoluteErrorPct": 17
         }
       },
       "listing": null,
@@ -3665,15 +4646,15 @@
       "clusterName": "Raleigh · West Corridor",
       "model": {
         "value": 1217000,
-        "low": 1011000,
-        "high": 1423000,
+        "low": 1010000,
+        "high": 1424000,
         "confidence": 88,
         "watchScore": 82,
-        "valuationGapPct": 24.3,
+        "valuationGapPct": 24.4,
         "compCount": 12,
         "anchors": {
           "hpiAdjustedSale": 1194000,
-          "assessmentCalibrated": 1027000,
+          "assessmentCalibrated": 1028000,
           "comparablePpsf": 1319000
         },
         "weights": {
@@ -3681,12 +4662,29 @@
           "assessmentCalibrated": 0.2,
           "comparableSales": 0.45
         },
-        "calibrationRatio": 1.049,
+        "calibrationRatio": 1.05,
         "comparablePpsf": 259,
         "clusterEdgeScore": 76,
+        "pricePerSqft": {
+          "recordedSale": 234,
+          "hpiAdjustedSale": 234,
+          "assessmentCalibrated": 202,
+          "comparableP25": 242,
+          "comparableMedian": 259,
+          "comparableP75": 321,
+          "modelCenter": 239
+        },
+        "recency": {
+          "saleAgeMonths": 0.8,
+          "score": 99,
+          "band": "current"
+        },
         "comparableQuality": {
           "nearestMiles": 1,
           "medianMiles": 2.3,
+          "medianAgeMonths": 1.9,
+          "newestSaleDate": "2026-07-23",
+          "oldestSaleDate": "2026-04-28",
           "sameTypePct": 100,
           "recordIds": [
             "wake-0407696",
@@ -3704,10 +4702,10 @@
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 1202,
-          "marketMedianAbsoluteErrorPct": 8.6,
-          "marketP80AbsoluteErrorPct": 16.9
+          "modelVersion": "2.1",
+          "marketBacktestSample": 1210,
+          "marketMedianAbsoluteErrorPct": 8.7,
+          "marketP80AbsoluteErrorPct": 17
         }
       },
       "listing": null,
@@ -3739,15 +4737,15 @@
       "clusterName": "Raleigh · West Corridor",
       "model": {
         "value": 458000,
-        "low": 381000,
-        "high": 535000,
+        "low": 380000,
+        "high": 536000,
         "confidence": 87,
         "watchScore": 82,
         "valuationGapPct": 29.4,
         "compCount": 12,
         "anchors": {
           "hpiAdjustedSale": 450000,
-          "assessmentCalibrated": 371000,
+          "assessmentCalibrated": 372000,
           "comparablePpsf": 502000
         },
         "weights": {
@@ -3755,12 +4753,29 @@
           "assessmentCalibrated": 0.2,
           "comparableSales": 0.45
         },
-        "calibrationRatio": 1.049,
+        "calibrationRatio": 1.05,
         "comparablePpsf": 289,
         "clusterEdgeScore": 76,
+        "pricePerSqft": {
+          "recordedSale": 259,
+          "hpiAdjustedSale": 259,
+          "assessmentCalibrated": 214,
+          "comparableP25": 253,
+          "comparableMedian": 289,
+          "comparableP75": 313,
+          "modelCenter": 263
+        },
+        "recency": {
+          "saleAgeMonths": 1,
+          "score": 98,
+          "band": "current"
+        },
         "comparableQuality": {
           "nearestMiles": 0.2,
-          "medianMiles": 1.8,
+          "medianMiles": 1.9,
+          "medianAgeMonths": 1.4,
+          "newestSaleDate": "2026-07-31",
+          "oldestSaleDate": "2026-04-29",
           "sameTypePct": 100,
           "recordIds": [
             "wake-0126084",
@@ -3774,14 +4789,14 @@
             "wake-0106969",
             "wake-0101536",
             "wake-0068549",
-            "wake-0187238"
+            "wake-0143818"
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 1202,
-          "marketMedianAbsoluteErrorPct": 8.6,
-          "marketP80AbsoluteErrorPct": 16.9
+          "modelVersion": "2.1",
+          "marketBacktestSample": 1210,
+          "marketMedianAbsoluteErrorPct": 8.7,
+          "marketP80AbsoluteErrorPct": 17
         }
       },
       "listing": null,
@@ -3814,7 +4829,7 @@
       "model": {
         "value": 750000,
         "low": 623000,
-        "high": 877000,
+        "high": 878000,
         "confidence": 86,
         "watchScore": 82,
         "valuationGapPct": 28,
@@ -3829,12 +4844,29 @@
           "assessmentCalibrated": 0.2,
           "comparableSales": 0.45
         },
-        "calibrationRatio": 1.049,
+        "calibrationRatio": 1.05,
         "comparablePpsf": 280,
         "clusterEdgeScore": 76,
+        "pricePerSqft": {
+          "recordedSale": 197,
+          "hpiAdjustedSale": 197,
+          "assessmentCalibrated": 191,
+          "comparableP25": 238,
+          "comparableMedian": 280,
+          "comparableP75": 298,
+          "modelCenter": 233
+        },
+        "recency": {
+          "saleAgeMonths": 1.2,
+          "score": 98,
+          "band": "current"
+        },
         "comparableQuality": {
           "nearestMiles": 0.8,
           "medianMiles": 1.8,
+          "medianAgeMonths": 2.3,
+          "newestSaleDate": "2026-07-22",
+          "oldestSaleDate": "2026-04-30",
           "sameTypePct": 100,
           "recordIds": [
             "wake-0184962",
@@ -3852,84 +4884,10 @@
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 1202,
-          "marketMedianAbsoluteErrorPct": 8.6,
-          "marketP80AbsoluteErrorPct": 16.9
-        }
-      },
-      "listing": null,
-      "vendorEstimates": []
-    },
-    {
-      "id": "wake-0155836",
-      "marketId": "raleigh",
-      "clusterId": "raleigh-west",
-      "sourceId": "wake-county",
-      "sourceLabel": "Wake County GIS",
-      "sourceUrl": "https://data.wake.gov/datasets/Wake::parcels/about",
-      "parcelId": "0155836",
-      "address": "115 RAVENNA WAY",
-      "locality": "CARY, NC 27513",
-      "zip": "27513",
-      "lng": -78.81785484396465,
-      "lat": 35.77031812945308,
-      "propertyType": "SINGLFAM",
-      "yearBuilt": 1990,
-      "sqft": 3528,
-      "lotSqft": null,
-      "beds": null,
-      "baths": null,
-      "saleDate": "2026-06-29",
-      "salePrice": 750000,
-      "assessedValue": 678858,
-      "qualification": "Wake parcel record · price, area, use and value sanity filters passed",
-      "clusterName": "Raleigh · West Corridor",
-      "model": {
-        "value": 884000,
-        "low": 735000,
-        "high": 1034000,
-        "confidence": 86,
-        "watchScore": 82,
-        "valuationGapPct": 30.2,
-        "compCount": 12,
-        "anchors": {
-          "hpiAdjustedSale": 750000,
-          "assessmentCalibrated": 712000,
-          "comparablePpsf": 1065000
-        },
-        "weights": {
-          "hpiAdjustedSale": 0.35,
-          "assessmentCalibrated": 0.2,
-          "comparableSales": 0.45
-        },
-        "calibrationRatio": 1.049,
-        "comparablePpsf": 302,
-        "clusterEdgeScore": 76,
-        "comparableQuality": {
-          "nearestMiles": 0.7,
-          "medianMiles": 1.9,
-          "sameTypePct": 100,
-          "recordIds": [
-            "wake-0203714",
-            "wake-0337155",
-            "wake-0194159",
-            "wake-0184365",
-            "wake-0167297",
-            "wake-0198255",
-            "wake-0228072",
-            "wake-0169735",
-            "wake-0184962",
-            "wake-0180443",
-            "wake-0226769",
-            "wake-0176290"
-          ]
-        },
-        "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 1202,
-          "marketMedianAbsoluteErrorPct": 8.6,
-          "marketP80AbsoluteErrorPct": 16.9
+          "modelVersion": "2.1",
+          "marketBacktestSample": 1210,
+          "marketMedianAbsoluteErrorPct": 8.7,
+          "marketP80AbsoluteErrorPct": 17
         }
       },
       "listing": null,
@@ -3961,15 +4919,15 @@
       "clusterName": "Raleigh · West Corridor",
       "model": {
         "value": 1232000,
-        "low": 1024000,
-        "high": 1440000,
+        "low": 1023000,
+        "high": 1441000,
         "confidence": 87,
         "watchScore": 82,
         "valuationGapPct": 31.1,
         "compCount": 12,
         "anchors": {
           "hpiAdjustedSale": 1295000,
-          "assessmentCalibrated": 986000,
+          "assessmentCalibrated": 987000,
           "comparablePpsf": 1292000
         },
         "weights": {
@@ -3977,12 +4935,29 @@
           "assessmentCalibrated": 0.2,
           "comparableSales": 0.45
         },
-        "calibrationRatio": 1.049,
+        "calibrationRatio": 1.05,
         "comparablePpsf": 298,
         "clusterEdgeScore": 76,
+        "pricePerSqft": {
+          "recordedSale": 299,
+          "hpiAdjustedSale": 299,
+          "assessmentCalibrated": 228,
+          "comparableP25": 296,
+          "comparableMedian": 298,
+          "comparableP75": 306,
+          "modelCenter": 284
+        },
+        "recency": {
+          "saleAgeMonths": 1.3,
+          "score": 98,
+          "band": "current"
+        },
         "comparableQuality": {
           "nearestMiles": 0,
           "medianMiles": 1.7,
+          "medianAgeMonths": 2.1,
+          "newestSaleDate": "2026-07-27",
+          "oldestSaleDate": "2026-05-04",
           "sameTypePct": 100,
           "recordIds": [
             "wake-0333676",
@@ -4000,158 +4975,101 @@
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 1202,
-          "marketMedianAbsoluteErrorPct": 8.6,
-          "marketP80AbsoluteErrorPct": 16.9
+          "modelVersion": "2.1",
+          "marketBacktestSample": 1210,
+          "marketMedianAbsoluteErrorPct": 8.7,
+          "marketP80AbsoluteErrorPct": 17
         }
       },
       "listing": null,
       "vendorEstimates": []
     },
     {
-      "id": "wake-0410454",
+      "id": "wake-0155836",
       "marketId": "raleigh",
       "clusterId": "raleigh-west",
       "sourceId": "wake-county",
       "sourceLabel": "Wake County GIS",
       "sourceUrl": "https://data.wake.gov/datasets/Wake::parcels/about",
-      "parcelId": "0410454",
-      "address": "101 SHURLING PL",
-      "locality": "CARY, NC 27519",
-      "zip": "27519",
-      "lng": -78.89935913531255,
-      "lat": 35.80211685140489,
+      "parcelId": "0155836",
+      "address": "115 RAVENNA WAY",
+      "locality": "CARY, NC 27513",
+      "zip": "27513",
+      "lng": -78.81785484396465,
+      "lat": 35.77031812945308,
       "propertyType": "SINGLFAM",
-      "yearBuilt": 2012,
-      "sqft": 6290,
+      "yearBuilt": 1990,
+      "sqft": 3528,
       "lotSqft": null,
       "beds": null,
       "baths": null,
-      "saleDate": "2026-06-26",
-      "salePrice": 1180000,
-      "assessedValue": 1098925,
+      "saleDate": "2026-06-29",
+      "salePrice": 750000,
+      "assessedValue": 678858,
       "qualification": "Wake parcel record · price, area, use and value sanity filters passed",
       "clusterName": "Raleigh · West Corridor",
       "model": {
-        "value": 1516000,
-        "low": 1260000,
-        "high": 1772000,
-        "confidence": 84,
+        "value": 884000,
+        "low": 734000,
+        "high": 1035000,
+        "confidence": 86,
         "watchScore": 82,
-        "valuationGapPct": 38,
+        "valuationGapPct": 30.3,
         "compCount": 12,
         "anchors": {
-          "hpiAdjustedSale": 1180000,
-          "assessmentCalibrated": 1153000,
-          "comparablePpsf": 1939000
+          "hpiAdjustedSale": 750000,
+          "assessmentCalibrated": 713000,
+          "comparablePpsf": 1065000
         },
         "weights": {
           "hpiAdjustedSale": 0.35,
           "assessmentCalibrated": 0.2,
           "comparableSales": 0.45
         },
-        "calibrationRatio": 1.049,
-        "comparablePpsf": 308,
+        "calibrationRatio": 1.05,
+        "comparablePpsf": 302,
         "clusterEdgeScore": 76,
+        "pricePerSqft": {
+          "recordedSale": 213,
+          "hpiAdjustedSale": 213,
+          "assessmentCalibrated": 202,
+          "comparableP25": 231,
+          "comparableMedian": 302,
+          "comparableP75": 365,
+          "modelCenter": 251
+        },
+        "recency": {
+          "saleAgeMonths": 1.3,
+          "score": 98,
+          "band": "current"
+        },
         "comparableQuality": {
           "nearestMiles": 0.7,
           "medianMiles": 1.8,
+          "medianAgeMonths": 1.9,
+          "newestSaleDate": "2026-07-28",
+          "oldestSaleDate": "2026-04-27",
           "sameTypePct": 100,
           "recordIds": [
-            "wake-0361853",
-            "wake-0419759",
-            "wake-0499933",
-            "wake-0451430",
-            "wake-0333678",
-            "wake-0499934",
-            "wake-0494342",
-            "wake-0429301",
-            "wake-0275563",
-            "wake-0372104",
-            "wake-0313351",
-            "wake-0499960"
+            "wake-0203714",
+            "wake-0337155",
+            "wake-0184365",
+            "wake-0167297",
+            "wake-0198255",
+            "wake-0228072",
+            "wake-0169735",
+            "wake-0184962",
+            "wake-0180443",
+            "wake-0226769",
+            "wake-0176290",
+            "wake-0423583"
           ]
         },
         "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 1202,
-          "marketMedianAbsoluteErrorPct": 8.6,
-          "marketP80AbsoluteErrorPct": 16.9
-        }
-      },
-      "listing": null,
-      "vendorEstimates": []
-    },
-    {
-      "id": "wake-0490791",
-      "marketId": "raleigh",
-      "clusterId": "raleigh-west",
-      "sourceId": "wake-county",
-      "sourceLabel": "Wake County GIS",
-      "sourceUrl": "https://data.wake.gov/datasets/Wake::parcels/about",
-      "parcelId": "0490791",
-      "address": "170 PLEASANTS AVE",
-      "locality": "CARY, NC 27511",
-      "zip": "27511",
-      "lng": -78.77937979118704,
-      "lat": 35.779595028173254,
-      "propertyType": "SINGLFAM",
-      "yearBuilt": 2022,
-      "sqft": 5084,
-      "lotSqft": null,
-      "beds": null,
-      "baths": null,
-      "saleDate": "2026-06-26",
-      "salePrice": 2375000,
-      "assessedValue": 1330393,
-      "qualification": "Wake parcel record · price, area, use and value sanity filters passed",
-      "clusterName": "Raleigh · West Corridor",
-      "model": {
-        "value": 1784000,
-        "low": 1483000,
-        "high": 2086000,
-        "confidence": 84,
-        "watchScore": 82,
-        "valuationGapPct": 34.1,
-        "compCount": 12,
-        "anchors": {
-          "hpiAdjustedSale": 2375000,
-          "assessmentCalibrated": 1396000,
-          "comparablePpsf": 1497000
-        },
-        "weights": {
-          "hpiAdjustedSale": 0.35,
-          "assessmentCalibrated": 0.2,
-          "comparableSales": 0.45
-        },
-        "calibrationRatio": 1.049,
-        "comparablePpsf": 295,
-        "clusterEdgeScore": 76,
-        "comparableQuality": {
-          "nearestMiles": 0.3,
-          "medianMiles": 3.4,
-          "sameTypePct": 100,
-          "recordIds": [
-            "wake-0076695",
-            "wake-0249892",
-            "wake-0353060",
-            "wake-0201292",
-            "wake-0514219",
-            "wake-0336791",
-            "wake-0344320",
-            "wake-0348610",
-            "wake-0450254",
-            "wake-0453171",
-            "wake-0435975",
-            "wake-0407696"
-          ]
-        },
-        "diagnostics": {
-          "modelVersion": "2.0",
-          "marketBacktestSample": 1202,
-          "marketMedianAbsoluteErrorPct": 8.6,
-          "marketP80AbsoluteErrorPct": 16.9
+          "modelVersion": "2.1",
+          "marketBacktestSample": 1210,
+          "marketMedianAbsoluteErrorPct": 8.7,
+          "marketP80AbsoluteErrorPct": 17
         }
       },
       "listing": null,

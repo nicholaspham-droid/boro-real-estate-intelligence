@@ -52,20 +52,24 @@ test("server-renders the national Borocast workbench and verified registry", asy
   assert.match(html, /RentCast/);
   assert.match(html, /ATTOM/);
   assert.match(html, /DECISION STUDIO · EDITABLE UNDERWRITING/);
+  assert.match(html, /ACS CLUSTER RENT EVIDENCE/);
+  assert.match(html, /25th percentile/);
+  assert.match(html, /75th percentile/);
+  assert.match(html, /Recorded sale \/ sf/);
+  assert.match(html, /Comparable recency/);
   assert.match(html, /Advance only when at least four gates pass and none fail/);
   assert.match(html, /MODEL GOVERNANCE CHECK/);
   assert.match(html, /Out-of-time validation/);
   assert.match(html, /Bring an independent AVM into the evidence stack/);
-  assert.match(html, /Raleigh live-listing pilot map/);
   assert.match(html, /ATTOM MARKET AUDIT · SIX CONTROL ADDRESSES/);
   assert.match(html, /RENTCAST · LISTING \+ RENT CHANNEL/);
-  assert.match(html, /FREE-TIER MVP · RALEIGH LIVE LISTINGS/);
-  assert.match(html, /Twelve listings\. Three evidence bands\. One API request/);
-  assert.match(html, /Raleigh is the only live-listing market enabled/);
-  assert.match(html, /Raleigh live-listing pilot map/);
+  assert.match(html, /REGIONAL LIVE LISTING SCREEN · SCALE TEST/);
+  assert.match(html, /Up to 500 listings\. One market request/);
+  assert.match(html, /Chicago/);
+  assert.match(html, /Philadelphia/);
   assert.match(html, /Map ready · load listings to add scored pins/);
   assert.match(html, /Historical model library/);
-  assert.match(html, /Chicago and Philadelphia also open their recorded-evidence maps/);
+  assert.match(html, /live-listing screen above now covers Raleigh, Chicago and Philadelphia/);
   assert.match(html, /Market Explorer/);
   assert.match(html, /Deal Studio/);
   assert.match(html, /FEATURE AVAILABILITY · NO EMPTY MARKETS/);
@@ -279,10 +283,10 @@ test("RentCast adapter stays server-side and closes property evidence without a 
   assert.equal(pilot.status, 503);
 });
 
-test("Raleigh listing route returns a twelve-property comparison set from one upstream response", async () => {
+test("regional listing routes score up to 500 records from one upstream response per market", async () => {
   const originalFetch = globalThis.fetch;
   const now = new Date().toISOString();
-  const mockListings = Array.from({ length: 50 }, (_, index) => ({
+  const mockListings = Array.from({ length: 160 }, (_, index) => ({
     id: `raleigh-${index}`,
     formattedAddress: `${100 + index} Test Ave, Raleigh, NC 276${String(index % 10).padStart(2, "0")}`,
     addressLine1: `${100 + index} Test Ave`,
@@ -305,22 +309,30 @@ test("Raleigh listing route returns a twelve-property comparison set from one up
   }));
   globalThis.fetch = async (input, init) => {
     if (String(input).startsWith("https://api.rentcast.io/v1/listings/sale")) {
+      const upstreamUrl = new URL(String(input));
       assert.equal(init.headers["X-Api-Key"], "test-key");
+      assert.equal(upstreamUrl.searchParams.get("limit"), "500");
+      assert.match(upstreamUrl.searchParams.get("propertyType"), /Multi-Family/);
       return new Response(JSON.stringify(mockListings), { status: 200, headers: { "Content-Type": "application/json", "X-Total-Count": "1036" } });
     }
     return originalFetch(input, init);
   };
   try {
     const worker = await loadWorker();
-    const response = await worker.fetch(new Request("http://localhost/api/listings/raleigh"), { ...env, RENTCAST_API_KEY: "test-key" }, ctx);
-    assert.equal(response.status, 200);
-    const payload = await response.json();
-    assert.equal(payload.requestCost, 1);
-    assert.equal(payload.scoredCandidateCount, 50);
-    assert.equal(payload.candidateCount, 1036);
-    assert.equal(payload.listings.length, 12);
-    assert.ok(payload.listings.some((listing) => listing.priority === "low"));
-    assert.ok(payload.listings.every((listing) => listing.scoreBreakdown.length === 5));
+    for (const market of ["raleigh", "chicago", "philadelphia"]) {
+      const response = await worker.fetch(new Request(`http://localhost/api/listings/${market}`), { ...env, RENTCAST_API_KEY: "test-key" }, ctx);
+      assert.equal(response.status, 200);
+      const payload = await response.json();
+      assert.equal(payload.requestCost, 1);
+      assert.equal(payload.market.id, market);
+      assert.equal(payload.scoredCandidateCount, 160);
+      assert.equal(payload.candidateCount, 1036);
+      assert.equal(payload.listings.length, 24);
+      assert.ok(payload.listings.some((listing) => listing.priority === "low"));
+      assert.ok(payload.listings.every((listing) => listing.scoreBreakdown.length === 5));
+      assert.ok(payload.pricePerSqftBand.p25 < payload.pricePerSqftBand.p75);
+      assert.equal(payload.regionDiagnostics.listingSample, 160);
+    }
   } finally {
     globalThis.fetch = originalFetch;
   }
@@ -390,6 +402,10 @@ test("market-intelligence API exposes measured ACS cluster evidence", async () =
   assert.equal(payload.market.clusters.length, 5);
   assert.equal(payload.market.clusters[0].coverage, 100);
   assert.ok(payload.market.clusters[0].sampleGeoids.length > 0);
+  assert.ok(payload.market.clusters[0].rentP25 < payload.market.clusters[0].medianRent);
+  assert.ok(payload.market.clusters[0].medianRent < payload.market.clusters[0].rentP75);
+  assert.ok(payload.market.clusters[0].rentObservationCount > 0);
+  assert.ok(payload.market.clusters[0].rentCoverage > 90);
 });
 
 test("hosted samples omit owner and mailing fields", async () => {
@@ -424,6 +440,9 @@ test("valuation API exposes qualified property models without owner data", async
     assert.ok(record.model.high > record.model.value);
     assert.ok(record.model.confidence >= 45 && record.model.confidence <= 95);
     assert.ok(record.model.compCount >= 1);
+    assert.ok(record.model.pricePerSqft.comparableP25 < record.model.pricePerSqft.comparableP75);
+    assert.ok(record.model.recency.saleAgeMonths >= 0);
+    assert.ok(record.model.comparableQuality.medianAgeMonths >= 0);
     assert.equal(record.listing, null);
     assert.equal("owner" in record, false);
     assert.equal("mailingAddress" in record, false);

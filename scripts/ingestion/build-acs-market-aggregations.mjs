@@ -4,7 +4,7 @@ const ROOT = new URL("../../", import.meta.url);
 const CONFIG_PATH = new URL("../../data/market-geographies.json", import.meta.url);
 const OUTPUT_PATH = new URL("../../data/acs-market-aggregations.json", import.meta.url);
 const MEMBERSHIP_PATH = new URL("../../data/acs-cluster-membership.json", import.meta.url);
-const TABLES = ["B01003", "B01002", "B15003", "B23025", "B19013", "B17001", "B25002", "B25077", "B25064"];
+const TABLES = ["B01003", "B01002", "B15003", "B23025", "B19013", "B17001", "B25002", "B25003", "B25077", "B25064"];
 
 const config = JSON.parse(await readFile(CONFIG_PATH, "utf8"));
 const now = new Date().toISOString();
@@ -23,6 +23,10 @@ function rss(values) {
 }
 
 function weightedMedian(items, field, weightField = "population") {
+  return weightedQuantile(items, field, .5, weightField);
+}
+
+function weightedQuantile(items, field, quantile, weightField = "population") {
   const values = items
     .map((item) => ({ value: finite(item[field]), weight: Math.max(1, finite(item[weightField]) ?? 1) }))
     .filter((item) => item.value !== null)
@@ -31,7 +35,7 @@ function weightedMedian(items, field, weightField = "population") {
   let cursor = 0;
   for (const item of values) {
     cursor += item.weight;
-    if (cursor >= total / 2) return item.value;
+    if (cursor >= total * quantile) return item.value;
   }
   return null;
 }
@@ -106,6 +110,7 @@ async function fetchCounty(marketId, state, county) {
       medianIncome: finite(estimates.B19013?.B19013001),
       povertyPct: povertyUniverse ? povertyCount / povertyUniverse * 100 : null,
       vacancyPct: housingUnits ? vacantUnits / housingUnits * 100 : null,
+      renterOccupiedUnits: finite(estimates.B25003?.B25003003),
       medianHomeValue: finite(estimates.B25077?.B25077001),
       medianRent: finite(estimates.B25064?.B25064001),
       reliability: Math.max(0, 100 - relativeErrors.reduce((a, b) => a + b, 0) / relativeErrors.length * 100),
@@ -125,6 +130,9 @@ function sector(tract, center, centralRadius) {
 
 function aggregateCluster(id, name, tracts) {
   const population = sum(tracts.map((tract) => tract.population));
+  const rentObservedTracts = tracts.filter((tract) => finite(tract.medianRent) !== null);
+  const renterOccupiedUnits = sum(tracts.map((tract) => tract.renterOccupiedUnits));
+  const observedRenterOccupiedUnits = sum(rentObservedTracts.map((tract) => tract.renterOccupiedUnits));
   const validFields = ["medianAge", "bachelorsPct", "unemploymentPct", "medianIncome", "povertyPct", "vacancyPct", "medianHomeValue", "medianRent"];
   const completeness = validFields.reduce((total, field) => total + tracts.filter((tract) => finite(tract[field]) !== null).length / Math.max(1, tracts.length), 0) / validFields.length * 100;
   const reliability = weightedMean(tracts, "reliability") ?? 0;
@@ -142,7 +150,12 @@ function aggregateCluster(id, name, tracts) {
     povertyPct: weightedMean(tracts, "povertyPct"),
     vacancyPct: weightedMean(tracts, "vacancyPct"),
     medianHomeValue: weightedMedian(tracts, "medianHomeValue"),
-    medianRent: weightedMedian(tracts, "medianRent"),
+    rentP25: weightedQuantile(tracts, "medianRent", .25, "renterOccupiedUnits"),
+    medianRent: weightedQuantile(tracts, "medianRent", .5, "renterOccupiedUnits"),
+    rentP75: weightedQuantile(tracts, "medianRent", .75, "renterOccupiedUnits"),
+    rentObservationCount: rentObservedTracts.length,
+    renterOccupiedUnits,
+    rentCoverage: renterOccupiedUnits ? Math.round(observedRenterOccupiedUnits / renterOccupiedUnits * 100) : 0,
     coverage: Math.round(completeness),
     reliability: Math.round(reliability),
     sampleGeoids: tracts.slice(0, 4).map((tract) => tract.geoid),
@@ -227,6 +240,7 @@ await writeFile(OUTPUT_PATH, JSON.stringify({
     attributes: "2020-2024 ACS 5-year detailed tables mirrored by Census Reporter",
     geometry: "U.S. Census Bureau TIGERweb ACS 2024 Census Tracts",
     scoreScope: "Cross-sectional factor percentile, not a property-value forecast",
+    rentDistribution: "25th, 50th and 75th percentiles of tract-level ACS median gross rent, weighted by renter-occupied households; contextual cluster distribution, not unit-level rent comps",
   },
   tables: TABLES,
   marketCount: markets.length,

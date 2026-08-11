@@ -10,7 +10,13 @@ test("property valuation snapshot is internally consistent", () => {
     const weights = record.model.weights;
     const expected = anchors.hpiAdjustedSale * weights.hpiAdjustedSale + anchors.assessmentCalibrated * weights.assessmentCalibrated + anchors.comparablePpsf * weights.comparableSales;
     assert.ok(Math.abs(expected - record.model.value) <= 1500, `${record.id} model center matches documented weights`);
-    assert.equal(record.model.diagnostics.modelVersion, "2.0");
+    assert.equal(record.model.diagnostics.modelVersion, "2.1");
+    assert.ok(record.model.pricePerSqft.comparableP25 <= record.model.pricePerSqft.comparableMedian);
+    assert.ok(record.model.pricePerSqft.comparableMedian <= record.model.pricePerSqft.comparableP75);
+    assert.ok(record.model.pricePerSqft.recordedSale > 0);
+    assert.ok(record.model.recency.saleAgeMonths >= 0);
+    assert.ok(["current", "recent", "aging", "stale"].includes(record.model.recency.band));
+    assert.ok(record.model.comparableQuality.medianAgeMonths >= 0);
     assert.ok(record.model.comparableQuality.nearestMiles <= record.model.comparableQuality.medianMiles);
     assert.ok(record.model.comparableQuality.sameTypePct >= 0 && record.model.comparableQuality.sameTypePct <= 100);
     assert.ok(record.salePrice > 0);

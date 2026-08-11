@@ -80,10 +80,10 @@ export const PRODUCT_FEATURES: ProductFeatureCoverage[] = [
     label: "Active listing screen",
     shortLabel: "Listings",
     description: "Active asking price, status, days on market and source identifiers from the connected RentCast feed.",
-    marketIds: ["raleigh"],
+    marketIds: ["raleigh", "chicago", "philadelphia"],
     href: "#valuation",
     freshness: "Live lookup · six-hour cache",
-    boundary: "Raleigh only in the free-tier MVP. Listing evidence is not a valuation or investment recommendation.",
+    boundary: "Raleigh, Chicago and Philadelphia are enabled with one cached regional request each. Listing evidence is not a valuation or investment recommendation.",
   },
 ];
 

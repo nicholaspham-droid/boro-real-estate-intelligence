@@ -116,19 +116,39 @@ function medianNumber(values: number[]) {
   return sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
 }
 
+function quantileNumber(values: number[], percentile: number) {
+  const sorted = values.filter(Number.isFinite).sort((a, b) => a - b);
+  if (!sorted.length) return 0;
+  const index = (sorted.length - 1) * percentile;
+  const lower = Math.floor(index);
+  const upper = Math.ceil(index);
+  return sorted[lower] + (sorted[upper] - sorted[lower]) * (index - lower);
+}
+
 function daysSince(value?: string) {
   if (!value) return 365;
   return Math.max(0, Math.round((Date.now() - new Date(value).getTime()) / 86_400_000));
 }
 
-async function fetchRaleighListingPilot(apiKey: string) {
+const LISTING_MARKETS = {
+  raleigh: { id: "raleigh", city: "Raleigh", state: "NC", label: "Raleigh, NC", center: { lat: 35.7796, lng: -78.6382 } },
+  chicago: { id: "chicago", city: "Chicago", state: "IL", label: "Chicago, IL", center: { lat: 41.8781, lng: -87.6298 } },
+  philadelphia: { id: "philadelphia", city: "Philadelphia", state: "PA", label: "Philadelphia, PA", center: { lat: 39.9526, lng: -75.1652 } },
+} as const;
+
+type ListingMarketId = keyof typeof LISTING_MARKETS;
+
+async function fetchMarketListingPilot(apiKey: string, marketId: ListingMarketId) {
+  const marketConfig = LISTING_MARKETS[marketId];
+  const modelMarket = propertyValuations.markets.find((market) => market.id === marketId);
+  const marketCompetencyScore = modelMarket && "competency" in modelMarket ? modelMarket.competency : 50;
   const endpoint = new URL("https://api.rentcast.io/v1/listings/sale");
-  endpoint.searchParams.set("city", "Raleigh");
-  endpoint.searchParams.set("state", "NC");
+  endpoint.searchParams.set("city", marketConfig.city);
+  endpoint.searchParams.set("state", marketConfig.state);
   endpoint.searchParams.set("status", "Active");
-  endpoint.searchParams.set("propertyType", "Single Family");
-  endpoint.searchParams.set("price", "150000:1250000");
-  endpoint.searchParams.set("limit", "50");
+  endpoint.searchParams.set("propertyType", "Single Family|Condo|Townhouse|Multi-Family");
+  endpoint.searchParams.set("price", "75000:3000000");
+  endpoint.searchParams.set("limit", "500");
   endpoint.searchParams.set("includeTotalCount", "true");
   const response = await fetch(endpoint, { headers: { Accept: "application/json", "X-Api-Key": apiKey } });
   const responseBody = await response.text();
@@ -144,11 +164,17 @@ async function fetchRaleighListingPilot(apiKey: string) {
 
   const usable = payload.filter((listing) => listing.id && listing.formattedAddress && listing.price && listing.squareFootage && listing.latitude && listing.longitude);
   const medianPpsf = medianNumber(usable.map((listing) => listing.price! / listing.squareFootage!));
+  const typePpsf = new Map<string, number>();
+  for (const propertyType of new Set(usable.map((listing) => listing.propertyType ?? "Residential"))) {
+    const values = usable.filter((listing) => (listing.propertyType ?? "Residential") === propertyType).map((listing) => listing.price! / listing.squareFootage!);
+    if (values.length >= 8) typePpsf.set(propertyType, medianNumber(values));
+  }
   const scored = usable.map((listing) => {
     const ppsf = listing.price! / listing.squareFootage!;
+    const ppsfBaseline = typePpsf.get(listing.propertyType ?? "Residential") ?? medianPpsf;
     const dom = listing.daysOnMarket ?? 0;
     const freshnessDays = daysSince(listing.lastSeenDate);
-    const valueSignal = bounded(50 + (medianPpsf - ppsf) / Math.max(1, medianPpsf) * 120, 20, 92);
+    const valueSignal = bounded(50 + (ppsfBaseline - ppsf) / Math.max(1, ppsfBaseline) * 120, 20, 92);
     const negotiability = dom >= 21 && dom <= 90 ? 88 : dom <= 180 && dom > 90 ? 64 : dom <= 365 && dom > 180 ? 44 : dom > 365 ? 24 : dom >= 7 ? 64 : 46;
     const freshness = freshnessDays <= 1 ? 100 : freshnessDays <= 3 ? 86 : freshnessDays <= 7 ? 68 : 42;
     const completeness = [listing.bedrooms, listing.bathrooms, listing.squareFootage, listing.yearBuilt, listing.mlsName, listing.mlsNumber].filter((value) => value !== null && value !== undefined && value !== "").length / 6 * 100;
@@ -157,11 +183,11 @@ async function fetchRaleighListingPilot(apiKey: string) {
       marketTime: Math.round(negotiability),
       freshness: Math.round(freshness),
       completeness: Math.round(completeness),
-      marketContext: 82,
+      marketContext: marketCompetencyScore,
     };
     const score = Math.round(components.value * .30 + components.marketTime * .22 + components.freshness * .20 + components.completeness * .13 + components.marketContext * .15);
     const reasons = [
-      ppsf <= medianPpsf ? `${Math.round((1 - ppsf / medianPpsf) * 100)}% below pilot median price/sf` : `${Math.round((ppsf / medianPpsf - 1) * 100)}% above pilot median price/sf`,
+      ppsf <= ppsfBaseline ? `${Math.round((1 - ppsf / ppsfBaseline) * 100)}% below ${listing.propertyType ?? "market"} median price/sf` : `${Math.round((ppsf / ppsfBaseline - 1) * 100)}% above ${listing.propertyType ?? "market"} median price/sf`,
       `${dom} days on market`,
       freshnessDays <= 3 ? "recently observed" : `last observed ${freshnessDays} days ago`,
     ];
@@ -169,8 +195,8 @@ async function fetchRaleighListingPilot(apiKey: string) {
       id: listing.id,
       address: listing.formattedAddress,
       addressLine1: listing.addressLine1 ?? listing.formattedAddress,
-      city: listing.city ?? "Raleigh",
-      state: listing.state ?? "NC",
+      city: listing.city ?? marketConfig.city,
+      state: listing.state ?? marketConfig.state,
       zipCode: listing.zipCode ?? null,
       county: listing.county ?? null,
       lat: listing.latitude,
@@ -201,7 +227,7 @@ async function fetchRaleighListingPilot(apiKey: string) {
     marketTime: Math.round(medianNumber(scored.map((listing) => listing.components.marketTime))),
     freshness: Math.round(medianNumber(scored.map((listing) => listing.components.freshness))),
     completeness: Math.round(medianNumber(scored.map((listing) => listing.components.completeness))),
-    marketContext: 82,
+    marketContext: marketCompetencyScore,
   };
   const enriched = scored.map((listing) => {
     const deltaFromBaseline = listing.screeningScore - baselineScore;
@@ -217,7 +243,7 @@ async function fetchRaleighListingPilot(apiKey: string) {
         { key: "marketTime", label: "Market time", weight: 22, score: listing.components.marketTime, baseline: componentBaselines.marketTime, weightedPoints: Math.round(listing.components.marketTime * .22 * 10) / 10 },
         { key: "freshness", label: "Listing freshness", weight: 20, score: listing.components.freshness, baseline: componentBaselines.freshness, weightedPoints: Math.round(listing.components.freshness * .20 * 10) / 10 },
         { key: "completeness", label: "Field completeness", weight: 13, score: listing.components.completeness, baseline: componentBaselines.completeness, weightedPoints: Math.round(listing.components.completeness * .13 * 10) / 10 },
-        { key: "marketContext", label: "Raleigh data competency", weight: 15, score: listing.components.marketContext, baseline: componentBaselines.marketContext, weightedPoints: Math.round(listing.components.marketContext * .15 * 10) / 10 },
+        { key: "marketContext", label: `${marketConfig.city} data competency`, weight: 15, score: listing.components.marketContext, baseline: componentBaselines.marketContext, weightedPoints: Math.round(listing.components.marketContext * .15 * 10) / 10 },
       ],
     };
   });
@@ -230,25 +256,49 @@ async function fetchRaleighListingPilot(apiKey: string) {
       comparisonSet.push(listing);
     }
   };
-  enriched.slice(0, 4).forEach(add);
-  [...enriched].sort((a, b) => Math.abs(a.deltaFromBaseline) - Math.abs(b.deltaFromBaseline)).slice(0, 8).forEach((listing) => {
-    if (comparisonSet.length < 8) add(listing);
+  enriched.slice(0, 8).forEach(add);
+  [...enriched].sort((a, b) => Math.abs(a.deltaFromBaseline) - Math.abs(b.deltaFromBaseline)).slice(0, 16).forEach((listing) => {
+    if (comparisonSet.length < 16) add(listing);
   });
-  enriched.slice(-8).reverse().forEach((listing) => {
-    if (comparisonSet.length < 12) add(listing);
+  enriched.slice(-16).reverse().forEach((listing) => {
+    if (comparisonSet.length < 24) add(listing);
   });
   enriched.forEach((listing) => {
-    if (comparisonSet.length < 12) add(listing);
+    if (comparisonSet.length < 24) add(listing);
   });
   comparisonSet.sort((a, b) => b.screeningScore - a.screeningScore);
+
+  const ppsfValues = scored.map((listing) => listing.pricePerSqft);
+  const completenessValues = scored.map((listing) => listing.components.completeness);
+  const freshCount = scored.filter((listing) => listing.components.freshness >= 68).length;
+  const diagnostics = modelMarket && "diagnostics" in modelMarket ? modelMarket.diagnostics : null;
+  const ppsfP25 = Math.round(quantileNumber(ppsfValues, .25));
+  const ppsfP75 = Math.round(quantileNumber(ppsfValues, .75));
+  const medianCompleteness = Math.round(medianNumber(completenessValues));
+  const freshnessCoverage = Math.round(freshCount / Math.max(1, scored.length) * 100);
+  const backtestSample = diagnostics?.sampleSize ?? 0;
+  const p80Error = diagnostics?.p80AbsoluteErrorPct ?? 100;
+  const regionalStatus = scored.length >= 100 && medianCompleteness >= 70 && backtestSample >= 8 && p80Error <= 25 ? "pass" : scored.length >= 30 && backtestSample >= 5 && p80Error <= 35 ? "watch" : "compromised";
 
   return {
     listings: comparisonSet,
     candidateCount: Number(response.headers.get("X-Total-Count")) || payload.length,
     scoredCandidateCount: scored.length,
     medianPricePerSqft: Math.round(medianPpsf),
+    pricePerSqftBand: { p25: ppsfP25, median: Math.round(medianPpsf), p75: ppsfP75 },
     baselineScore,
     componentBaselines,
+    regionDiagnostics: {
+      status: regionalStatus,
+      listingSample: scored.length,
+      listingCompleteness: medianCompleteness,
+      listingFreshnessCoverage: freshnessCoverage,
+      publicRecordBacktestSample: backtestSample,
+      publicRecordMedianErrorPct: diagnostics?.medianAbsoluteErrorPct ?? null,
+      publicRecordP80ErrorPct: diagnostics?.p80AbsoluteErrorPct ?? null,
+      modelCompetency: modelMarket && "modelCompetency" in modelMarket ? modelMarket.modelCompetency : null,
+      interpretation: regionalStatus === "pass" ? "Listing breadth, field completeness and public-record backtesting support regional use with visible uncertainty." : regionalStatus === "watch" ? "The regional model remains usable for screening, but sample depth or validation error requires higher diligence." : "Regional evidence does not clear the minimum transferability gate; do not compare its scores as if equally calibrated.",
+    },
   };
 }
 
@@ -729,29 +779,31 @@ const worker = {
         provider: "RentCast",
         connected: Boolean(env.RENTCAST_API_KEY),
         endpoint: "/api/integrations/rentcast/property?address=...",
-        pilotEndpoint: "/api/listings/raleigh",
-        capabilities: ["active sale listing", "active rental listing", "rent estimate", "rental comps", "one-call Raleigh listing pilot"],
+        pilotEndpoint: "/api/listings/{raleigh|chicago|philadelphia}",
+        capabilities: ["active sale listing", "active rental listing", "rent estimate", "rental comps", "one-call 500-record regional listing screen", "cross-region model diagnostics"],
         privacy: "The API key stays server-side. Owner and listing-contact fields are not returned.",
       }, { headers: { "Cache-Control": "private, no-store" } });
     }
 
-    if (url.pathname === "/api/listings/raleigh" || url.pathname === "/api/integrations/rentcast/pilot") {
+    if (url.pathname.startsWith("/api/listings/") || url.pathname === "/api/integrations/rentcast/pilot") {
       if (!env.RENTCAST_API_KEY) return Response.json({ error: "RentCast is not configured" }, { status: 503, headers: { "Cache-Control": "private, no-store" } });
-      const market = url.pathname === "/api/listings/raleigh" ? "raleigh" : url.searchParams.get("market")?.trim().toLowerCase() ?? "raleigh";
-      if (market !== "raleigh") return Response.json({ error: "The free-tier MVP pilot is limited to Raleigh." }, { status: 400 });
+      const market = (url.pathname.startsWith("/api/listings/") ? url.pathname.slice("/api/listings/".length) : url.searchParams.get("market")?.trim().toLowerCase() ?? "raleigh") as ListingMarketId;
+      if (!(market in LISTING_MARKETS)) return Response.json({ error: "Supported listing markets are Raleigh, Chicago and Philadelphia." }, { status: 400 });
       try {
-        const pilot = await fetchRaleighListingPilot(env.RENTCAST_API_KEY);
+        const marketConfig = LISTING_MARKETS[market];
+        const marketModel = propertyValuations.markets.find((item) => item.id === market);
+        const pilot = await fetchMarketListingPilot(env.RENTCAST_API_KEY, market);
         return Response.json({
           provider: "RentCast",
-          market: { id: "raleigh", label: "Raleigh, NC", modelCompetency: 81, integratedCompetency: 82 },
+          market: { id: market, label: marketConfig.label, center: marketConfig.center, modelCompetency: marketModel && "modelCompetency" in marketModel ? marketModel.modelCompetency : null, integratedCompetency: marketModel?.competency ?? null },
           retrievedAt: new Date().toISOString(),
           requestCost: 1,
           ...pilot,
-          methodology: "Twelve active single-family listings span the leading, baseline and higher-diligence portions of one 50-record candidate sample. The score weights relative price/sf 30%, market time 22%, freshness 20%, field completeness 13% and Raleigh data competency 15%.",
+          methodology: "Twenty-four mapped listings span the leading, baseline and higher-diligence portions of up to 500 active listings returned in one regional request. Relative price/sf is normalized within property type; the score weights price/sf 30%, market time 22%, freshness 20%, field completeness 13% and regional data competency 15%.",
           boundary: "This is a live-listing screen, not a valuation or recommendation. Verify status, source rights, condition, taxes, insurance, title, concessions and full deal inputs before underwriting.",
         }, { headers: { "Cache-Control": "private, max-age=21600" } });
       } catch (error) {
-        return Response.json({ error: error instanceof Error ? error.message : "RentCast pilot lookup failed" }, { status: 502, headers: { "Cache-Control": "private, no-store" } });
+        return Response.json({ error: error instanceof Error ? error.message : "RentCast regional listing lookup failed" }, { status: 502, headers: { "Cache-Control": "private, no-store" } });
       }
     }
 
