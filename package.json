@@ -12,6 +12,7 @@
     "test": "pnpm run build && node --test tests/*.test.mjs",
     "ingest:verify": "node scripts/ingestion/verify-first-wave.mjs",
     "ingest:acs": "node scripts/ingestion/build-acs-market-aggregations.mjs",
+    "ingest:tract-pilot": "node scripts/ingestion/build-tract-pilot.mjs",
     "ingest:fhfa": "node scripts/ingestion/build-fhfa-pricing-history.mjs",
     "ingest:fhfa-tract": "node scripts/ingestion/build-fhfa-cluster-pricing-history.mjs",
     "ingest:valuations": "node scripts/ingestion/build-property-valuations.mjs",

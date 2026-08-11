@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { BOROCAST_MAP_STYLES, getGoogleMaps, type GoogleCircle, type GoogleInfoWindow, type GoogleMapInstance, type GoogleMapsNamespace, type GoogleMarker } from "./googleMapsLoader";
-import { explorerLayerValue, type ExplorerLayer, type MarketExplorer, type NeighborhoodSignal } from "./marketNeighborhoods";
+import { type ExplorerLayer, type MarketExplorer, type NeighborhoodSignal } from "./marketNeighborhoods";
+import type { ScoredTract } from "./tractPilot";
 import propertyValuations from "../data/property-valuations.json";
 
 type Props = {
@@ -12,6 +13,9 @@ type Props = {
   selectedId: string;
   onSelect: (id: string) => void;
   onPropertySelect?: (id: string) => void;
+  geographyMode?: "clusters" | "tracts";
+  tracts?: ScoredTract[];
+  focus?: { center: { lat: number; lng: number }; zoom: number };
 };
 
 const LAYER_PALETTES: Record<ExplorerLayer, { low: number; high: number; label: string }> = {
@@ -30,7 +34,7 @@ function heatColor(layer: ExplorerLayer, intensity: number) {
   return `hsl(${hue} 88% ${light}%)`;
 }
 
-export function NationalMarketMap({ market, neighborhoods, layer, selectedId, onSelect, onPropertySelect }: Props) {
+export function NationalMarketMap({ market, neighborhoods, layer, selectedId, onSelect, onPropertySelect, geographyMode = "clusters", tracts = [], focus }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<GoogleMapInstance | null>(null);
   const mapsRef = useRef<GoogleMapsNamespace | null>(null);
@@ -45,6 +49,7 @@ export function NationalMarketMap({ market, neighborhoods, layer, selectedId, on
 
   useEffect(() => { onSelectRef.current = onSelect; }, [onSelect]);
   useEffect(() => { onPropertySelectRef.current = onPropertySelect; }, [onPropertySelect]);
+  useEffect(() => { if (geographyMode === "tracts" && view === "properties") setView("heat"); }, [geographyMode, view]);
 
   useEffect(() => {
     let cancelled = false;
@@ -84,16 +89,18 @@ export function NationalMarketMap({ market, neighborhoods, layer, selectedId, on
     overlaysRef.current.forEach((overlay) => overlay.setMap(null));
     overlaysRef.current = [];
     infoRef.current?.close();
-    map.setCenter(market.center);
-    map.setZoom(market.zoom);
-    const radius = market.zoom <= 9 ? 6200 : market.zoom === 10 ? 2300 : 1250;
-    const values = neighborhoods.map((item) => explorerLayerValue(item, layer));
+    map.setCenter(focus?.center ?? market.center);
+    map.setZoom(focus?.zoom ?? market.zoom);
+    const radius = geographyMode === "tracts" ? 520 : market.zoom <= 9 ? 6200 : market.zoom === 10 ? 2300 : 1250;
+    const signals: Array<NeighborhoodSignal | ScoredTract> = geographyMode === "tracts" ? tracts : neighborhoods;
+    const values = signals.map((item) => item[layer]);
+    if (!values.length) return;
     const minimum = Math.min(...values);
     const maximum = Math.max(...values);
     const spread = Math.max(8, maximum - minimum);
 
-    for (const neighborhood of neighborhoods) {
-      const value = explorerLayerValue(neighborhood, layer);
+    for (const neighborhood of signals) {
+      const value = neighborhood[layer];
       const intensity = Math.max(0, Math.min(1, (value - minimum) / spread));
       const selected = neighborhood.id === selectedId;
       if (view === "heat") {
@@ -121,7 +128,8 @@ export function NationalMarketMap({ market, neighborhoods, layer, selectedId, on
       });
       const select = () => onSelectRef.current(neighborhood.id);
       const show = () => {
-        infoRef.current?.setContent(`<div class="map-tooltip"><b>${neighborhood.name}</b><strong>${value}/100 ${LAYER_PALETTES[layer].label}</strong><span>${neighborhood.tractCount} tracts · ${neighborhood.population.toLocaleString()} residents · ${neighborhood.confidence}% evidence competency</span><small>Click to inspect this cluster</small></div>`);
+        const isTract = geographyMode === "tracts";
+        infoRef.current?.setContent(`<div class="map-tooltip"><b>${neighborhood.name}</b><strong>${value}/100 ${LAYER_PALETTES[layer].label}</strong><span>${isTract ? "Census tract" : `${(neighborhood as NeighborhoodSignal).tractCount} tracts`} · ${neighborhood.population.toLocaleString()} residents · ${neighborhood.confidence}% evidence competency</span><small>Click to inspect this ${isTract ? "tract" : "cluster"}</small></div>`);
         infoRef.current?.setPosition({ lat: neighborhood.lat, lng: neighborhood.lng });
         infoRef.current?.open({ map });
       };
@@ -163,15 +171,15 @@ export function NationalMarketMap({ market, neighborhoods, layer, selectedId, on
       overlaysRef.current.forEach((overlay) => overlay.setMap(null));
       overlaysRef.current = [];
     };
-  }, [layer, market, neighborhoods, ready, selectedId, view]);
+  }, [focus, geographyMode, layer, market, neighborhoods, ready, selectedId, tracts, view]);
 
   return (
     <div className="national-map-wrap">
-      <div ref={containerRef} className="national-google-map" aria-label={`Interactive Google map of ${market.metro.short} census-tract clusters`} />
+      <div ref={containerRef} className="national-google-map" aria-label={`Interactive Google map of ${market.metro.short} ${geographyMode === "tracts" ? "census tracts" : "census-tract clusters"}`} />
       {!ready && !error && <div className="map-loading"><i /> Loading {market.metro.short} on Google Maps…</div>}
       {error && <div className="map-error"><strong>Map unavailable</strong><span>{error}</span></div>}
-      {ready && <div className="map-live-badge"><i /> Google Maps · {market.tractCount.toLocaleString()} ACS tracts</div>}
-      <div className="map-mode-switch" aria-label="Map display mode"><button disabled={!ready} className={view === "heat" ? "active" : ""} onClick={() => setView("heat")}>Heat</button><button disabled={!ready} className={view === "clusters" ? "active" : ""} onClick={() => setView("clusters")}>Clusters</button><button disabled={!ready} className={view === "properties" ? "active" : ""} onClick={() => setView("properties")}>Properties</button></div>
+      {ready && <div className="map-live-badge"><i /> Google Maps · {geographyMode === "tracts" ? `${tracts.length.toLocaleString()} tracts in cluster` : `${market.tractCount.toLocaleString()} ACS tracts`}</div>}
+      <div className="map-mode-switch" aria-label="Map display mode"><button disabled={!ready} className={view === "heat" ? "active" : ""} onClick={() => setView("heat")}>Heat</button><button disabled={!ready} className={view === "clusters" ? "active" : ""} onClick={() => setView("clusters")}>{geographyMode === "tracts" ? "Points" : "Clusters"}</button>{geographyMode === "clusters" && <button disabled={!ready} className={view === "properties" ? "active" : ""} onClick={() => setView("properties")}>Properties</button>}</div>
       {ready && view !== "properties" && <div className="heat-legend"><span>Lower</span>{[0, .25, .5, .75, 1].map((intensity) => <i key={intensity} style={{ background: heatColor(layer, intensity) }} />)}<span>Higher</span><b>{LAYER_PALETTES[layer].label}</b></div>}
       {ready && view === "properties" && <div className="property-map-note">{propertyValuations.properties.some((property) => property.marketId === market.id) ? "Markers show watch score · click for valuation detail" : "Property records not connected in this market yet"}</div>}
     </div>
