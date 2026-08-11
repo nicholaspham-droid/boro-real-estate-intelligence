@@ -31,7 +31,7 @@
     }
   ],
   "triggers": {
-    "crons": ["17 9 * * 6"]
+    "crons": []
   },
   "secrets": {
     "required": [

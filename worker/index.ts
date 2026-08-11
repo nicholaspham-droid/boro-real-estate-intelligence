@@ -285,6 +285,7 @@ async function fetchAttomProperty(apiKey: string, address1: string, address2: st
   attomUrl.searchParams.set("address2", address2);
   const upstream = await fetch(attomUrl, { headers: { Accept: "application/json", APIKey: apiKey } });
   const payload = await upstream.json() as { property?: AttomProperty[]; status?: { msg?: string } };
+  if (upstream.status === 401 || upstream.status === 403) throw new Error("ATTOM authorization failed. Verify the active key and AVM Detail product entitlement.");
   if (!upstream.ok || !payload.property?.length) throw new Error(payload.status?.msg || `ATTOM property not found (${upstream.status})`);
   const property = payload.property[0];
   return {

@@ -18,7 +18,7 @@ Validation is out of time: each historical test sale is estimated only from earl
 
 ## ATTOM secondary signal
 
-One AVM Detail request supplies the retained fact, assessment, sale and AVM fields. Successful responses are cached for 30 days and failures for seven days. The weekly scheduler checks two controls per live property market, so a fully stale three-market run costs at most six requests; fresh runs cost zero.
+One AVM Detail request supplies the retained fact, assessment, sale and AVM fields. Successful responses are cached for 30 days and failures for seven days. The intended weekly scheduler checks two controls per live property market, so a fully stale three-market run costs at most six requests; fresh runs cost zero. Scheduling stays paused whenever provider authentication or product entitlement is unhealthy.
 
 ATTOM weight is gated by AVM confidence and retained-field completeness and is capped at 15%. Vendor disagreement above 15% penalizes integrated confidence. The reliability-adjusted watch score shrinks the public score toward 50 as confidence falls; provider agreement cannot raise neighborhood fundamentals.
 
