@@ -1,4 +1,4 @@
-import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { index, integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const reviewFeedback = sqliteTable("review_feedback", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -19,3 +19,26 @@ export const reviewFeedback = sqliteTable("review_feedback", {
   triageStatus: text("triage_status").notNull().default("new"),
   impactLane: text("impact_lane").notNull().default("untriaged"),
 }, (table) => [index("idx_review_feedback_created_at").on(table.createdAt)]);
+
+export const attomEnrichment = sqliteTable("attom_enrichment", {
+  propertyKey: text("property_key").primaryKey(),
+  propertyId: text("property_id"),
+  marketId: text("market_id").notNull(),
+  normalizedAddress: text("normalized_address").notNull(),
+  providerStatus: text("provider_status").notNull(),
+  attomId: text("attom_id"),
+  payload: text("payload"),
+  avmValue: real("avm_value"),
+  avmLow: real("avm_low"),
+  avmHigh: real("avm_high"),
+  avmConfidence: real("avm_confidence"),
+  providerModifiedAt: text("provider_modified_at"),
+  fetchedAt: text("fetched_at").notNull(),
+  expiresAt: text("expires_at").notNull(),
+  errorMessage: text("error_message"),
+  apiCallCount: integer("api_call_count").notNull().default(1),
+}, (table) => [
+  index("idx_attom_enrichment_market").on(table.marketId),
+  index("idx_attom_enrichment_expiry").on(table.expiresAt),
+  index("idx_attom_enrichment_property").on(table.propertyId),
+]);

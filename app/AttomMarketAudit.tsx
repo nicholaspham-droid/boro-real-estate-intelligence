@@ -13,6 +13,8 @@ type AuditRecord = {
   deltaPct?: number | null;
   rangeOverlap?: boolean;
   attomConfidence?: number | null;
+  cacheHit?: boolean;
+  secondarySignal?: { vendorWeightPct: number; integratedConfidence: number; agreementScore: number; blendedValue: number; interpretation: string } | null;
 };
 
 type AuditResult = {
@@ -20,7 +22,13 @@ type AuditResult = {
   requested: number;
   matched: number;
   failed: number;
+  providerCalls: number;
+  cacheHits: number;
+  cacheTtlDays: number;
+  markets: Array<{ marketId: string; sampleSize: number; matched: number; coveragePct: number; publicCompetency: number; integratedCompetency: number; medianDeltaPct: number | null; rangeOverlapPct: number }>;
   records: AuditRecord[];
+  methodology: string;
+  boundary: string;
 };
 
 function money(value: number | null | undefined) {
@@ -66,8 +74,8 @@ export function AttomMarketAudit() {
   })) : [];
 
   return <div className="attom-audit">
-    <div className="attom-audit-head"><div><p className="eyebrow">ATTOM MARKET AUDIT · SIX CONTROL ADDRESSES</p><h3>Test the vendor against our evidence—not in place of it.</h3><p>Two qualified public records per live market are checked for address match, AVM availability, range overlap and disagreement with the BORO model.</p></div><button onClick={runAudit} disabled={!connected || loading}>{loading ? "Auditing six properties…" : result ? "Run audit again" : connected ? "Launch ATTOM analysis" : "ATTOM key required"}</button></div>
+    <div className="attom-audit-head"><div><p className="eyebrow">ATTOM ENRICHMENT · SIX CACHED CONTROL ADDRESSES</p><h3>Add vendor evidence without letting it dominate.</h3><p>One AVM Detail call supplies facts, assessment, recorded sale and an AVM. Two controls per market are cached for 30 days; ATTOM is capped at 15% and changes reliability—not neighborhood attractiveness.</p></div><button onClick={runAudit} disabled={!connected || loading}>{loading ? "Checking cache…" : result ? "Check enrichment again" : connected ? "Enrich three markets" : "ATTOM key required"}</button></div>
     {error && <p className="attom-error">{error}</p>}
-    {result && <><div className="attom-audit-summary"><div><span>Matched</span><b>{result.matched}/{result.requested}</b></div><div><span>Failed</span><b>{result.failed}</b></div><div><span>Range agreement</span><b>{result.matched ? Math.round(result.records.filter((record) => record.rangeOverlap).length / result.matched * 100) : 0}%</b></div><small>Retrieved {new Date(result.retrievedAt).toLocaleString()} · live vendor responses are session evidence and are not written into the public-record model.</small></div><div className="attom-audit-markets">{byMarket.map((market) => <article key={market.marketId}><span>{market.label}</span>{market.rows.map((record) => <div key={record.id} className={record.status}><b>{record.address}</b><strong>{record.status === "matched" ? money(record.attomValue) : "No match"}</strong><small>{record.status === "matched" ? `${record.deltaPct && record.deltaPct > 0 ? "+" : ""}${record.deltaPct ?? "—"}% vs. BORO · ${record.rangeOverlap ? "ranges overlap" : "ranges disagree"}` : record.error}</small></div>)}</article>)}</div></>}
+    {result && <><div className="attom-audit-summary"><div><span>Matched</span><b>{result.matched}/{result.requested}</b></div><div><span>New paid calls</span><b>{result.providerCalls}</b></div><div><span>Cache hits</span><b>{result.cacheHits}</b></div><div><span>Range agreement</span><b>{result.matched ? Math.round(result.records.filter((record) => record.rangeOverlap).length / result.matched * 100) : 0}%</b></div><small>Retrieved {new Date(result.retrievedAt).toLocaleString()} · successful responses are reused for {result.cacheTtlDays} days.</small></div><div className="attom-audit-markets">{byMarket.map((market) => { const summary = result.markets.find((item) => item.marketId === market.marketId); return <article key={market.marketId}><span>{market.label} · {summary?.integratedCompetency ?? "—"}% integrated competency</span>{market.rows.map((record) => <div key={record.id} className={record.status}><b>{record.address}</b><strong>{record.status === "matched" ? money(record.attomValue) : "No match"}</strong><small>{record.status === "matched" ? `${record.deltaPct && record.deltaPct > 0 ? "+" : ""}${record.deltaPct ?? "—"}% vs. BORO · ${record.rangeOverlap ? "ranges overlap" : "ranges disagree"} · ${record.secondarySignal?.vendorWeightPct ?? 0}% vendor weight${record.cacheHit ? " · cached" : ""}` : record.error}</small></div>)}</article>; })}</div><p className="attom-error"><b>Model boundary.</b> {result.boundary}</p></>}
   </div>;
 }

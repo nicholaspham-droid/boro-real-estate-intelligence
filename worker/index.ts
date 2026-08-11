@@ -304,6 +304,157 @@ async function fetchAttomProperty(apiKey: string, address1: string, address2: st
   };
 }
 
+const ATTOM_SUCCESS_TTL_DAYS = 30;
+const ATTOM_FAILURE_TTL_DAYS = 7;
+const ATTOM_MARKET_SAMPLE_SIZE = 2;
+
+type AttomNormalizedProperty = Awaited<ReturnType<typeof fetchAttomProperty>>;
+type AttomCacheRow = {
+  property_key: string;
+  property_id: string | null;
+  market_id: string;
+  normalized_address: string;
+  provider_status: "matched" | "failed";
+  payload: string | null;
+  fetched_at: string;
+  expires_at: string;
+  error_message: string | null;
+  api_call_count: number;
+};
+
+function normalizedAddress(address1: string, address2: string) {
+  return `${address1} ${address2}`.toUpperCase().replace(/[^A-Z0-9]+/g, " ").trim();
+}
+
+function attomPropertyKey(propertyId: string | null, address1: string, address2: string) {
+  return propertyId ? `public:${propertyId}` : `address:${normalizedAddress(address1, address2)}`;
+}
+
+function datePlusDays(days: number) {
+  const value = new Date();
+  value.setUTCDate(value.getUTCDate() + days);
+  return value.toISOString();
+}
+
+function parseAttomPayload(row: AttomCacheRow) {
+  if (!row.payload) return null;
+  try { return JSON.parse(row.payload) as AttomNormalizedProperty; } catch { return null; }
+}
+
+async function cachedAttomProperty(env: Env, input: { propertyId: string | null; marketId: string; address1: string; address2: string }, force = false) {
+  const key = attomPropertyKey(input.propertyId, input.address1, input.address2);
+  const cached = await env.DB.prepare("SELECT * FROM attom_enrichment WHERE property_key = ?").bind(key).first<AttomCacheRow>();
+  if (!force && cached && cached.expires_at > new Date().toISOString()) {
+    return { status: cached.provider_status, property: parseAttomPayload(cached), error: cached.error_message, cacheHit: true, providerCalls: 0, fetchedAt: cached.fetched_at };
+  }
+  if (!env.ATTOM_API_KEY) throw new Error("ATTOM is not configured");
+  const fetchedAt = new Date().toISOString();
+  try {
+    const property = await fetchAttomProperty(env.ATTOM_API_KEY, input.address1, input.address2);
+    await env.DB.prepare(`INSERT INTO attom_enrichment
+      (property_key, property_id, market_id, normalized_address, provider_status, attom_id, payload, avm_value, avm_low, avm_high, avm_confidence, provider_modified_at, fetched_at, expires_at, error_message, api_call_count)
+      VALUES (?, ?, ?, ?, 'matched', ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, 1)
+      ON CONFLICT(property_key) DO UPDATE SET property_id=excluded.property_id, market_id=excluded.market_id,
+      normalized_address=excluded.normalized_address, provider_status='matched', attom_id=excluded.attom_id,
+      payload=excluded.payload, avm_value=excluded.avm_value, avm_low=excluded.avm_low, avm_high=excluded.avm_high,
+      avm_confidence=excluded.avm_confidence, provider_modified_at=excluded.provider_modified_at,
+      fetched_at=excluded.fetched_at, expires_at=excluded.expires_at, error_message=NULL,
+      api_call_count=attom_enrichment.api_call_count + 1`)
+      .bind(key, input.propertyId, input.marketId, normalizedAddress(input.address1, input.address2), property.attomId == null ? null : String(property.attomId), JSON.stringify(property), property.avm.value, property.avm.low, property.avm.high, property.avm.confidence, property.vintage.modified ?? property.avm.asOf, fetchedAt, datePlusDays(ATTOM_SUCCESS_TTL_DAYS)).run();
+    return { status: "matched" as const, property, error: null, cacheHit: false, providerCalls: 1, fetchedAt };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "ATTOM lookup failed";
+    await env.DB.prepare(`INSERT INTO attom_enrichment
+      (property_key, property_id, market_id, normalized_address, provider_status, payload, fetched_at, expires_at, error_message, api_call_count)
+      VALUES (?, ?, ?, ?, 'failed', NULL, ?, ?, ?, 1)
+      ON CONFLICT(property_key) DO UPDATE SET provider_status='failed', payload=NULL, fetched_at=excluded.fetched_at,
+      expires_at=excluded.expires_at, error_message=excluded.error_message,
+      api_call_count=attom_enrichment.api_call_count + 1`)
+      .bind(key, input.propertyId, input.marketId, normalizedAddress(input.address1, input.address2), fetchedAt, datePlusDays(ATTOM_FAILURE_TTL_DAYS), message).run();
+    return { status: "failed" as const, property: null, error: message, cacheHit: false, providerCalls: 1, fetchedAt };
+  }
+}
+
+function attomSecondarySignal(sample: (typeof propertyValuations.properties)[number], property: AttomNormalizedProperty | null) {
+  const avm = property?.avm.value;
+  if (!avm || avm <= 0) return null;
+  const market = propertyValuations.markets.find((candidate) => candidate.id === sample.marketId);
+  const publicCompetency = market && "competency" in market ? market.competency : 50;
+  const providerConfidence = bounded(Number(property?.avm.confidence ?? 50));
+  const deltaPct = (avm - sample.model.value) / sample.model.value * 100;
+  const agreementScore = bounded(100 - Math.abs(deltaPct) * 2.5);
+  const factCompleteness = [property?.livingSize, property?.yearBuilt, property?.assessment.total, property?.sale.amount, avm].filter((value) => value != null).length / 5 * 100;
+  const sparseBoost = bounded((75 - publicCompetency) / 100, 0, .05);
+  const vendorWeight = Math.min(.15, .05 + sparseBoost + providerConfidence / 100 * .05 + factCompleteness / 100 * .02);
+  const blendedValue = sample.model.value * (1 - vendorWeight) + avm * vendorWeight;
+  const coverageGain = Math.round(Math.min(8, factCompleteness / 25 + providerConfidence / 40));
+  const disagreementPenalty = Math.round(Math.max(0, Math.abs(deltaPct) - 15) / 4);
+  const integratedConfidence = bounded(sample.model.confidence + coverageGain - disagreementPenalty, 35, 95);
+  const reliability = .60 + integratedConfidence / 100 * .40;
+  const reliabilityAdjustedWatchScore = Math.round(50 + (sample.model.watchScore - 50) * reliability);
+  return {
+    vendorWeightPct: Math.round(vendorWeight * 1000) / 10,
+    publicWeightPct: Math.round((1 - vendorWeight) * 1000) / 10,
+    attomAvm: avm,
+    blendedValue: Math.round(blendedValue / 1000) * 1000,
+    deltaPct: Math.round(deltaPct * 10) / 10,
+    agreementScore: Math.round(agreementScore),
+    factCompleteness: Math.round(factCompleteness),
+    coverageGain,
+    disagreementPenalty,
+    integratedConfidence: Math.round(integratedConfidence),
+    reliabilityAdjustedWatchScore,
+    interpretation: Math.abs(deltaPct) <= 15 ? "ATTOM independently supports the public-record range." : "ATTOM disagreement widens diligence; it does not create investment edge.",
+  };
+}
+
+function attomSampleProperties(marketIds: string[], perMarket = ATTOM_MARKET_SAMPLE_SIZE) {
+  return marketIds.flatMap((marketId) => {
+    const records = propertyValuations.properties.filter((property) => property.marketId === marketId).sort((a, b) => a.model.confidence - b.model.confidence || b.model.watchScore - a.model.watchScore);
+    if (records.length <= perMarket) return records;
+    const selected = [records[0]];
+    while (selected.length < perMarket) selected.push(records[Math.floor((records.length - 1) * selected.length / Math.max(1, perMarket - 1))]);
+    return [...new Map(selected.map((record) => [record.id, record])).values()];
+  });
+}
+
+async function runAttomEnrichment(env: Env, marketIds: string[], perMarket = ATTOM_MARKET_SAMPLE_SIZE, force = false) {
+  const samples = attomSampleProperties(marketIds, perMarket);
+  const records = [];
+  for (const sample of samples) {
+    const lookup = await cachedAttomProperty(env, { propertyId: sample.id, marketId: sample.marketId, address1: sample.address, address2: sample.locality }, force);
+    const signal = lookup.status === "matched" ? attomSecondarySignal(sample, lookup.property) : null;
+    records.push({
+      id: sample.id, marketId: sample.marketId, address: sample.address, status: lookup.status,
+      error: lookup.error, cacheHit: lookup.cacheHit, providerCalls: lookup.providerCalls, fetchedAt: lookup.fetchedAt,
+      borocastValue: sample.model.value, borocastRange: { low: sample.model.low, high: sample.model.high },
+      attomValue: lookup.property?.avm.value ?? null, attomRange: { low: lookup.property?.avm.low ?? null, high: lookup.property?.avm.high ?? null },
+      attomConfidence: lookup.property?.avm.confidence ?? null,
+      deltaPct: signal?.deltaPct ?? null,
+      rangeOverlap: Boolean(lookup.property?.avm.low != null && lookup.property?.avm.high != null && lookup.property.avm.low <= sample.model.high && lookup.property.avm.high >= sample.model.low),
+      secondarySignal: signal,
+    });
+  }
+  const matched = records.filter((record) => record.status === "matched");
+  const marketSummaries = marketIds.map((marketId) => {
+    const marketRecords = records.filter((record) => record.marketId === marketId);
+    const marketMatched = marketRecords.filter((record) => record.status === "matched");
+    const publicMarket = propertyValuations.markets.find((market) => market.id === marketId);
+    const publicCompetency = publicMarket && "competency" in publicMarket ? publicMarket.competency : 50;
+    const coverage = marketRecords.length ? marketMatched.length / marketRecords.length * 100 : 0;
+    const meanGain = marketMatched.length ? marketMatched.reduce((sum, record) => sum + (record.secondarySignal?.coverageGain ?? 0) - (record.secondarySignal?.disagreementPenalty ?? 0), 0) / marketMatched.length : 0;
+    return { marketId, sampleSize: marketRecords.length, matched: marketMatched.length, coveragePct: Math.round(coverage), publicCompetency, integratedCompetency: Math.round(bounded(publicCompetency + meanGain * coverage / 100, 0, 95)), medianDeltaPct: marketMatched.length ? Math.round(medianNumber(marketMatched.map((record) => record.deltaPct ?? 0)) * 10) / 10 : null, rangeOverlapPct: marketMatched.length ? Math.round(marketMatched.filter((record) => record.rangeOverlap).length / marketMatched.length * 100) : 0 };
+  });
+  return {
+    provider: "ATTOM", retrievedAt: new Date().toISOString(), requested: records.length, matched: matched.length,
+    failed: records.length - matched.length, providerCalls: records.reduce((sum, record) => sum + record.providerCalls, 0),
+    cacheHits: records.filter((record) => record.cacheHit).length, cacheTtlDays: ATTOM_SUCCESS_TTL_DAYS,
+    records, markets: marketSummaries,
+    methodology: "One ATTOM AVM Detail request supplies facts, assessment, recorded sale and AVM for each control property. Successful matches are reused for 30 days; failures are retried after seven days. ATTOM receives at most a 15% secondary weight and only changes evidence reliability—not neighborhood attractiveness.",
+    boundary: "Vendor agreement can increase evidence competency; disagreement reduces confidence. ATTOM never overrides public-record anchors or turns model agreement into investment edge.",
+  };
+}
+
 type SafetyBucket = { total: number; violent: number; property: number; other: number };
 
 function emptySafetyBucket(): SafetyBucket {
@@ -730,14 +881,24 @@ const worker = {
     if (url.pathname === "/api/valuation/properties") {
       const marketId = url.searchParams.get("market");
       const records = marketId ? propertyValuations.properties.filter((property) => property.marketId === marketId) : propertyValuations.properties;
-      return Response.json({ generatedAt: propertyValuations.generatedAt, asOf: propertyValuations.asOf, count: records.length, records }, { headers: snapshotHeaders });
+      const cacheStatement = env.DB?.prepare(`SELECT * FROM attom_enrichment WHERE property_id IS NOT NULL${marketId ? " AND market_id = ?" : ""}`);
+      const cached = cacheStatement ? await (marketId ? cacheStatement.bind(marketId) : cacheStatement).all<AttomCacheRow>() : { results: [] as AttomCacheRow[] };
+      const byProperty = new Map((cached.results ?? []).map((row) => [row.property_id, row]));
+      const enrichedRecords = records.map((property) => {
+        const row = byProperty.get(property.id);
+        const attom = row?.provider_status === "matched" ? parseAttomPayload(row) : null;
+        return { ...property, attomEnrichment: attom ? { provider: "ATTOM", fetchedAt: row!.fetched_at, expiresAt: row!.expires_at, property: attom, secondarySignal: attomSecondarySignal(property, attom) } : null };
+      });
+      return Response.json({ generatedAt: propertyValuations.generatedAt, asOf: propertyValuations.asOf, count: enrichedRecords.length, records: enrichedRecords }, { headers: snapshotHeaders });
     }
 
     if (url.pathname.startsWith("/api/valuation/properties/")) {
       const propertyId = decodeURIComponent(url.pathname.slice("/api/valuation/properties/".length));
       const property = propertyValuations.properties.find((candidate) => candidate.id === propertyId);
+      const row = property && env.DB ? await env.DB.prepare("SELECT * FROM attom_enrichment WHERE property_id = ?").bind(propertyId).first<AttomCacheRow>() : null;
+      const attom = row?.provider_status === "matched" ? parseAttomPayload(row) : null;
       return property
-        ? Response.json({ generatedAt: propertyValuations.generatedAt, asOf: propertyValuations.asOf, methodology: propertyValuations.methodology, property }, { headers: snapshotHeaders })
+        ? Response.json({ generatedAt: propertyValuations.generatedAt, asOf: propertyValuations.asOf, methodology: propertyValuations.methodology, property: { ...property, attomEnrichment: attom ? { provider: "ATTOM", fetchedAt: row!.fetched_at, expiresAt: row!.expires_at, property: attom, secondarySignal: attomSecondarySignal(property, attom) } : null } }, { headers: snapshotHeaders })
         : Response.json({ error: "Unknown property" }, { status: 404, headers: snapshotHeaders });
     }
 
@@ -747,7 +908,8 @@ const worker = {
         connected: Boolean(env.ATTOM_API_KEY),
         endpoint: "/api/integrations/attom/property?address1=...&address2=city,state,zip",
         capabilities: ["property facts", "assessment", "recorded sale", "AVM range", "AVM confidence"],
-        privacy: "The API key stays server-side. Owner, mortgage and mailing fields are not requested or returned.",
+        cache: { persistent: true, successTtlDays: ATTOM_SUCCESS_TTL_DAYS, failureTtlDays: ATTOM_FAILURE_TTL_DAYS, scheduledSamplePerMarket: ATTOM_MARKET_SAMPLE_SIZE },
+        privacy: "The API key stays server-side. The AVM Detail response is reduced to property facts, assessment, sale and AVM fields; owner, mortgage and mailing fields are discarded before storage.",
       }, { headers: { "Cache-Control": "private, no-store" } });
     }
 
@@ -816,36 +978,26 @@ const worker = {
       const address2 = url.searchParams.get("address2")?.trim();
       if (!address1 || !address2) return Response.json({ error: "address1 and address2 are required" }, { status: 400 });
       try {
-        const property = await fetchAttomProperty(env.ATTOM_API_KEY, address1, address2);
-        return Response.json({ provider: "ATTOM", retrievedAt: new Date().toISOString(), property, use: "Independent vendor cross-check. BORO does not substitute ATTOM's AVM for its public-record anchors or average correlated estimates blindly." }, { headers: { "Cache-Control": "private, no-store" } });
+        const propertyId = url.searchParams.get("propertyId")?.trim() || null;
+        const marketId = url.searchParams.get("market")?.trim() || "ad-hoc";
+        const lookup = await cachedAttomProperty(env, { propertyId, marketId, address1, address2 });
+        if (lookup.status === "failed") return Response.json({ error: lookup.error, cacheHit: lookup.cacheHit, providerCalls: lookup.providerCalls }, { status: 404, headers: { "Cache-Control": "private, no-store" } });
+        const publicProperty = propertyId ? propertyValuations.properties.find((candidate) => candidate.id === propertyId) : null;
+        return Response.json({ provider: "ATTOM", retrievedAt: lookup.fetchedAt, cacheHit: lookup.cacheHit, providerCalls: lookup.providerCalls, property: lookup.property, secondarySignal: publicProperty ? attomSecondarySignal(publicProperty, lookup.property) : null, use: "Independent vendor cross-check with a capped 15% secondary weight. Agreement changes reliability; it does not manufacture investment edge." }, { headers: { "Cache-Control": "private, no-store" } });
       } catch (error) {
         return Response.json({ error: error instanceof Error ? error.message : "ATTOM property not found" }, { status: 502, headers: { "Cache-Control": "private, no-store" } });
       }
     }
 
-    if (url.pathname === "/api/integrations/attom/audit" && request.method === "POST") {
+    if (url.pathname === "/api/integrations/attom/audit" && (request.method === "POST" || request.method === "GET")) {
       if (!env.ATTOM_API_KEY) return Response.json({ error: "ATTOM is not configured" }, { status: 503, headers: { "Cache-Control": "private, no-store" } });
       const allowedMarkets = new Set(propertyValuations.markets.filter((market) => market.status === "live").map((market) => market.id));
-      let body: { marketIds?: string[]; perMarket?: number } = {};
-      try { body = await request.json() as typeof body; } catch { body = {}; }
+      let body: { marketIds?: string[]; perMarket?: number; forceRefresh?: boolean } = {};
+      if (request.method === "POST") try { body = await request.json() as typeof body; } catch { body = {}; }
       const marketIds = (body.marketIds ?? Array.from(allowedMarkets)).filter((marketId) => allowedMarkets.has(marketId));
       const perMarket = Math.max(1, Math.min(3, Math.round(body.perMarket ?? 2)));
-      const samples = marketIds.flatMap((marketId) => propertyValuations.properties.filter((property) => property.marketId === marketId).slice(0, perMarket));
-      const records = await Promise.all(samples.map(async (sample) => {
-        try {
-          const property = await fetchAttomProperty(env.ATTOM_API_KEY!, sample.address, sample.locality);
-          const attomValue = property.avm.value;
-          const deltaPct = attomValue ? Math.round((attomValue - sample.model.value) / sample.model.value * 1000) / 10 : null;
-          const rangeOverlap = property.avm.low != null && property.avm.high != null
-            ? property.avm.low <= sample.model.high && property.avm.high >= sample.model.low
-            : false;
-          return { id: sample.id, marketId: sample.marketId, address: sample.address, status: "matched" as const, borocastValue: sample.model.value, borocastRange: { low: sample.model.low, high: sample.model.high }, attomValue, attomRange: { low: property.avm.low, high: property.avm.high }, attomConfidence: property.avm.confidence, deltaPct, rangeOverlap };
-        } catch (error) {
-          return { id: sample.id, marketId: sample.marketId, address: sample.address, status: "failed" as const, borocastValue: sample.model.value, error: error instanceof Error ? error.message : "ATTOM lookup failed" };
-        }
-      }));
-      const matched = records.filter((record) => record.status === "matched").length;
-      return Response.json({ provider: "ATTOM", retrievedAt: new Date().toISOString(), marketIds, requested: records.length, matched, failed: records.length - matched, records, boundary: "This audit measures vendor availability and agreement. It does not retrain or average into the BORO public-record model." }, { headers: { "Cache-Control": "private, no-store" } });
+      const result = await runAttomEnrichment(env, marketIds, perMarket, Boolean(body.forceRefresh));
+      return Response.json(result, { headers: { "Cache-Control": "private, no-store" } });
     }
 
     if (url.pathname === "/api/public-safety/local") {
@@ -912,6 +1064,12 @@ const worker = {
     }
 
     return handler.fetch(request, env, ctx);
+  },
+  async scheduled(_controller: ScheduledController, env: Env, ctx: ExecutionContext) {
+    const marketIds = propertyValuations.markets.filter((market) => market.status === "live").map((market) => market.id);
+    ctx.waitUntil(runAttomEnrichment(env, marketIds, ATTOM_MARKET_SAMPLE_SIZE, false).then((result) => {
+      console.log(JSON.stringify({ event: "attom_enrichment", providerCalls: result.providerCalls, cacheHits: result.cacheHits, matched: result.matched, failed: result.failed }));
+    }));
   },
 };
 

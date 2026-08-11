@@ -8,6 +8,7 @@ type PortfolioView = "overview" | "builder" | "risk";
 type Assumption = {
   propertyId: string;
   purchasePrice: number;
+  closingCostPct: number;
   monthlyRent: number;
   vacancyPct: number;
   expensePct: number;
@@ -63,6 +64,7 @@ function initialAssumption(propertyId: string): Assumption {
   return {
     propertyId,
     purchasePrice: property.salePrice,
+    closingCostPct: 2,
     monthlyRent: marketRentProxy(propertyId),
     vacancyPct: 5,
     expensePct: 35,
@@ -81,24 +83,28 @@ export function PortfolioLab() {
   const items = useMemo(() => assumptions.map((assumption) => {
     const property = propertyValuations.properties.find((candidate) => candidate.id === assumption.propertyId)!;
     const market = propertyValuations.markets.find((candidate) => candidate.id === property.marketId)!;
+    const closingCosts = assumption.purchasePrice * assumption.closingCostPct / 100;
+    const acquisitionCost = assumption.purchasePrice + closingCosts;
     const debt = assumption.purchasePrice * (1 - assumption.downPaymentPct / 100);
-    const investedEquity = assumption.purchasePrice - debt;
+    const investedEquity = assumption.purchasePrice - debt + closingCosts;
     const annualRent = assumption.monthlyRent * 12 * (1 - assumption.vacancyPct / 100);
     const noi = annualRent * (1 - assumption.expensePct / 100);
     const annualDebtService = payment(debt, assumption.interestRate, assumption.termYears) * 12;
     const cashFlow = noi - annualDebtService;
     const dscr = annualDebtService > 0 ? noi / annualDebtService : 99;
     const cashOnCash = investedEquity > 0 ? cashFlow / investedEquity * 100 : 0;
-    const capRate = assumption.purchasePrice > 0 ? noi / assumption.purchasePrice * 100 : 0;
-    const priceDelta = assumption.purchasePrice > 0 ? (property.model.value - assumption.purchasePrice) / assumption.purchasePrice * 100 : 0;
+    const capRate = acquisitionCost > 0 ? noi / acquisitionCost * 100 : 0;
+    const priceDelta = acquisitionCost > 0 ? (property.model.value - acquisitionCost) / acquisitionCost * 100 : 0;
     const returnScore = clamp(45 + cashOnCash * 4 + (dscr - 1.1) * 22);
     const priceScore = clamp(50 + priceDelta * 2);
-    const itemEdge = Math.round(returnScore * .35 + priceScore * .2 + property.model.clusterEdgeScore * .15 + property.model.confidence * .15 + property.model.watchScore * .15);
-    return { assumption, property, market, debt, investedEquity, annualRent, noi, annualDebtService, cashFlow, dscr, cashOnCash, capRate, priceDelta, returnScore, priceScore, itemEdge };
+    const rawOpportunity = returnScore * .45 + priceScore * .25 + property.model.clusterEdgeScore * .20 + property.model.watchScore * .10;
+    const reliability = .60 + property.model.confidence / 100 * .40;
+    const itemEdge = Math.round(50 + (rawOpportunity - 50) * reliability);
+    return { assumption, property, market, closingCosts, acquisitionCost, debt, investedEquity, annualRent, noi, annualDebtService, cashFlow, dscr, cashOnCash, capRate, priceDelta, returnScore, priceScore, rawOpportunity, reliability, itemEdge };
   }), [assumptions]);
 
   const totals = useMemo(() => {
-    const acquisitionCost = items.reduce((sum, item) => sum + item.assumption.purchasePrice, 0);
+    const acquisitionCost = items.reduce((sum, item) => sum + item.acquisitionCost, 0);
     const modeledValue = items.reduce((sum, item) => sum + item.property.model.value, 0);
     const valueLow = items.reduce((sum, item) => sum + item.property.model.low, 0);
     const valueHigh = items.reduce((sum, item) => sum + item.property.model.high, 0);
@@ -108,11 +114,11 @@ export function PortfolioLab() {
     const debtService = items.reduce((sum, item) => sum + item.annualDebtService, 0);
     const cashFlow = noi - debtService;
     const investedEquity = items.reduce((sum, item) => sum + item.investedEquity, 0);
-    const competency = acquisitionCost > 0 ? items.reduce((sum, item) => sum + item.property.model.confidence * item.assumption.purchasePrice, 0) / acquisitionCost : 0;
-    const clusterEdge = acquisitionCost > 0 ? items.reduce((sum, item) => sum + item.property.model.clusterEdgeScore * item.assumption.purchasePrice, 0) / acquisitionCost : 0;
+    const competency = acquisitionCost > 0 ? items.reduce((sum, item) => sum + item.property.model.confidence * item.acquisitionCost, 0) / acquisitionCost : 0;
+    const clusterEdge = acquisitionCost > 0 ? items.reduce((sum, item) => sum + item.property.model.clusterEdgeScore * item.acquisitionCost, 0) / acquisitionCost : 0;
     const marketExposure = Array.from(new Set(items.map((item) => item.property.marketId))).map((marketId) => {
       const marketItems = items.filter((item) => item.property.marketId === marketId);
-      const value = marketItems.reduce((sum, item) => sum + item.assumption.purchasePrice, 0);
+      const value = marketItems.reduce((sum, item) => sum + item.acquisitionCost, 0);
       return { marketId, label: marketItems[0].market.label.split(" · ")[0], value, share: acquisitionCost > 0 ? value / acquisitionCost * 100 : 0 };
     }).sort((a, b) => b.value - a.value);
     const largestShare = marketExposure[0]?.share ?? 0;
@@ -120,8 +126,10 @@ export function PortfolioLab() {
     const returnScore = clamp(45 + (investedEquity > 0 ? cashFlow / investedEquity * 100 : 0) * 4 + (debtService > 0 ? noi / debtService - 1.1 : 1) * 22);
     const priceEdgePct = acquisitionCost > 0 ? (modeledValue - acquisitionCost) / acquisitionCost * 100 : 0;
     const acquisitionScore = clamp(50 + priceEdgePct * 2);
-    const portfolioEdge = Math.round(returnScore * .35 + acquisitionScore * .2 + clusterEdge * .15 + diversificationScore * .15 + competency * .15);
-    return { acquisitionCost, modeledValue, valueLow, valueHigh, debt, equity, noi, debtService, cashFlow, investedEquity, competency, clusterEdge, marketExposure, largestShare, diversificationScore, returnScore, priceEdgePct, acquisitionScore, portfolioEdge, dscr: debtService > 0 ? noi / debtService : 99, cashOnCash: investedEquity > 0 ? cashFlow / investedEquity * 100 : 0, ltv: modeledValue > 0 ? debt / modeledValue * 100 : 0 };
+    const rawPortfolioEdge = returnScore * .40 + acquisitionScore * .25 + clusterEdge * .20 + diversificationScore * .15;
+    const reliability = .60 + competency / 100 * .40;
+    const portfolioEdge = Math.round(50 + (rawPortfolioEdge - 50) * reliability);
+    return { acquisitionCost, modeledValue, valueLow, valueHigh, debt, equity, noi, debtService, cashFlow, investedEquity, competency, clusterEdge, marketExposure, largestShare, diversificationScore, returnScore, priceEdgePct, acquisitionScore, rawPortfolioEdge, reliability, portfolioEdge, dscr: debtService > 0 ? noi / debtService : 99, cashOnCash: investedEquity > 0 ? cashFlow / investedEquity * 100 : 0, ltv: modeledValue > 0 ? debt / modeledValue * 100 : 0 };
   }, [items]);
 
   const stressed = useMemo(() => {
@@ -176,10 +184,10 @@ export function PortfolioLab() {
     <nav className="portfolio-tabs" aria-label="Portfolio Lab views">{([{"id":"overview","label":"Portfolio Overview","detail":"Health, allocation and edge"},{"id":"builder","label":"Portfolio Builder","detail":"Positions and assumptions"},{"id":"risk","label":"Risk & Scenarios","detail":"Stress tests and actions"}] as const).map((view) => <button key={view.id} className={activeView === view.id ? "active" : ""} aria-pressed={activeView === view.id} onClick={() => setActiveView(view.id)}><b>{view.label}</b><small>{view.detail}</small></button>)}</nav>
 
     {activeView === "overview" && <div className="portfolio-panel">
-      <div className="portfolio-kpis"><article className="edge"><span>Portfolio Edge Score</span><strong>{totals.portfolioEdge}</strong><small>Return + price basis + area + diversification + evidence</small></article><article><span>Modeled value</span><b>{currency(totals.modeledValue, true)}</b><small>{currency(totals.valueLow, true)}–{currency(totals.valueHigh, true)} aggregate range</small></article><article><span>Annual cash flow</span><b className={totals.cashFlow < 0 ? "negative" : ""}>{currency(totals.cashFlow)}</b><small>{percent(totals.cashOnCash)} cash-on-cash</small></article><article><span>Debt coverage</span><b>{totals.dscr.toFixed(2)}×</b><small>{percent(totals.ltv)} modeled LTV</small></article><article><span>Data competency</span><b>{percent(totals.competency, 0)}</b><small>Value-weighted property evidence</small></article></div>
+      <div className="portfolio-kpis"><article className="edge"><span>Reliability-adjusted edge</span><strong>{totals.portfolioEdge}</strong><small>Opportunity is shrunk toward 50 when evidence is weaker</small></article><article><span>Modeled value</span><b>{currency(totals.modeledValue, true)}</b><small>{currency(totals.valueLow, true)}–{currency(totals.valueHigh, true)} aggregate range</small></article><article><span>Annual cash flow</span><b className={totals.cashFlow < 0 ? "negative" : ""}>{currency(totals.cashFlow)}</b><small>{percent(totals.cashOnCash)} cash-on-cash after closing costs</small></article><article><span>Debt coverage</span><b>{totals.dscr.toFixed(2)}×</b><small>{percent(totals.ltv)} modeled LTV</small></article><article><span>Data competency</span><b>{percent(totals.competency, 0)}</b><small>Confidence modifier, not an alpha factor</small></article></div>
       <div className="portfolio-overview-grid">
         <article className="allocation-card"><div className="portfolio-card-head"><div><p className="eyebrow">ALLOCATION</p><h3>Market concentration</h3></div><b>{percent(totals.largestShare, 0)}<small>largest exposure</small></b></div><div className="allocation-bars">{totals.marketExposure.map((market) => <div key={market.marketId}><span><b>{market.label}</b><small>{currency(market.value, true)}</small></span><i><b style={{ width: `${market.share}%` }} /></i><strong>{percent(market.share, 0)}</strong></div>)}</div><p>Based on modeled acquisition cost. A market above 50% fails the default concentration gate.</p></article>
-        <article className="edge-card"><div className="portfolio-card-head"><div><p className="eyebrow">PORTFOLIO EDGE MODEL</p><h3>Five visible contributions</h3></div></div><div className="edge-contributions"><div><span>Risk-adjusted return</span><b>35%</b><strong>{Math.round(totals.returnScore)}</strong></div><div><span>Price-to-model basis</span><b>20%</b><strong>{Math.round(totals.acquisitionScore)}</strong></div><div><span>Area fundamentals</span><b>15%</b><strong>{Math.round(totals.clusterEdge)}</strong></div><div><span>Diversification</span><b>15%</b><strong>{Math.round(totals.diversificationScore)}</strong></div><div><span>Evidence quality</span><b>15%</b><strong>{Math.round(totals.competency)}</strong></div></div><p>The score ranks this modeled portfolio under explicit assumptions. It is not an expected return or probability of profit.</p></article>
+        <article className="edge-card"><div className="portfolio-card-head"><div><p className="eyebrow">PORTFOLIO EDGE MODEL</p><h3>Four drivers + a reliability modifier</h3></div></div><div className="edge-contributions"><div><span>Risk-adjusted return</span><b>40%</b><strong>{Math.round(totals.returnScore)}</strong></div><div><span>Price-to-model basis</span><b>25%</b><strong>{Math.round(totals.acquisitionScore)}</strong></div><div><span>Area fundamentals</span><b>20%</b><strong>{Math.round(totals.clusterEdge)}</strong></div><div><span>Diversification</span><b>15%</b><strong>{Math.round(totals.diversificationScore)}</strong></div><div><span>Evidence reliability</span><b>modifier</b><strong>{Math.round(totals.competency)}</strong></div></div><p>Evidence no longer earns investment points. It shrinks the raw opportunity score toward neutral when confidence is weak. The result is an ordinal screen—not expected return or probability of profit.</p></article>
       </div>
       <div className="portfolio-position-list"><div className="portfolio-card-head"><div><p className="eyebrow">POSITION CONTRIBUTION</p><h3>What each property adds</h3></div><button onClick={() => setActiveView("builder")}>Edit assumptions →</button></div><table><thead><tr><th>Property</th><th>Basis / model</th><th>NOI</th><th>Cash flow</th><th>DSCR</th><th>Item edge</th><th>Action</th></tr></thead><tbody>{actions.map((item) => <tr key={item.property.id}><td><b>{item.property.address}</b><small>{item.property.locality}</small></td><td>{currency(item.assumption.purchasePrice)}<small>{currency(item.property.model.value)} model center</small></td><td>{currency(item.noi)}</td><td className={item.cashFlow < 0 ? "negative" : ""}>{currency(item.cashFlow)}</td><td>{item.dscr.toFixed(2)}×</td><td><strong>{item.itemEdge}</strong></td><td><span className={item.status}>{item.action}</span><small>{item.reason}</small></td></tr>)}</tbody></table></div>
     </div>}
@@ -187,7 +195,8 @@ export function PortfolioLab() {
     {activeView === "builder" && <div className="portfolio-panel">
       <div className="portfolio-builder-toolbar"><div><p className="eyebrow">ADD FROM QUALIFIED PUBLIC RECORDS</p><h3>{propertyValuations.properties.length - assumptions.length} available properties</h3></div><label><span>Property</span><select value={propertyToAdd} onChange={(event) => setPropertyToAdd(event.target.value)} disabled={!availableProperties.length}>{availableProperties.map((property) => <option key={property.id} value={property.id}>{property.address} · {property.locality}</option>)}</select></label><button onClick={addProperty} disabled={!availableProperties.length}>Add position</button></div>
       <div className="builder-table"><table><thead><tr><th>Position + evidence</th><th>Acquisition basis</th><th>Monthly rent</th><th>Vacancy</th><th>Operating expense</th><th>Down payment</th><th>Interest rate</th><th>Remove</th></tr></thead><tbody>{items.map((item) => <tr key={item.property.id}><td><b>{item.property.address}</b><small>{item.market.label} · value {currency(item.property.model.value)} · {item.property.model.confidence}% evidence</small><a href={`/report?type=property&id=${encodeURIComponent(item.property.id)}`} target="_blank" rel="noreferrer">Open property report →</a></td><td><label><span>Price</span><input aria-label={`${item.property.address} acquisition basis`} type="number" min="0" step="1000" value={item.assumption.purchasePrice} onChange={(event) => updateAssumption(item.property.id, "purchasePrice", Number(event.target.value))} /></label><small>Default: recorded sale</small></td><td><label><span>Rent</span><input aria-label={`${item.property.address} monthly rent`} type="number" min="0" step="50" value={item.assumption.monthlyRent} onChange={(event) => updateAssumption(item.property.id, "monthlyRent", Number(event.target.value))} /></label><small>Default: ACS cluster median</small></td><td><label><span>Vacancy</span><input aria-label={`${item.property.address} vacancy`} type="number" min="0" max="95" step=".5" value={item.assumption.vacancyPct} onChange={(event) => updateAssumption(item.property.id, "vacancyPct", Number(event.target.value))} /></label><small>% of gross rent</small></td><td><label><span>Expenses</span><input aria-label={`${item.property.address} operating expenses`} type="number" min="0" max="95" step="1" value={item.assumption.expensePct} onChange={(event) => updateAssumption(item.property.id, "expensePct", Number(event.target.value))} /></label><small>% after vacancy</small></td><td><label><span>Equity</span><input aria-label={`${item.property.address} down payment`} type="number" min="0" max="100" step="1" value={item.assumption.downPaymentPct} onChange={(event) => updateAssumption(item.property.id, "downPaymentPct", Number(event.target.value))} /></label><small>% of basis</small></td><td><label><span>Rate</span><input aria-label={`${item.property.address} interest rate`} type="number" min="0" max="30" step=".1" value={item.assumption.interestRate} onChange={(event) => updateAssumption(item.property.id, "interestRate", Number(event.target.value))} /></label><small>30-year amortization</small></td><td><button aria-label={`Remove ${item.property.address}`} onClick={() => setAssumptions((current) => current.filter((assumption) => assumption.propertyId !== item.property.id))} disabled={assumptions.length <= 1}>×</button></td></tr>)}</tbody></table></div>
-      <div className="portfolio-data-legend"><b>INPUT PROVENANCE</b><span><i className="public" /> Public record: identity, recorded sale, assessment and building facts</span><span><i className="model" /> BORO model: value range, comps, cluster edge and confidence</span><span><i className="assumption" /> Editable assumption: rent, vacancy, expenses and financing</span><p>Defaults are starting points, not verified deal facts. Replace every operating and financing assumption before using the output for diligence.</p></div>
+      <div className="portfolio-data-legend"><b>ACQUISITION-COST ASSUMPTIONS</b>{items.map((item) => <label key={item.property.id}><span>{item.property.address} closing costs</span><input aria-label={`${item.property.address} closing costs`} type="number" min="0" max="20" step=".5" value={item.assumption.closingCostPct} onChange={(event) => updateAssumption(item.property.id, "closingCostPct", Number(event.target.value))} />%</label>)}<p>Closing costs are included in all-in basis, invested cash, cash-on-cash return and price-to-model margin. The 2% default is an editable placeholder—not a market fact.</p></div>
+      <div className="portfolio-data-legend"><b>INPUT PROVENANCE</b><span><i className="public" /> Public record: identity, recorded sale, assessment and building facts</span><span><i className="model" /> BORO model: value range, comps, cluster edge and confidence</span><span><i className="assumption" /> Editable assumption: rent, vacancy, expenses, reserves and financing</span><p>Operating expense is a combined screening ratio after vacancy. Replace it with taxes, insurance, management, utilities, repairs and replacement reserves before diligence. Refinance-rate stress is an indicative refinance case; it does not reprice existing fixed-rate debt.</p></div>
     </div>}
 
     {activeView === "risk" && <div className="portfolio-panel risk-panel">

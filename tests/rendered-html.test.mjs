@@ -61,7 +61,7 @@ test("server-renders the national Borocast workbench and verified registry", asy
   assert.match(html, /MODEL GOVERNANCE CHECK/);
   assert.match(html, /Out-of-time validation/);
   assert.match(html, /Bring an independent AVM into the evidence stack/);
-  assert.match(html, /ATTOM MARKET AUDIT · SIX CONTROL ADDRESSES/);
+  assert.match(html, /ATTOM ENRICHMENT · SIX CACHED CONTROL ADDRESSES/);
   assert.match(html, /RENTCAST · LISTING \+ RENT CHANNEL/);
   assert.match(html, /REGIONAL LIVE LISTING SCREEN · SCALE TEST/);
   assert.match(html, /Up to 500 listings\. One market request/);
@@ -87,7 +87,7 @@ test("server-renders the national Borocast workbench and verified registry", asy
   assert.match(html, /Portfolio Lab/);
   assert.match(html, /PORTFOLIO LAB · V2 MODEL MODE/);
   assert.match(html, /Build the book/);
-  assert.match(html, /Portfolio Edge Score/);
+  assert.match(html, /Reliability-adjusted edge/);
   assert.match(html, /Portfolio Builder/);
   assert.match(html, /Risk &amp; Scenarios/);
   assert.match(html, /MODEL PORTFOLIO ONLY/);
