@@ -15,6 +15,7 @@
     "ingest:fhfa": "node scripts/ingestion/build-fhfa-pricing-history.mjs",
     "ingest:fhfa-tract": "node scripts/ingestion/build-fhfa-cluster-pricing-history.mjs",
     "ingest:valuations": "node scripts/ingestion/build-property-valuations.mjs",
+    "audit:model": "node scripts/model-quality-scorecard.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next --ignore-pattern worker-configuration.d.ts",
     "db:generate": "drizzle-kit generate",
     "cloudflare:types": "wrangler types --config wrangler.cloudflare.jsonc worker-configuration.d.ts",

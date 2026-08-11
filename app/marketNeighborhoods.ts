@@ -66,9 +66,15 @@ export const WEIGHT_PRESETS: Array<{ id: string; label: string; detail: string; 
   { id: "momentum", label: "Momentum", detail: "Recent and durable HPI growth", weights: { demographic: 10, economic: 15, education: 10, housing: 15, pricing: 50 } },
 ];
 
-export function weightedComposite(signal: Pick<NeighborhoodSignal, "demographic" | "economic" | "education" | "housing" | "pricing">, weights: FactorWeights) {
+export function rawWeightedComposite(signal: Pick<NeighborhoodSignal, "demographic" | "economic" | "education" | "housing" | "pricing">, weights: FactorWeights) {
   const total = Object.values(weights).reduce((sum, value) => sum + value, 0) || 1;
   return Math.round((signal.demographic * weights.demographic + signal.economic * weights.economic + signal.education * weights.education + signal.housing * weights.housing + signal.pricing * weights.pricing) / total);
+}
+
+export function weightedComposite(signal: Pick<NeighborhoodSignal, "demographic" | "economic" | "education" | "housing" | "pricing"> & { confidence?: number }, weights: FactorWeights) {
+  const raw = rawWeightedComposite(signal, weights);
+  const reliability = Math.min(1, Math.max(0, (signal.confidence ?? 100) / 100));
+  return Math.round(50 + (raw - 50) * reliability);
 }
 
 export const MARKET_EXPLORERS: MarketExplorer[] = acsAggregations.markets.map((aggregate) => {

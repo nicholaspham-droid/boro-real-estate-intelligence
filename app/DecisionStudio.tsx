@@ -49,12 +49,12 @@ export function DecisionStudio() {
   const [taxes, setTaxes] = useState(0);
   const [insurance, setInsurance] = useState(0);
   const [hoaMonthly, setHoaMonthly] = useState(0);
-  const [downPct, setDownPct] = useState(strategy.down);
+  const [downPct, setDownPct] = useState<number>(strategy.down);
   const [interestRate, setInterestRate] = useState(6.75);
   const [termYears, setTermYears] = useState(30);
-  const [vacancyPct, setVacancyPct] = useState(strategy.vacancy);
-  const [maintenancePct, setMaintenancePct] = useState(strategy.maintenance);
-  const [targetCap, setTargetCap] = useState(strategy.targetCap);
+  const [vacancyPct, setVacancyPct] = useState<number>(strategy.vacancy);
+  const [maintenancePct, setMaintenancePct] = useState<number>(strategy.maintenance);
+  const [targetCap, setTargetCap] = useState<number>(strategy.targetCap);
 
   function chooseMarket(id: string) {
     const property = propertyValuations.properties.find((item) => item.marketId === id)!;

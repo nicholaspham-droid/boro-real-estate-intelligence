@@ -25,7 +25,9 @@ type Scenario = {
   rateShock: number;
 };
 
-const DEFAULT_PROPERTY_IDS = ["cook-08214030100000", "phl-041334800", "wake-0500524"];
+const DEFAULT_PROPERTY_IDS = ["chicago", "philadelphia", "raleigh"]
+  .map((marketId) => propertyValuations.properties.find((property) => property.marketId === marketId)?.id)
+  .filter((propertyId): propertyId is string => Boolean(propertyId));
 
 function clamp(value: number, minimum = 0, maximum = 100) {
   return Math.min(maximum, Math.max(minimum, value));

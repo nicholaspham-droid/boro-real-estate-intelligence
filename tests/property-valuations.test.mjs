@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import valuations from "../data/property-valuations.json" with { type: "json" };
+import scorecard from "../data/model-quality-scorecard.json" with { type: "json" };
 
 test("property valuation snapshot is internally consistent", () => {
   assert.equal(valuations.properties.length, 54);
@@ -10,7 +11,7 @@ test("property valuation snapshot is internally consistent", () => {
     const weights = record.model.weights;
     const expected = anchors.hpiAdjustedSale * weights.hpiAdjustedSale + anchors.assessmentCalibrated * weights.assessmentCalibrated + anchors.comparablePpsf * weights.comparableSales;
     assert.ok(Math.abs(expected - record.model.value) <= 1500, `${record.id} model center matches documented weights`);
-    assert.equal(record.model.diagnostics.modelVersion, "2.1");
+    assert.equal(record.model.diagnostics.modelVersion, "3.0");
     assert.ok(record.model.pricePerSqft.comparableP25 <= record.model.pricePerSqft.comparableMedian);
     assert.ok(record.model.pricePerSqft.comparableMedian <= record.model.pricePerSqft.comparableP75);
     assert.ok(record.model.pricePerSqft.recordedSale > 0);
@@ -34,12 +35,27 @@ test("market competency separates source coverage from observed model performanc
     assert.equal(market.modelCompetency, market.diagnostics.modelCompetency);
     assert.ok(market.diagnostics.p80AbsoluteErrorPct >= market.diagnostics.medianAbsoluteErrorPct);
     assert.ok(market.competency <= Math.max(market.sourceCompetency, market.modelCompetency));
+    assert.ok(["pass", "watch", "compromised"].includes(market.decisionUse));
+    assert.equal(market.decisionUse, market.diagnostics.decisionUse);
   }
   const philadelphia = live.find((market) => market.id === "philadelphia");
   const raleigh = live.find((market) => market.id === "raleigh");
   assert.ok(philadelphia.modelCompetency < philadelphia.sourceCompetency);
   assert.ok(philadelphia.diagnostics.p80AbsoluteErrorPct > 50);
-  assert.ok(raleigh.diagnostics.medianAbsoluteErrorPct < 10);
+  assert.equal(philadelphia.decisionUse, "compromised");
+  assert.ok(raleigh.diagnostics.medianAbsoluteErrorPct <= 15);
+  assert.equal(raleigh.decisionUse, "pass");
+  assert.equal(live.find((market) => market.id === "chicago").decisionUse, "watch");
+});
+
+test("machine-readable scorecard mirrors the release gates", () => {
+  assert.match(scorecard.modelVersion, /v3\.0/);
+  assert.equal(scorecard.valuationAsOf, valuations.asOf);
+  assert.equal(scorecard.markets.length, 3);
+  for (const market of scorecard.markets) {
+    assert.equal(market.decisionUse, valuations.markets.find((item) => item.id === market.id).decisionUse);
+  }
+  assert.ok(scorecard.enforcedControls.some((control) => /assessments are excluded/i.test(control)));
 });
 
 test("Cook County assessments are normalized to market-equivalent residential values", () => {

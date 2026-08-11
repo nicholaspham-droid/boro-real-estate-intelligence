@@ -44,8 +44,9 @@ test("server-renders the national Borocast workbench and verified registry", asy
   assert.match(html, /Northwest Arkansas/);
   assert.match(html, /WHY IT STANDS OUT/);
   assert.match(html, /Open this area in the market workspace/);
-  assert.match(html, /PROPERTY VALUATION LAB · MODEL V2/);
+  assert.match(html, /PROPERTY VALUATION LAB · MODEL V3/);
   assert.match(html, /Cross-check the property/);
+  assert.match(html, /MODEL DECISION GATE/);
   assert.match(html, /Chicago · West Corridor/);
   assert.match(html, /Public-record model range/);
   assert.match(html, /INDEPENDENT CROSS-REFERENCE STACK/);
@@ -60,7 +61,7 @@ test("server-renders the national Borocast workbench and verified registry", asy
   assert.match(html, /Advance only when at least four gates pass and none fail/);
   assert.match(html, /MODEL GOVERNANCE CHECK/);
   assert.match(html, /Out-of-time validation/);
-  assert.match(html, /Bring an independent AVM into the evidence stack/);
+  assert.match(html, /Build an independent property evidence file/);
   assert.match(html, /ATTOM ENRICHMENT · SIX CACHED CONTROL ADDRESSES/);
   assert.match(html, /RENTCAST · LISTING \+ RENT CHANNEL/);
   assert.match(html, /REGIONAL LIVE LISTING SCREEN · SCALE TEST/);
@@ -74,7 +75,7 @@ test("server-renders the national Borocast workbench and verified registry", asy
   assert.match(html, /Deal Studio/);
   assert.match(html, /FEATURE AVAILABILITY · NO EMPTY MARKETS/);
   assert.match(html, /Pick the evidence/);
-  assert.match(html, /Prove listing \+ vendor joins/);
+  assert.match(html, /Validate listing \+ ATTOM joins/);
   assert.match(html, /Available parcel market/);
   assert.match(html, /LOCAL PUBLIC-SAFETY EVIDENCE/);
   assert.match(html, /Load local safety context/);
@@ -258,6 +259,13 @@ test("ATTOM adapter reports readiness and keeps the property route closed withou
   const payload = await status.json();
   assert.equal(payload.connected, false);
   assert.match(payload.privacy, /server-side/i);
+  assert.equal(payload.requestProfiles.core.maximumRequests, 1);
+  assert.equal(payload.requestProfiles.underwriting.maximumRequests, 6);
+  assert.ok(payload.requestProfiles.underwriting.endpoints.includes("saleshistory/expandedhistory"));
+  assert.ok(payload.requestProfiles.underwriting.endpoints.includes("property/buildingpermits"));
+  assert.ok(payload.requestProfiles.underwriting.endpoints.includes("valuation/homeequity"));
+  assert.match(payload.allowanceRule, /HTTP 200/i);
+  assert.match(payload.privacy, /buyer\/seller/i);
 
   const lookup = await worker.fetch(new Request("http://localhost/api/integrations/attom/property?address1=123%20Main%20St&address2=Raleigh%2C%20NC"), env, ctx);
   assert.equal(lookup.status, 503);
@@ -329,7 +337,9 @@ test("regional listing routes score up to 500 records from one upstream response
       assert.equal(payload.candidateCount, 1036);
       assert.equal(payload.listings.length, 24);
       assert.ok(payload.listings.some((listing) => listing.priority === "low"));
-      assert.ok(payload.listings.every((listing) => listing.scoreBreakdown.length === 5));
+      assert.ok(payload.listings.every((listing) => listing.scoreBreakdown.length === 2));
+      assert.ok(payload.listings.every((listing) => listing.evidenceReliability > 0 && listing.evidenceReliability <= 95));
+      assert.ok(payload.listings.every((listing) => listing.scoreBreakdown.reduce((sum, factor) => sum + factor.weight, 0) === 100));
       assert.ok(payload.pricePerSqftBand.p25 < payload.pricePerSqftBand.p75);
       assert.equal(payload.regionDiagnostics.listingSample, 160);
     }
@@ -345,6 +355,12 @@ test("property-data APIs expose health and market evidence", async () => {
   const healthPayload = await health.json();
   assert.equal(healthPayload.sourceCount, 6);
   assert.equal(healthPayload.connectedMarketCount, 10);
+
+  const quality = await worker.fetch(new Request("http://localhost/api/model-quality"), env, ctx);
+  assert.equal(quality.status, 200);
+  const qualityPayload = await quality.json();
+  assert.match(qualityPayload.modelVersion, /v3\.0/);
+  assert.equal(qualityPayload.markets.find((market) => market.id === "philadelphia").decisionUse, "compromised");
   assert.deepEqual(healthPayload.adapters.sort(), ["arcgis", "carto", "socrata"]);
   assert.equal(healthPayload.acs.marketCount, 20);
   assert.equal(healthPayload.acs.clusterCount, 97);

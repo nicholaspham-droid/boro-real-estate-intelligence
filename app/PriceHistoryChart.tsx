@@ -16,8 +16,12 @@ export function PriceHistoryChart({ points, seriesLabel }: { points: PriceChartP
     if (!canvas || points.length < 2) return;
     const context = canvas.getContext("2d");
     if (!context) return;
+    const activeCanvas = canvas;
+    const activeContext = context;
 
     function draw() {
+      const canvas = activeCanvas;
+      const context = activeContext;
       const width = Math.max(320, canvas.clientWidth);
       const height = Math.max(190, canvas.clientHeight);
       const ratio = Math.min(2, window.devicePixelRatio || 1);
@@ -85,6 +89,7 @@ export function PriceHistoryChart({ points, seriesLabel }: { points: PriceChartP
       context.stroke();
 
       const last = points.at(-1);
+      if (!last) return;
       context.beginPath();
       context.arc(x(points.length - 1), y(last.index), 4, 0, Math.PI * 2);
       context.fillStyle = "#d9ff55";
@@ -93,7 +98,7 @@ export function PriceHistoryChart({ points, seriesLabel }: { points: PriceChartP
 
     draw();
     const observer = new ResizeObserver(draw);
-    observer.observe(canvas);
+    observer.observe(activeCanvas);
     return () => observer.disconnect();
   }, [points]);
 

@@ -24,6 +24,8 @@ type PilotListing = {
   mlsName: string | null;
   mlsNumber: string | null;
   screeningScore: number;
+  rawSignal: number;
+  evidenceReliability: number;
   deltaFromBaseline: number;
   percentile: number;
   priority: "high" | "medium" | "low";
@@ -83,7 +85,7 @@ export function MarketListingPilot() {
   useEffect(() => {
     fetch("/api/integrations/rentcast/status")
       .then((response) => response.json())
-      .then((payload) => setConnected(Boolean(payload.connected)))
+      .then((payload) => setConnected(Boolean((payload as { connected?: boolean }).connected)))
       .catch(() => setConnected(false));
   }, []);
 
@@ -175,7 +177,7 @@ export function MarketListingPilot() {
 
   return <section className="listing-pilot" aria-labelledby="listing-pilot-title">
     <div className="listing-pilot-head">
-      <div><p className="eyebrow">REGIONAL LIVE LISTING SCREEN · SCALE TEST</p><h3 id="listing-pilot-title">Up to 500 listings. One market request.</h3><p>Raleigh, Chicago and Philadelphia now use the same listing-screen method. Price per square foot is normalized within property type, while regional backtest error and evidence competency stay visible so a model weakness cannot hide behind a national score.</p><div className="listing-market-switch" aria-label="Live listing market">{LISTING_MARKETS.map((market) => <button type="button" key={market.id} className={marketId === market.id ? "active" : ""} onClick={() => chooseMarket(market.id)}>{market.label}</button>)}</div></div>
+      <div><p className="eyebrow">REGIONAL LIVE LISTING SCREEN · SCALE TEST</p><h3 id="listing-pilot-title">Up to 500 listings. One market request.</h3><p>Raleigh, Chicago and Philadelphia use the same listing-screen method. Price per square foot is normalized within property type; freshness, completeness and regional calibration now reduce confidence instead of adding opportunity points.</p><div className="listing-market-switch" aria-label="Live listing market">{LISTING_MARKETS.map((market) => <button type="button" key={market.id} className={marketId === market.id ? "active" : ""} onClick={() => chooseMarket(market.id)}>{market.label}</button>)}</div></div>
       <div className="listing-budget"><span>Request efficiency</span><b>500 max</b><small>RentCast supports up to 500 listings in one response. BORO scores the full usable set, maps 24 representative records and caches each market for six hours.</small><button type="button" onClick={loadPilot} disabled={!connected || loading}>{loading ? `Loading ${marketConfig.label}…` : result ? `Refresh ${marketConfig.label} · 1 call` : connected ? `Load ${marketConfig.label} · 1 call` : "RentCast key required"}</button></div>
     </div>
     {error && <p className="listing-pilot-error" role="alert"><b>Listings did not load.</b> {error} The {marketConfig.label} map remains available; retrying costs one request only if the provider receives it.</p>}
@@ -190,7 +192,7 @@ export function MarketListingPilot() {
     </div>
     {result && <>
       {selected && <article className={`listing-pilot-detail ${selected.priority}`}>
-        <div className="listing-detail-summary"><span>{BAND_LABELS[selected.priority]}</span><h4>{selected.addressLine1}</h4><p>{selected.address}</p><div><strong>{selected.screeningScore}<small>/100</small></strong><b>{selected.deltaFromBaseline >= 0 ? "+" : ""}{selected.deltaFromBaseline} vs baseline</b><i>{selected.percentile}th percentile</i></div></div>
+        <div className="listing-detail-summary"><span>{BAND_LABELS[selected.priority]}</span><h4>{selected.addressLine1}</h4><p>{selected.address}</p><div><strong>{selected.screeningScore}<small>/100</small></strong><b>{selected.deltaFromBaseline >= 0 ? "+" : ""}{selected.deltaFromBaseline} vs baseline</b><i>{selected.percentile}th percentile · {selected.evidenceReliability}% reliable</i></div></div>
         <dl><div><dt>Asking price</dt><dd>{money(selected.price)}</dd></div><div><dt>Price / sf</dt><dd>{money(selected.pricePerSqft)}</dd></div><div><dt>Days on market</dt><dd>{selected.daysOnMarket ?? "—"}</dd></div><div><dt>Listing source</dt><dd>{selected.mlsName ?? "Not named"}{selected.mlsNumber ? ` · ${selected.mlsNumber}` : ""}</dd></div></dl>
         <div className="listing-score-breakdown"><div className="score-breakdown-head"><b>Score breakdown</b><span>Listing score</span><span>Pool baseline ◆</span><span>Weighted points</span></div>{selected.scoreBreakdown.map((factor) => <div className="score-factor" key={factor.key}><label><b>{factor.label}</b><small>{factor.weight}% weight</small></label><div className="score-factor-track"><i style={{ width: `${factor.score}%` }} /><em style={{ left: `${factor.baseline}%` }} /></div><strong>{factor.score}</strong><span>◆ {factor.baseline}</span><b>{factor.weightedPoints}</b></div>)}</div>
         <div className="listing-detail-foot"><ul>{selected.reasons.map((reason) => <li key={reason}>{reason}</li>)}</ul><a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selected.address)}`} target="_blank" rel="noreferrer">Open location in Google Maps →</a></div>

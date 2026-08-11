@@ -48,7 +48,7 @@ export function FeatureAvailability({ onOpenMarket }: Props) {
       </div>
     </div>
     <div className="expansion-sequence">
-      <article className="current"><span>01 · DEEPEN NOW</span><strong>{VALUATION_MARKET_IDS.length} markets</strong><h3>Prove listing + vendor joins</h3><p>{VALUATION_MARKET_IDS.map(marketLabel).join(" · ")}</p><small>Run the ATTOM entitlement audit, acquire analytics listing rights, and join asking price, status and DOM to the existing validated property models.</small></article>
+      <article className="current"><span>01 · DEEPEN NOW</span><strong>{VALUATION_MARKET_IDS.length} markets</strong><h3>Validate listing + ATTOM joins</h3><p>{VALUATION_MARKET_IDS.map(marketLabel).join(" · ")}</p><small>Track ATTOM match, entitlement, freshness and disagreement by market; join asking price, status and DOM to the existing validated property models.</small></article>
       <article><span>02 · ACTIVATE NEXT</span><strong>{parcelActivation.length} markets</strong><h3>Promote verified parcels</h3><p>{parcelActivation.map(marketLabel).join(" · ")}</p><small>Add qualified sales, model backtests and jurisdiction joins. A market moves to valuation only after the historical error gate passes.</small></article>
       <article><span>03 · CONNECT AFTER</span><strong>{parcelAcquisition.length} markets</strong><h3>Acquire local parcel truth</h3><p>{parcelAcquisition.map(marketLabel).join(" · ")}</p><small>Verify one reusable city, county or state source per market before exposing parcel or property controls.</small></article>
     </div>

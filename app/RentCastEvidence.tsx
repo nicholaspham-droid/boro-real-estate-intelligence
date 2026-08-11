@@ -34,7 +34,7 @@ export function RentCastEvidence({ address, locality }: { address: string; local
   useEffect(() => {
     fetch("/api/integrations/rentcast/status")
       .then((response) => response.json())
-      .then((payload) => setConnected(Boolean(payload.connected)))
+      .then((payload) => setConnected(Boolean((payload as { connected?: boolean }).connected)))
       .catch(() => setConnected(false));
   }, []);
 
@@ -45,7 +45,7 @@ export function RentCastEvidence({ address, locality }: { address: string; local
     try {
       const params = new URLSearchParams({ address: `${address}, ${locality}` });
       const response = await fetch(`/api/integrations/rentcast/property?${params}`);
-      const payload = await response.json();
+      const payload = await response.json() as RentCastResult & { error?: string };
       if (!response.ok) throw new Error(payload.error || "RentCast lookup failed");
       setResult(payload);
     } catch (caught) {

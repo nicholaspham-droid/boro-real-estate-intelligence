@@ -6,7 +6,9 @@ const membership = JSON.parse(await readFile(new URL("../../data/acs-cluster-mem
 const acs = JSON.parse(await readFile(new URL("../../data/acs-market-aggregations.json", import.meta.url), "utf8"));
 const pricing = JSON.parse(await readFile(new URL("../../data/fhfa-cluster-pricing-history.json", import.meta.url), "utf8"));
 
-const TODAY = new Date("2026-08-07T00:00:00Z");
+const TODAY = new Date();
+TODAY.setUTCHours(0, 0, 0, 0);
+const AS_OF = TODAY.toISOString().slice(0, 10);
 const round = (value, digits = 0) => {
   const scale = 10 ** digits;
   return Math.round(Number(value) * scale) / scale;
@@ -170,7 +172,7 @@ async function fetchCookCounty() {
 }
 
 async function fetchPhiladelphia() {
-  const sql = `select parcel_number,location,market_value,sale_date,sale_price,category_code_description,census_tract,number_of_bedrooms,number_of_bathrooms,total_livable_area,year_built,zip_code,st_x(the_geom) as lon,st_y(the_geom) as lat from opa_properties_public where sale_date >= '2023-01-01' and sale_date <= '2026-08-07' and sale_price between 75000 and 3000000 and market_value > 30000 and total_livable_area between 500 and 8000 and category_code_description in ('SINGLE FAMILY','ROW B/GARAGE','ROW CONV/APT','2 STY ROW','3 STY ROW','CONDO') and st_x(the_geom) < -75.20 order by sale_date desc limit 700`;
+  const sql = `select parcel_number,location,market_value,sale_date,sale_price,category_code_description,census_tract,number_of_bedrooms,number_of_bathrooms,total_livable_area,year_built,zip_code,st_x(the_geom) as lon,st_y(the_geom) as lat from opa_properties_public where sale_date >= '2023-01-01' and sale_date <= '${AS_OF}' and sale_price between 75000 and 3000000 and market_value > 30000 and total_livable_area between 500 and 8000 and category_code_description in ('SINGLE FAMILY','ROW B/GARAGE','ROW CONV/APT','2 STY ROW','3 STY ROW','CONDO') and st_x(the_geom) < -75.20 order by sale_date desc limit 700`;
   const url = new URL("https://phl.carto.com/api/v2/sql");
   url.searchParams.set("q", sql);
   const payload = await fetchJson(url);
@@ -218,7 +220,7 @@ async function fetchWakeCounty() {
     const latDelta = row.lat - 35.79;
     const lngDelta = (row.lng + 78.64) * Math.cos(35.79 * Math.PI / 180);
     const ratio = row.salePrice / row.assessedValue;
-    return row.saleDate <= "2026-08-07" && lngDelta < -0.035 && Math.abs(lngDelta) > Math.abs(latDelta) && ratio > 0.35 && ratio < 2.75;
+    return row.saleDate <= AS_OF && lngDelta < -0.035 && Math.abs(lngDelta) > Math.abs(latDelta) && ratio > 0.35 && ratio < 2.75;
   });
 }
 
@@ -292,26 +294,38 @@ function backtestMarket(usable, price) {
     const prior = usable.filter((candidate) => candidate.id !== subject.id && candidate.saleDate < subject.saleDate);
     const comps = comparableEvidence(subject, prior, price, targetDate);
     if (!comps.ppsf || comps.count < 3 || prior.length < 6) continue;
-    const calibration = calibrationFor(prior);
     const compValue = subject.sqft * comps.ppsf;
-    const assessmentValue = subject.assessedValue * calibration;
-    const predicted = compValue * 0.72 + assessmentValue * 0.28;
+    // The current assessment is not guaranteed to have existed at the historical
+    // test date. Excluding it prevents post-sale assessment leakage.
+    const predicted = compValue;
     const ratio = predicted / subject.salePrice;
-    tests.push({ id: subject.id, predicted, actual: subject.salePrice, ratio, absoluteErrorPct: Math.abs(ratio - 1) * 100, compCount: comps.count });
+    tests.push({ id: subject.id, predicted, actual: subject.salePrice, ratio, absoluteError: Math.abs(predicted - subject.salePrice), absoluteErrorPct: Math.abs(ratio - 1) * 100, compCount: comps.count });
   }
   const ratios = tests.map((item) => item.ratio);
   const medianRatio = median(ratios) ?? 1;
+  const meanRatio = tests.length ? ratios.reduce((sum, value) => sum + value, 0) / tests.length : 1;
+  const weightedMeanRatio = tests.length ? tests.reduce((sum, item) => sum + item.predicted, 0) / tests.reduce((sum, item) => sum + item.actual, 0) : 1;
   const cod = medianRatio ? tests.reduce((sum, item) => sum + Math.abs(item.ratio - medianRatio), 0) / Math.max(1, tests.length) / medianRatio * 100 : null;
+  const medianAbsoluteErrorPct = round(median(tests.map((item) => item.absoluteErrorPct)) ?? 50, 1);
+  const p80AbsoluteErrorPct = round(quantile(tests.map((item) => item.absoluteErrorPct), 0.8) ?? 60, 1);
+  const biasPct = round((medianRatio - 1) * 100, 1);
+  const decisionUse = tests.length >= 30 && medianAbsoluteErrorPct <= 15 && p80AbsoluteErrorPct <= 30 && Math.abs(biasPct) <= 10 ? "pass"
+    : tests.length >= 12 && medianAbsoluteErrorPct <= 25 && p80AbsoluteErrorPct <= 45 && Math.abs(biasPct) <= 15 ? "watch" : "compromised";
   return {
-    method: "Out-of-time backtest: each sale is estimated only from earlier sales, a locally calibrated assessment, physical similarity and distance",
+    method: "Leakage-controlled rolling-origin backtest: each sale is estimated only from earlier comparable sales; current assessments are excluded because their historical effective date is unavailable",
     sampleSize: tests.length,
-    medianAbsoluteErrorPct: round(median(tests.map((item) => item.absoluteErrorPct)) ?? 30, 1),
-    p80AbsoluteErrorPct: round(quantile(tests.map((item) => item.absoluteErrorPct), 0.8) ?? 30, 1),
+    medianAbsoluteErrorPct,
+    p80AbsoluteErrorPct,
+    medianAbsoluteDollarError: round(median(tests.map((item) => item.absoluteError)) ?? 0, -3),
     medianRatio: round(medianRatio, 3),
-    biasPct: round((medianRatio - 1) * 100, 1),
+    meanRatio: round(meanRatio, 3),
+    weightedMeanRatio: round(weightedMeanRatio, 3),
+    priceRelatedDifferential: round(meanRatio / Math.max(.001, weightedMeanRatio), 3),
+    biasPct,
     coefficientOfDispersion: round(cod ?? 30, 1),
     within10Pct: round(tests.filter((item) => item.absoluteErrorPct <= 10).length / Math.max(1, tests.length) * 100, 1),
     within20Pct: round(tests.filter((item) => item.absoluteErrorPct <= 20).length / Math.max(1, tests.length) * 100, 1),
+    decisionUse,
   };
 }
 
@@ -340,13 +354,12 @@ function modelMarket(records, clusterId) {
     const completeness = [record.sqft, record.yearBuilt, record.assessedValue, record.lat, record.lng, record.zip].filter(Boolean).length / 6;
     const compQuality = clamp(comps.count / 8 * 50 + comps.sameTypePct * 0.3 + (20 - (comps.medianMiles ?? 20)) * 1.0, 0, 100);
     const agreement = clamp(100 - spread / estimate * 120, 0, 100);
-    const confidence = clamp(Math.round(modelQuality * 0.35 + recency * 0.15 + completeness * 100 * 0.15 + compQuality * 0.20 + agreement * 0.10 + meta.price.pricingCompetency * 0.05), 35, 94);
+    const rawConfidence = Math.round(modelQuality * 0.35 + recency * 0.15 + completeness * 100 * 0.15 + compQuality * 0.20 + agreement * 0.10 + meta.price.pricingCompetency * 0.05);
+    const confidence = clamp(Math.round(Math.min(rawConfidence, modelQuality + 10)), 25, 94);
     const empiricalMargin = diagnostics.sampleSize >= 8 ? diagnostics.p80AbsoluteErrorPct / 100 : 0.22;
     const margin = clamp(Math.max(empiricalMargin, spread / estimate * 0.28, (100 - confidence) / 300), 0.08, 0.60);
     const valuationGapPct = (estimate / record.assessedValue - 1) * 100;
-    const gapSignal = clamp(50 + valuationGapPct, 0, 100);
-    const liquidity = clamp(100 - ageMonths * 1.4, 20, 100);
-    const watchScore = Math.round(meta.score * 0.45 + confidence * 0.30 + gapSignal * 0.15 + liquidity * 0.10);
+    const watchScore = Math.round(50 + (meta.score - 50) * confidence / 100);
     return {
       ...record,
       clusterName: `${meta.market.label} · ${meta.cluster.name}`,
@@ -359,7 +372,7 @@ function modelMarket(records, clusterId) {
         pricePerSqft: { recordedSale: round(record.salePrice / record.sqft, 0), hpiAdjustedSale: round(saleAnchor / record.sqft, 0), assessmentCalibrated: round(assessmentAnchor / record.sqft, 0), comparableP25: round(comps.ppsfP25, 0), comparableMedian: round(comps.ppsf, 0), comparableP75: round(comps.ppsfP75, 0), modelCenter: round(estimate / record.sqft, 0) },
         recency: { saleAgeMonths: round(ageMonths, 1), score: round(recency, 0), band: recencyBand },
         comparableQuality: { nearestMiles: round(comps.nearestMiles ?? 0, 1), medianMiles: round(comps.medianMiles ?? 0, 1), medianAgeMonths: round(comps.medianAgeMonths ?? 0, 1), newestSaleDate: comps.newestSaleDate, oldestSaleDate: comps.oldestSaleDate, sameTypePct: round(comps.sameTypePct, 0), recordIds: comps.ids },
-        diagnostics: { modelVersion: "2.1", marketBacktestSample: diagnostics.sampleSize, marketMedianAbsoluteErrorPct: diagnostics.medianAbsoluteErrorPct, marketP80AbsoluteErrorPct: diagnostics.p80AbsoluteErrorPct },
+        diagnostics: { modelVersion: "3.0", decisionUse: diagnostics.decisionUse, marketBacktestSample: diagnostics.sampleSize, marketMedianAbsoluteErrorPct: diagnostics.medianAbsoluteErrorPct, marketP80AbsoluteErrorPct: diagnostics.p80AbsoluteErrorPct },
       },
       listing: null,
       vendorEstimates: [],
@@ -382,19 +395,19 @@ const properties = [
 
 const output = {
   generatedAt: new Date().toISOString(),
-  asOf: "2026-08-07",
+  asOf: AS_OF,
   methodology: {
-    label: "Public-record valuation watch model v2.1",
+    label: "Public-record valuation watch model v3.0",
     value: "Recency-weighted prior sale + 20% locally calibrated assessment + 45–65% geographically, physically and price-per-square-foot matched comparable sales",
     range: "The larger of the market's out-of-time 80th-percentile error, anchor disagreement, or evidence-quality penalty",
-    watchScore: "45% cluster edge + 30% evidence quality + 15% assessment gap signal + 10% sale recency",
-    validation: "Out-of-time backtesting uses only sales recorded before each test transaction; no later comparable is allowed into that test",
+    watchScore: "Cluster screening signal shrunk toward neutral in proportion to property evidence confidence; evidence quality and assessment gaps do not earn edge points",
+    validation: "Rolling-origin backtesting uses only earlier comparable sales and excludes current assessment values to prevent historical effective-date leakage",
     boundary: "The assessment gap is not acquisition edge. A true price edge requires an asking price or licensed live listing joined to the record.",
   },
   markets: [
-    { id: "chicago", clusterId: "chicago-west", label: "Chicago · West Corridor", status: "live", propertyCount: properties.filter((row) => row.marketId === "chicago").length, sourceCompetency: 91, modelCompetency: modeledMarkets[0].diagnostics.modelCompetency, competency: Math.round(91 * 0.55 + modeledMarkets[0].diagnostics.modelCompetency * 0.45), diagnostics: modeledMarkets[0].diagnostics },
-    { id: "philadelphia", clusterId: "philadelphia-west", label: "Philadelphia · West Corridor", status: "live", propertyCount: properties.filter((row) => row.marketId === "philadelphia").length, sourceCompetency: 90, modelCompetency: modeledMarkets[1].diagnostics.modelCompetency, competency: Math.round(90 * 0.55 + modeledMarkets[1].diagnostics.modelCompetency * 0.45), diagnostics: modeledMarkets[1].diagnostics },
-    { id: "raleigh", clusterId: "raleigh-west", label: "Raleigh · West Corridor", status: "live", propertyCount: properties.filter((row) => row.marketId === "raleigh").length, sourceCompetency: 82, modelCompetency: modeledMarkets[2].diagnostics.modelCompetency, competency: Math.round(82 * 0.55 + modeledMarkets[2].diagnostics.modelCompetency * 0.45), diagnostics: modeledMarkets[2].diagnostics },
+    { id: "chicago", clusterId: "chicago-west", label: "Chicago · West Corridor", status: "live", decisionUse: modeledMarkets[0].diagnostics.decisionUse, propertyCount: properties.filter((row) => row.marketId === "chicago").length, sourceCompetency: 91, modelCompetency: modeledMarkets[0].diagnostics.modelCompetency, competency: Math.round(91 * 0.55 + modeledMarkets[0].diagnostics.modelCompetency * 0.45), diagnostics: modeledMarkets[0].diagnostics },
+    { id: "philadelphia", clusterId: "philadelphia-west", label: "Philadelphia · West Corridor", status: "live", decisionUse: modeledMarkets[1].diagnostics.decisionUse, propertyCount: properties.filter((row) => row.marketId === "philadelphia").length, sourceCompetency: 90, modelCompetency: modeledMarkets[1].diagnostics.modelCompetency, competency: Math.round(90 * 0.55 + modeledMarkets[1].diagnostics.modelCompetency * 0.45), diagnostics: modeledMarkets[1].diagnostics },
+    { id: "raleigh", clusterId: "raleigh-west", label: "Raleigh · West Corridor", status: "live", decisionUse: modeledMarkets[2].diagnostics.decisionUse, propertyCount: properties.filter((row) => row.marketId === "raleigh").length, sourceCompetency: 82, modelCompetency: modeledMarkets[2].diagnostics.modelCompetency, competency: Math.round(82 * 0.55 + modeledMarkets[2].diagnostics.modelCompetency * 0.45), diagnostics: modeledMarkets[2].diagnostics },
     { id: "northwest-arkansas", clusterId: "northwest-arkansas-north", label: "Northwest Arkansas · North Arc", status: "gap", propertyCount: 0, competency: 38, gap: "Parcel geometry is available, but a verified reusable county sale-price feed is not yet connected." },
   ],
   providers: [

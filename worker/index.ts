@@ -9,18 +9,95 @@ import acsAggregations from "../data/acs-market-aggregations.json";
 import pricingHistory from "../data/fhfa-pricing-history.json";
 import clusterPricingHistory from "../data/fhfa-cluster-pricing-history.json";
 import propertyValuations from "../data/property-valuations.json";
+import modelQualityScorecard from "../data/model-quality-scorecard.json";
 
 interface AttomProperty {
   identifier?: { attomId?: string | number; apn?: string };
   address?: { oneLine?: string };
-  location?: { latitude?: string | number; longitude?: string | number };
-  summary?: { proptype?: string; propertyType?: string; yearbuilt?: number };
-  building?: { summary?: { yearbuilt?: number }; size?: { livingsize?: number; universalsize?: number }; rooms?: { beds?: number; bathstotal?: number } };
-  assessment?: { assessed?: { assdttlvalue?: number }; market?: { mktttlvalue?: number }; tax?: { taxyear?: number } };
-  sale?: { saleTransDate?: string; salesearchdate?: string; amount?: { saleamt?: number; saledisclosuretype?: number | string } };
-  avm?: { amount?: { value?: number; low?: number; high?: number; scr?: number }; eventDate?: string; calculations?: { perSizeUnit?: number } };
+  location?: { latitude?: string | number; longitude?: string | number; geoIdV4?: Record<string, string> };
+  summary?: { proptype?: string; propType?: string; propertyType?: string; yearbuilt?: number; yearBuilt?: number };
+  building?: {
+    summary?: { yearbuilt?: number; yearBuilt?: number; unitsCount?: number; levels?: number; quality?: string };
+    size?: { livingsize?: number; livingSize?: number; universalsize?: number; universalSize?: number };
+    rooms?: { beds?: number; bathstotal?: number; bathsTotal?: number };
+    construction?: { condition?: string; propertyStructureMajorImprovementsYear?: number };
+    parking?: { prkgSpaces?: number; garageType?: string; garagetype?: string };
+  };
+  assessment?: {
+    assessed?: { assdttlvalue?: number; assdTtlValue?: number };
+    market?: { mktttlvalue?: number; mktTtlValue?: number };
+    tax?: { taxyear?: number; taxYear?: number; taxamt?: number; taxAmt?: number; taxPerSizeUnit?: number };
+    mortgage?: {
+      FirstConcurrent?: AttomMortgage;
+      firstConcurrent?: AttomMortgage;
+      SecondConcurrent?: AttomMortgage;
+      secondConcurrent?: AttomMortgage;
+    };
+  };
+  sale?: {
+    saleTransDate?: string;
+    salesearchdate?: string;
+    saleSearchDate?: string;
+    armsLengthIdent?: string;
+    amount?: { saleamt?: number; saleAmt?: number; saledisclosuretype?: number | string; saleDisclosureType?: number | string };
+    calculation?: { pricePerSizeUnit?: number };
+  };
+  saleHistory?: AttomSaleHistory[] | AttomSaleHistory;
+  buildingPermits?: AttomPermit[] | AttomPermit;
+  avm?: {
+    amount?: { value?: number; low?: number; high?: number; scr?: number };
+    eventDate?: string;
+    calculations?: { perSizeUnit?: number; monthlyChgPct?: number; monthlyChgValue?: number; ratioTaxValue?: number; ratioTaxAmt?: number; rangePctOfValue?: number };
+  };
+  homeEquity?: { LTV?: number; ltv?: number; estimatedAvailableEquity?: number };
+  school?: AttomSchool[] | AttomSchool;
+  schools?: AttomSchool[] | AttomSchool | { school?: AttomSchool[] | AttomSchool };
   vintage?: { pubDate?: string; lastModified?: string };
 }
+
+type AttomMortgage = {
+  amount?: number;
+  date?: string;
+  interestRate?: number;
+  loanTypeCode?: string;
+  term?: number;
+  dueDate?: string;
+  interestRateType?: string;
+  equityFlag?: string;
+  refiFlag?: string;
+};
+
+type AttomSaleHistory = {
+  sequence?: number;
+  saleSearchDate?: string;
+  saleTransDate?: string;
+  armsLengthIdent?: string;
+  deedInLieuOfIndicator?: string;
+  amount?: { saleAmt?: number; saleCode?: string; saleRecDate?: string; saleDisclosureType?: string | number; saleDocType?: string };
+};
+
+type AttomPermit = {
+  effectiveDate?: string;
+  status?: string;
+  description?: string;
+  type?: string;
+  subType?: string;
+  projectName?: string;
+  jobValue?: number;
+  fees?: number;
+};
+
+type AttomSchool = {
+  schoolName?: string;
+  name?: string;
+  schoolType?: string;
+  gradeSpanLow?: string;
+  gradeSpanHigh?: string;
+  testRating?: number;
+  distance?: number;
+  enrollment?: number;
+  updatedate?: string;
+};
 
 type RentCastListing = {
   id?: string;
@@ -67,7 +144,7 @@ function normalizeRentCastListing(listing: RentCastListing | undefined) {
   };
 }
 
-async function rentCastRequest<T>(apiKey: string, path: string, address: string) {
+async function rentCastRequest<T extends object>(apiKey: string, path: string, address: string) {
   const endpoint = new URL(`https://api.rentcast.io/v1/${path}`);
   endpoint.searchParams.set("address", address);
   if (path.startsWith("listings/")) {
@@ -146,7 +223,7 @@ async function fetchMarketListingPilot(apiKey: string, marketId: ListingMarketId
     const values = usable.filter((listing) => (listing.propertyType ?? "Residential") === propertyType).map((listing) => listing.price! / listing.squareFootage!);
     if (values.length >= 8) typePpsf.set(propertyType, medianNumber(values));
   }
-  const scored = usable.map((listing) => {
+  const scoredEvidence = usable.map((listing) => {
     const ppsf = listing.price! / listing.squareFootage!;
     const ppsfBaseline = typePpsf.get(listing.propertyType ?? "Residential") ?? medianPpsf;
     const dom = listing.daysOnMarket ?? 0;
@@ -162,7 +239,7 @@ async function fetchMarketListingPilot(apiKey: string, marketId: ListingMarketId
       completeness: Math.round(completeness),
       marketContext: marketCompetencyScore,
     };
-    const score = Math.round(components.value * .30 + components.marketTime * .22 + components.freshness * .20 + components.completeness * .13 + components.marketContext * .15);
+    const rawSignal = Math.round(components.value * .65 + components.marketTime * .35);
     const reasons = [
       ppsf <= ppsfBaseline ? `${Math.round((1 - ppsf / ppsfBaseline) * 100)}% below ${listing.propertyType ?? "market"} median price/sf` : `${Math.round((ppsf / ppsfBaseline - 1) * 100)}% above ${listing.propertyType ?? "market"} median price/sf`,
       `${dom} days on market`,
@@ -192,9 +269,34 @@ async function fetchMarketListingPilot(apiKey: string, marketId: ListingMarketId
       daysOnMarket: listing.daysOnMarket ?? null,
       mlsName: listing.mlsName ?? null,
       mlsNumber: listing.mlsNumber ?? null,
-      screeningScore: score,
+      rawSignal,
       components,
       reasons,
+    };
+  });
+
+  const evidencePpsfValues = scoredEvidence.map((listing) => listing.pricePerSqft);
+  const evidenceCompletenessValues = scoredEvidence.map((listing) => listing.components.completeness);
+  const evidenceFreshCount = scoredEvidence.filter((listing) => listing.components.freshness >= 68).length;
+  const diagnostics = modelMarket && "diagnostics" in modelMarket ? modelMarket.diagnostics : null;
+  const medianCompleteness = Math.round(medianNumber(evidenceCompletenessValues));
+  const freshnessCoverage = Math.round(evidenceFreshCount / Math.max(1, scoredEvidence.length) * 100);
+  const backtestSample = diagnostics?.sampleSize ?? 0;
+  const p80Error = diagnostics?.p80AbsoluteErrorPct ?? 100;
+  const modelGate = diagnostics && "decisionUse" in diagnostics ? diagnostics.decisionUse : null;
+  const regionalStatus = modelGate === "compromised" ? "compromised"
+    : scoredEvidence.length >= 100 && medianCompleteness >= 70 && backtestSample >= 20 && p80Error <= 25 && modelGate !== "watch" ? "pass"
+      : scoredEvidence.length >= 30 && backtestSample >= 5 && p80Error <= 35 ? "watch" : "compromised";
+  const regionalReliabilityCap = regionalStatus === "pass" ? .95 : regionalStatus === "watch" ? .80 : .55;
+  const scored = scoredEvidence.map((listing) => {
+    const observedReliability = (listing.components.freshness * .35 + listing.components.completeness * .30 + listing.components.marketContext * .35) / 100;
+    const evidenceReliability = Math.min(regionalReliabilityCap, observedReliability);
+    const screeningScore = Math.round(50 + (listing.rawSignal - 50) * evidenceReliability);
+    return {
+      ...listing,
+      screeningScore,
+      evidenceReliability: Math.round(evidenceReliability * 100),
+      reasons: [...listing.reasons, `${Math.round(evidenceReliability * 100)}% reliability after the ${regionalStatus} regional gate`],
     };
   }).sort((a, b) => b.screeningScore - a.screeningScore);
 
@@ -216,11 +318,8 @@ async function fetchMarketListingPilot(apiKey: string, marketId: ListingMarketId
       percentile,
       priority: deltaFromBaseline >= 7 && percentile >= 65 ? "high" as const : deltaFromBaseline <= -7 || percentile <= 30 ? "low" as const : "medium" as const,
       scoreBreakdown: [
-        { key: "value", label: "Relative price / sf", weight: 30, score: listing.components.value, baseline: componentBaselines.value, weightedPoints: Math.round(listing.components.value * .30 * 10) / 10 },
-        { key: "marketTime", label: "Market time", weight: 22, score: listing.components.marketTime, baseline: componentBaselines.marketTime, weightedPoints: Math.round(listing.components.marketTime * .22 * 10) / 10 },
-        { key: "freshness", label: "Listing freshness", weight: 20, score: listing.components.freshness, baseline: componentBaselines.freshness, weightedPoints: Math.round(listing.components.freshness * .20 * 10) / 10 },
-        { key: "completeness", label: "Field completeness", weight: 13, score: listing.components.completeness, baseline: componentBaselines.completeness, weightedPoints: Math.round(listing.components.completeness * .13 * 10) / 10 },
-        { key: "marketContext", label: `${marketConfig.city} data competency`, weight: 15, score: listing.components.marketContext, baseline: componentBaselines.marketContext, weightedPoints: Math.round(listing.components.marketContext * .15 * 10) / 10 },
+        { key: "value", label: "Relative price / sf", weight: 65, score: listing.components.value, baseline: componentBaselines.value, weightedPoints: Math.round(listing.components.value * .65 * 10) / 10 },
+        { key: "marketTime", label: "Market time", weight: 35, score: listing.components.marketTime, baseline: componentBaselines.marketTime, weightedPoints: Math.round(listing.components.marketTime * .35 * 10) / 10 },
       ],
     };
   });
@@ -228,7 +327,7 @@ async function fetchMarketListingPilot(apiKey: string, marketId: ListingMarketId
   const selectedIds = new Set<string>();
   const comparisonSet: typeof enriched = [];
   const add = (listing: (typeof enriched)[number] | undefined) => {
-    if (listing && !selectedIds.has(listing.id)) {
+    if (listing?.id && !selectedIds.has(listing.id)) {
       selectedIds.add(listing.id);
       comparisonSet.push(listing);
     }
@@ -245,17 +344,8 @@ async function fetchMarketListingPilot(apiKey: string, marketId: ListingMarketId
   });
   comparisonSet.sort((a, b) => b.screeningScore - a.screeningScore);
 
-  const ppsfValues = scored.map((listing) => listing.pricePerSqft);
-  const completenessValues = scored.map((listing) => listing.components.completeness);
-  const freshCount = scored.filter((listing) => listing.components.freshness >= 68).length;
-  const diagnostics = modelMarket && "diagnostics" in modelMarket ? modelMarket.diagnostics : null;
-  const ppsfP25 = Math.round(quantileNumber(ppsfValues, .25));
-  const ppsfP75 = Math.round(quantileNumber(ppsfValues, .75));
-  const medianCompleteness = Math.round(medianNumber(completenessValues));
-  const freshnessCoverage = Math.round(freshCount / Math.max(1, scored.length) * 100);
-  const backtestSample = diagnostics?.sampleSize ?? 0;
-  const p80Error = diagnostics?.p80AbsoluteErrorPct ?? 100;
-  const regionalStatus = scored.length >= 100 && medianCompleteness >= 70 && backtestSample >= 8 && p80Error <= 25 ? "pass" : scored.length >= 30 && backtestSample >= 5 && p80Error <= 35 ? "watch" : "compromised";
+  const ppsfP25 = Math.round(quantileNumber(evidencePpsfValues, .25));
+  const ppsfP75 = Math.round(quantileNumber(evidencePpsfValues, .75));
 
   return {
     listings: comparisonSet,
@@ -274,42 +364,232 @@ async function fetchMarketListingPilot(apiKey: string, marketId: ListingMarketId
       publicRecordMedianErrorPct: diagnostics?.medianAbsoluteErrorPct ?? null,
       publicRecordP80ErrorPct: diagnostics?.p80AbsoluteErrorPct ?? null,
       modelCompetency: modelMarket && "modelCompetency" in modelMarket ? modelMarket.modelCompetency : null,
-      interpretation: regionalStatus === "pass" ? "Listing breadth, field completeness and public-record backtesting support regional use with visible uncertainty." : regionalStatus === "watch" ? "The regional model remains usable for screening, but sample depth or validation error requires higher diligence." : "Regional evidence does not clear the minimum transferability gate; do not compare its scores as if equally calibrated.",
+      interpretation: regionalStatus === "pass" ? "Listing breadth, field completeness and public-record backtesting support regional use with visible uncertainty." : regionalStatus === "watch" ? "The regional model remains usable for screening, but reliability is capped at 80% because sample depth or validation error requires higher diligence." : "Regional evidence does not clear the minimum transferability gate; reliability is capped at 55% and scores must not be compared as if equally calibrated.",
     },
   };
 }
 
-async function fetchAttomProperty(apiKey: string, address1: string, address2: string) {
-  const attomUrl = new URL("https://api.gateway.attomdata.com/propertyapi/v1.0.0/attomavm/detail");
+type AttomEvidenceDepth = "core" | "underwriting";
+type AttomModuleStatus = "available" | "no_result" | "not_entitled" | "error";
+
+type AttomModuleEvidence = {
+  id: string;
+  label: string;
+  endpoint: string;
+  status: AttomModuleStatus;
+  countedCalls: number;
+  message: string | null;
+};
+
+const ATTOM_UNDERWRITING_MODULES = [
+  { id: "expanded_profile", label: "Assessment, tax + mortgage", endpoint: "property/expandedprofile" },
+  { id: "sales_history", label: "10-year recorded sales", endpoint: "saleshistory/expandedhistory" },
+  { id: "building_permits", label: "Building permits", endpoint: "property/buildingpermits" },
+  { id: "home_equity", label: "Home equity + LTV", endpoint: "valuation/homeequity" },
+  { id: "schools", label: "School context", endpoint: "property/detailwithschools" },
+] as const;
+
+class AttomApiError extends Error {
+  countedCalls: number;
+  status: number;
+  category: Exclude<AttomModuleStatus, "available">;
+
+  constructor(message: string, status: number, countedCalls: number, category: Exclude<AttomModuleStatus, "available">) {
+    super(message);
+    this.name = "AttomApiError";
+    this.status = status;
+    this.countedCalls = countedCalls;
+    this.category = category;
+  }
+}
+
+function finiteAttomNumber(...values: unknown[]) {
+  for (const value of values) {
+    if (value === null || value === undefined || value === "") continue;
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return null;
+}
+
+function attomArray<T>(value: T[] | T | null | undefined): T[] {
+  if (Array.isArray(value)) return value;
+  return value ? [value] : [];
+}
+
+async function attomPropertyRequest(apiKey: string, endpoint: string, address1: string, address2: string) {
+  const attomUrl = new URL(`https://api.gateway.attomdata.com/propertyapi/v1.0.0/${endpoint}`);
   attomUrl.searchParams.set("address1", address1);
   attomUrl.searchParams.set("address2", address2);
   const upstream = await fetch(attomUrl, { headers: { Accept: "application/json", APIKey: apiKey } });
-  const payload = await upstream.json() as { property?: AttomProperty[]; status?: { msg?: string } };
-  if (upstream.status === 401 || upstream.status === 403) throw new Error("ATTOM authorization failed. Verify the active key and AVM Detail product entitlement.");
-  if (!upstream.ok || !payload.property?.length) throw new Error(payload.status?.msg || `ATTOM property not found (${upstream.status})`);
-  const property = payload.property[0];
+  const countedCalls = upstream.status === 200 ? 1 : 0;
+  let payload: { property?: AttomProperty[]; status?: { code?: number; msg?: string } } = {};
+  try { payload = await upstream.json() as typeof payload; } catch { /* bounded ATTOM JSON response was unreadable */ }
+  if (upstream.status === 401 || upstream.status === 403) {
+    throw new AttomApiError(`ATTOM authorization failed for ${endpoint}. Verify product entitlement.`, upstream.status, countedCalls, "not_entitled");
+  }
+  if (!upstream.ok) throw new AttomApiError(payload.status?.msg || `ATTOM ${endpoint} request failed (${upstream.status})`, upstream.status, countedCalls, "error");
+  if (!payload.property?.length) throw new AttomApiError(payload.status?.msg || "SuccessWithoutResult", upstream.status, countedCalls, "no_result");
+  return { property: payload.property[0], countedCalls };
+}
+
+function normalizedMortgage(mortgage: AttomMortgage | undefined) {
+  if (!mortgage) return null;
+  const amount = finiteAttomNumber(mortgage.amount);
+  if (amount === null && !mortgage.date && !mortgage.dueDate) return null;
   return {
-    attomId: property.identifier?.attomId ?? null,
-    parcelId: property.identifier?.apn ?? null,
-    address: property.address?.oneLine ?? `${address1}, ${address2}`,
-    location: { latitude: property.location?.latitude ?? null, longitude: property.location?.longitude ?? null },
-    type: property.summary?.proptype ?? property.summary?.propertyType ?? null,
-    yearBuilt: property.summary?.yearbuilt ?? property.building?.summary?.yearbuilt ?? null,
-    livingSize: property.building?.size?.livingsize ?? property.building?.size?.universalsize ?? null,
-    beds: property.building?.rooms?.beds ?? null,
-    baths: property.building?.rooms?.bathstotal ?? null,
-    assessment: { total: property.assessment?.assessed?.assdttlvalue ?? null, market: property.assessment?.market?.mktttlvalue ?? null, taxYear: property.assessment?.tax?.taxyear ?? null },
-    sale: { date: property.sale?.saleTransDate ?? property.sale?.salesearchdate ?? null, amount: property.sale?.amount?.saleamt ?? null, disclosure: property.sale?.amount?.saledisclosuretype ?? null },
-    avm: { value: property.avm?.amount?.value ?? null, low: property.avm?.amount?.low ?? null, high: property.avm?.amount?.high ?? null, confidence: property.avm?.amount?.scr ?? null, asOf: property.avm?.eventDate ?? null, perSqft: property.avm?.calculations?.perSizeUnit ?? null },
-    vintage: { published: property.vintage?.pubDate ?? null, modified: property.vintage?.lastModified ?? null },
+    amount,
+    date: mortgage.date ?? null,
+    rate: finiteAttomNumber(mortgage.interestRate),
+    rateType: mortgage.interestRateType ?? null,
+    loanType: mortgage.loanTypeCode ?? null,
+    termMonths: finiteAttomNumber(mortgage.term),
+    dueDate: mortgage.dueDate ?? null,
+    refinance: mortgage.refiFlag ?? null,
+    equityLoan: mortgage.equityFlag ?? null,
   };
+}
+
+function normalizedSalesHistory(property: AttomProperty | null) {
+  return attomArray(property?.saleHistory).slice(0, 20).map((event) => ({
+    sequence: finiteAttomNumber(event.sequence),
+    date: event.saleTransDate ?? event.saleSearchDate ?? event.amount?.saleRecDate ?? null,
+    amount: finiteAttomNumber(event.amount?.saleAmt),
+    amountCode: event.amount?.saleCode ?? null,
+    disclosure: event.amount?.saleDisclosureType ?? null,
+    documentType: event.amount?.saleDocType ?? null,
+    armsLength: event.armsLengthIdent ?? null,
+    deedInLieu: event.deedInLieuOfIndicator ?? null,
+  }));
+}
+
+function normalizedPermits(property: AttomProperty | null) {
+  return attomArray(property?.buildingPermits).slice(0, 20).map((permit) => ({
+    date: permit.effectiveDate ?? null,
+    status: permit.status ?? null,
+    type: permit.type ?? null,
+    subType: permit.subType ?? null,
+    project: permit.projectName ?? null,
+    description: permit.description?.slice(0, 500) ?? null,
+    jobValue: finiteAttomNumber(permit.jobValue),
+    fees: finiteAttomNumber(permit.fees),
+  }));
+}
+
+function normalizedSchools(property: AttomProperty | null) {
+  const nested: AttomSchool[] | AttomSchool | null | undefined = property?.schools && !Array.isArray(property.schools) && "school" in property.schools ? property.schools.school : property?.schools as AttomSchool[] | AttomSchool | null | undefined;
+  return [...attomArray(property?.school), ...attomArray(nested)].slice(0, 12).map((school) => ({
+    name: school.schoolName ?? school.name ?? null,
+    type: school.schoolType ?? null,
+    grades: school.gradeSpanLow || school.gradeSpanHigh ? `${school.gradeSpanLow ?? "?"}–${school.gradeSpanHigh ?? "?"}` : null,
+    rating: finiteAttomNumber(school.testRating),
+    distanceMiles: finiteAttomNumber(school.distance),
+    enrollment: finiteAttomNumber(school.enrollment),
+    updatedAt: school.updatedate ?? null,
+  }));
+}
+
+async function fetchAttomProperty(apiKey: string, address1: string, address2: string, depth: AttomEvidenceDepth = "core") {
+  const core = await attomPropertyRequest(apiKey, "attomavm/detail", address1, address2);
+  const moduleEvidence: AttomModuleEvidence[] = [{ id: "avm_detail", label: "Facts, sale + AVM", endpoint: "attomavm/detail", status: "available", countedCalls: core.countedCalls, message: null }];
+  const moduleProperties = new Map<string, AttomProperty>();
+  let providerCalls = core.countedCalls;
+  let attemptedRequests = 1;
+
+  if (depth === "underwriting") {
+    const moduleResults = await Promise.all(ATTOM_UNDERWRITING_MODULES.map(async (module) => {
+      try {
+        const result = await attomPropertyRequest(apiKey, module.endpoint, address1, address2);
+        return { module, property: result.property, evidence: { ...module, status: "available" as const, countedCalls: result.countedCalls, message: null } };
+      } catch (error) {
+        const failure = error instanceof AttomApiError ? error : new AttomApiError("ATTOM module failed", 500, 0, "error");
+        return { module, property: null, evidence: { ...module, status: failure.category, countedCalls: failure.countedCalls, message: failure.message } };
+      }
+    }));
+    attemptedRequests += moduleResults.length;
+    for (const result of moduleResults) {
+      providerCalls += result.evidence.countedCalls;
+      moduleEvidence.push(result.evidence);
+      if (result.property) moduleProperties.set(result.module.id, result.property);
+    }
+  }
+
+  const property = core.property;
+  const expanded = moduleProperties.get("expanded_profile") ?? null;
+  const history = moduleProperties.get("sales_history") ?? null;
+  const permits = moduleProperties.get("building_permits") ?? null;
+  const equity = moduleProperties.get("home_equity") ?? null;
+  const schools = moduleProperties.get("schools") ?? null;
+  const primaryMortgage = expanded?.assessment?.mortgage?.FirstConcurrent ?? expanded?.assessment?.mortgage?.firstConcurrent;
+  const secondaryMortgage = expanded?.assessment?.mortgage?.SecondConcurrent ?? expanded?.assessment?.mortgage?.secondConcurrent;
+  const normalized = {
+    schemaVersion: 2,
+    depth,
+    attomId: property.identifier?.attomId ?? expanded?.identifier?.attomId ?? null,
+    parcelId: property.identifier?.apn ?? expanded?.identifier?.apn ?? null,
+    address: property.address?.oneLine ?? expanded?.address?.oneLine ?? `${address1}, ${address2}`,
+    location: {
+      latitude: property.location?.latitude ?? expanded?.location?.latitude ?? null,
+      longitude: property.location?.longitude ?? expanded?.location?.longitude ?? null,
+      geoIdV4: property.location?.geoIdV4 ?? expanded?.location?.geoIdV4 ?? null,
+    },
+    type: property.summary?.proptype ?? property.summary?.propType ?? property.summary?.propertyType ?? expanded?.summary?.propType ?? expanded?.summary?.propertyType ?? null,
+    yearBuilt: finiteAttomNumber(property.summary?.yearbuilt, property.summary?.yearBuilt, property.building?.summary?.yearbuilt, property.building?.summary?.yearBuilt, expanded?.summary?.yearBuilt),
+    livingSize: finiteAttomNumber(property.building?.size?.livingsize, property.building?.size?.livingSize, property.building?.size?.universalsize, property.building?.size?.universalSize, expanded?.building?.size?.universalSize),
+    beds: finiteAttomNumber(property.building?.rooms?.beds, expanded?.building?.rooms?.beds),
+    baths: finiteAttomNumber(property.building?.rooms?.bathstotal, property.building?.rooms?.bathsTotal, expanded?.building?.rooms?.bathsTotal),
+    physical: {
+      units: finiteAttomNumber(expanded?.building?.summary?.unitsCount, property.building?.summary?.unitsCount),
+      levels: finiteAttomNumber(expanded?.building?.summary?.levels, property.building?.summary?.levels),
+      condition: expanded?.building?.construction?.condition ?? property.building?.construction?.condition ?? null,
+      majorImprovementYear: finiteAttomNumber(expanded?.building?.construction?.propertyStructureMajorImprovementsYear),
+      parkingSpaces: finiteAttomNumber(expanded?.building?.parking?.prkgSpaces, property.building?.parking?.prkgSpaces),
+    },
+    assessment: {
+      total: finiteAttomNumber(property.assessment?.assessed?.assdttlvalue, property.assessment?.assessed?.assdTtlValue, expanded?.assessment?.assessed?.assdTtlValue),
+      market: finiteAttomNumber(property.assessment?.market?.mktttlvalue, property.assessment?.market?.mktTtlValue, expanded?.assessment?.market?.mktTtlValue),
+      taxYear: finiteAttomNumber(property.assessment?.tax?.taxyear, property.assessment?.tax?.taxYear, expanded?.assessment?.tax?.taxYear),
+      taxAmount: finiteAttomNumber(property.assessment?.tax?.taxamt, property.assessment?.tax?.taxAmt, expanded?.assessment?.tax?.taxAmt),
+      taxPerSqft: finiteAttomNumber(property.assessment?.tax?.taxPerSizeUnit, expanded?.assessment?.tax?.taxPerSizeUnit),
+    },
+    sale: {
+      date: property.sale?.saleTransDate ?? property.sale?.salesearchdate ?? property.sale?.saleSearchDate ?? expanded?.sale?.saleTransDate ?? expanded?.sale?.saleSearchDate ?? null,
+      amount: finiteAttomNumber(property.sale?.amount?.saleamt, property.sale?.amount?.saleAmt, expanded?.sale?.amount?.saleAmt),
+      disclosure: property.sale?.amount?.saledisclosuretype ?? property.sale?.amount?.saleDisclosureType ?? expanded?.sale?.amount?.saleDisclosureType ?? null,
+      pricePerSqft: finiteAttomNumber(property.sale?.calculation?.pricePerSizeUnit, expanded?.sale?.calculation?.pricePerSizeUnit),
+      armsLength: property.sale?.armsLengthIdent ?? expanded?.sale?.armsLengthIdent ?? null,
+    },
+    avm: {
+      value: finiteAttomNumber(property.avm?.amount?.value),
+      low: finiteAttomNumber(property.avm?.amount?.low),
+      high: finiteAttomNumber(property.avm?.amount?.high),
+      confidence: finiteAttomNumber(property.avm?.amount?.scr),
+      asOf: property.avm?.eventDate ?? null,
+      perSqft: finiteAttomNumber(property.avm?.calculations?.perSizeUnit),
+      monthlyChangePct: finiteAttomNumber(property.avm?.calculations?.monthlyChgPct),
+      monthlyChangeValue: finiteAttomNumber(property.avm?.calculations?.monthlyChgValue),
+      taxToValueRatio: finiteAttomNumber(property.avm?.calculations?.ratioTaxValue),
+      rangePctOfValue: finiteAttomNumber(property.avm?.calculations?.rangePctOfValue),
+    },
+    mortgage: { first: normalizedMortgage(primaryMortgage), second: normalizedMortgage(secondaryMortgage) },
+    homeEquity: {
+      ltvPct: finiteAttomNumber(equity?.homeEquity?.LTV, equity?.homeEquity?.ltv),
+      estimatedAvailable: finiteAttomNumber(equity?.homeEquity?.estimatedAvailableEquity),
+    },
+    salesHistory: normalizedSalesHistory(history),
+    permits: normalizedPermits(permits),
+    schools: normalizedSchools(schools),
+    modules: moduleEvidence,
+    vintage: { published: property.vintage?.pubDate ?? expanded?.vintage?.pubDate ?? null, modified: property.vintage?.lastModified ?? expanded?.vintage?.lastModified ?? null },
+  };
+  return { property: normalized, providerCalls, attemptedRequests };
 }
 
 const ATTOM_SUCCESS_TTL_DAYS = 30;
 const ATTOM_FAILURE_TTL_DAYS = 7;
 const ATTOM_MARKET_SAMPLE_SIZE = 2;
 
-type AttomNormalizedProperty = Awaited<ReturnType<typeof fetchAttomProperty>>;
+type AttomNormalizedProperty = Awaited<ReturnType<typeof fetchAttomProperty>>["property"];
 type AttomCacheRow = {
   property_key: string;
   property_id: string | null;
@@ -342,37 +622,45 @@ function parseAttomPayload(row: AttomCacheRow) {
   try { return JSON.parse(row.payload) as AttomNormalizedProperty; } catch { return null; }
 }
 
-async function cachedAttomProperty(env: Env, input: { propertyId: string | null; marketId: string; address1: string; address2: string }, force = false) {
+function attomCacheSatisfiesDepth(property: AttomNormalizedProperty | null, depth: AttomEvidenceDepth) {
+  if (!property || property.schemaVersion < 2) return false;
+  return depth === "core" || property.depth === "underwriting";
+}
+
+async function cachedAttomProperty(env: Env, input: { propertyId: string | null; marketId: string; address1: string; address2: string }, force = false, depth: AttomEvidenceDepth = "core") {
   const key = attomPropertyKey(input.propertyId, input.address1, input.address2);
   const cached = await env.DB.prepare("SELECT * FROM attom_enrichment WHERE property_key = ?").bind(key).first<AttomCacheRow>();
-  if (!force && cached && cached.expires_at > new Date().toISOString()) {
-    return { status: cached.provider_status, property: parseAttomPayload(cached), error: cached.error_message, cacheHit: true, providerCalls: 0, fetchedAt: cached.fetched_at };
+  const cachedProperty = cached?.provider_status === "matched" ? parseAttomPayload(cached) : null;
+  if (!force && cached && cached.expires_at > new Date().toISOString() && (cached.provider_status === "failed" || attomCacheSatisfiesDepth(cachedProperty, depth))) {
+    return { status: cached.provider_status, property: cachedProperty, error: cached.error_message, cacheHit: true, providerCalls: 0, attemptedRequests: 0, fetchedAt: cached.fetched_at };
   }
   if (!env.ATTOM_API_KEY) throw new Error("ATTOM is not configured");
   const fetchedAt = new Date().toISOString();
   try {
-    const property = await fetchAttomProperty(env.ATTOM_API_KEY, input.address1, input.address2);
+    const fetched = await fetchAttomProperty(env.ATTOM_API_KEY, input.address1, input.address2, depth);
+    const property = fetched.property;
     await env.DB.prepare(`INSERT INTO attom_enrichment
       (property_key, property_id, market_id, normalized_address, provider_status, attom_id, payload, avm_value, avm_low, avm_high, avm_confidence, provider_modified_at, fetched_at, expires_at, error_message, api_call_count)
-      VALUES (?, ?, ?, ?, 'matched', ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, 1)
+      VALUES (?, ?, ?, ?, 'matched', ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?)
       ON CONFLICT(property_key) DO UPDATE SET property_id=excluded.property_id, market_id=excluded.market_id,
       normalized_address=excluded.normalized_address, provider_status='matched', attom_id=excluded.attom_id,
       payload=excluded.payload, avm_value=excluded.avm_value, avm_low=excluded.avm_low, avm_high=excluded.avm_high,
       avm_confidence=excluded.avm_confidence, provider_modified_at=excluded.provider_modified_at,
       fetched_at=excluded.fetched_at, expires_at=excluded.expires_at, error_message=NULL,
-      api_call_count=attom_enrichment.api_call_count + 1`)
-      .bind(key, input.propertyId, input.marketId, normalizedAddress(input.address1, input.address2), property.attomId == null ? null : String(property.attomId), JSON.stringify(property), property.avm.value, property.avm.low, property.avm.high, property.avm.confidence, property.vintage.modified ?? property.avm.asOf, fetchedAt, datePlusDays(ATTOM_SUCCESS_TTL_DAYS)).run();
-    return { status: "matched" as const, property, error: null, cacheHit: false, providerCalls: 1, fetchedAt };
+      api_call_count=attom_enrichment.api_call_count + excluded.api_call_count`)
+      .bind(key, input.propertyId, input.marketId, normalizedAddress(input.address1, input.address2), property.attomId == null ? null : String(property.attomId), JSON.stringify(property), property.avm.value, property.avm.low, property.avm.high, property.avm.confidence, property.vintage.modified ?? property.avm.asOf, fetchedAt, datePlusDays(ATTOM_SUCCESS_TTL_DAYS), fetched.providerCalls).run();
+    return { status: "matched" as const, property, error: null, cacheHit: false, providerCalls: fetched.providerCalls, attemptedRequests: fetched.attemptedRequests, fetchedAt };
   } catch (error) {
     const message = error instanceof Error ? error.message : "ATTOM lookup failed";
+    const countedCalls = error instanceof AttomApiError ? error.countedCalls : 0;
     await env.DB.prepare(`INSERT INTO attom_enrichment
       (property_key, property_id, market_id, normalized_address, provider_status, payload, fetched_at, expires_at, error_message, api_call_count)
-      VALUES (?, ?, ?, ?, 'failed', NULL, ?, ?, ?, 1)
+      VALUES (?, ?, ?, ?, 'failed', NULL, ?, ?, ?, ?)
       ON CONFLICT(property_key) DO UPDATE SET provider_status='failed', payload=NULL, fetched_at=excluded.fetched_at,
       expires_at=excluded.expires_at, error_message=excluded.error_message,
-      api_call_count=attom_enrichment.api_call_count + 1`)
-      .bind(key, input.propertyId, input.marketId, normalizedAddress(input.address1, input.address2), fetchedAt, datePlusDays(ATTOM_FAILURE_TTL_DAYS), message).run();
-    return { status: "failed" as const, property: null, error: message, cacheHit: false, providerCalls: 1, fetchedAt };
+      api_call_count=attom_enrichment.api_call_count + excluded.api_call_count`)
+      .bind(key, input.propertyId, input.marketId, normalizedAddress(input.address1, input.address2), fetchedAt, datePlusDays(ATTOM_FAILURE_TTL_DAYS), message, countedCalls).run();
+    return { status: "failed" as const, property: null, error: message, cacheHit: false, providerCalls: countedCalls, attemptedRequests: 1, fetchedAt };
   }
 }
 
@@ -419,18 +707,48 @@ function attomSampleProperties(marketIds: string[], perMarket = ATTOM_MARKET_SAM
   });
 }
 
+type AttomAuditRecord = {
+  id: string;
+  marketId: string;
+  address: string;
+  status: "matched" | "failed";
+  error: string | null;
+  cacheHit: boolean;
+  providerCalls: number;
+  attemptedRequests: number;
+  fetchedAt: string;
+  borocastValue: number;
+  borocastRange: { low: number; high: number };
+  attomValue: number | null;
+  attomRange: { low: number | null; high: number | null };
+  attomConfidence: number | null;
+  attomPerSqft: number | null;
+  attomMonthlyChangePct: number | null;
+  taxAmount: number | null;
+  latestSaleAmount: number | null;
+  latestSaleDate: string | null;
+  deltaPct: number | null;
+  rangeOverlap: boolean;
+  secondarySignal: ReturnType<typeof attomSecondarySignal>;
+};
+
 async function runAttomEnrichment(env: Env, marketIds: string[], perMarket = ATTOM_MARKET_SAMPLE_SIZE, force = false) {
   const samples = attomSampleProperties(marketIds, perMarket);
-  const records = [];
+  const records: AttomAuditRecord[] = [];
   for (const sample of samples) {
     const lookup = await cachedAttomProperty(env, { propertyId: sample.id, marketId: sample.marketId, address1: sample.address, address2: sample.locality }, force);
     const signal = lookup.status === "matched" ? attomSecondarySignal(sample, lookup.property) : null;
     records.push({
       id: sample.id, marketId: sample.marketId, address: sample.address, status: lookup.status,
-      error: lookup.error, cacheHit: lookup.cacheHit, providerCalls: lookup.providerCalls, fetchedAt: lookup.fetchedAt,
+      error: lookup.error, cacheHit: lookup.cacheHit, providerCalls: lookup.providerCalls, attemptedRequests: lookup.attemptedRequests, fetchedAt: lookup.fetchedAt,
       borocastValue: sample.model.value, borocastRange: { low: sample.model.low, high: sample.model.high },
       attomValue: lookup.property?.avm.value ?? null, attomRange: { low: lookup.property?.avm.low ?? null, high: lookup.property?.avm.high ?? null },
       attomConfidence: lookup.property?.avm.confidence ?? null,
+      attomPerSqft: lookup.property?.avm.perSqft ?? null,
+      attomMonthlyChangePct: lookup.property?.avm.monthlyChangePct ?? null,
+      taxAmount: lookup.property?.assessment.taxAmount ?? null,
+      latestSaleAmount: lookup.property?.sale.amount ?? null,
+      latestSaleDate: lookup.property?.sale.date ?? null,
       deltaPct: signal?.deltaPct ?? null,
       rangeOverlap: Boolean(lookup.property?.avm.low != null && lookup.property?.avm.high != null && lookup.property.avm.low <= sample.model.high && lookup.property.avm.high >= sample.model.low),
       secondarySignal: signal,
@@ -449,9 +767,10 @@ async function runAttomEnrichment(env: Env, marketIds: string[], perMarket = ATT
   return {
     provider: "ATTOM", retrievedAt: new Date().toISOString(), requested: records.length, matched: matched.length,
     failed: records.length - matched.length, providerCalls: records.reduce((sum, record) => sum + record.providerCalls, 0),
+    attemptedRequests: records.reduce((sum, record) => sum + record.attemptedRequests, 0),
     cacheHits: records.filter((record) => record.cacheHit).length, cacheTtlDays: ATTOM_SUCCESS_TTL_DAYS,
     records, markets: marketSummaries,
-    methodology: "One ATTOM AVM Detail request supplies facts, assessment, recorded sale and AVM for each control property. Successful matches are reused for 30 days; failures are retried after seven days. ATTOM receives at most a 15% secondary weight and only changes evidence reliability—not neighborhood attractiveness.",
+    methodology: "One ATTOM AVM Detail request supplies normalized facts, assessment/tax, recorded sale, AVM range, price per square foot, monthly change and freshness for each control property. Successful matches are reused for 30 days; failures are retried after seven days. ATTOM receives at most a 15% secondary weight and only changes evidence reliability—not neighborhood attractiveness.",
     boundary: "Vendor agreement can increase evidence competency; disagreement reduces confidence. ATTOM never overrides public-record anchors or turns model agreement into investment edge.",
   };
 }
@@ -564,6 +883,14 @@ async function carySafety(lat: number, lng: number, from: string, to: string) {
 // To route SVGs through the optimizer (with security headers), set
 // dangerouslyAllowSVG: true in next.config.js and uncomment below:
 // const imageConfig: ImageConfig = { dangerouslyAllowSVG: true };
+
+type CloudflareImageFormat = "image/avif" | "image/webp" | "image/jpeg" | "image/png" | "image/gif" | "rgb" | "rgba";
+
+function cloudflareImageFormat(format: string): CloudflareImageFormat {
+  return ["image/avif", "image/webp", "image/jpeg", "image/png", "image/gif", "rgb", "rgba"].includes(format)
+    ? format as CloudflareImageFormat
+    : "image/webp";
+}
 
 const REVIEW_COOKIE = "borocast_review";
 const FEEDBACK_ADMIN_COOKIE = "borocast_feedback_admin";
@@ -801,6 +1128,10 @@ const worker = {
       }, { headers: snapshotHeaders });
     }
 
+    if (url.pathname === "/api/model-quality") {
+      return Response.json(modelQualityScorecard, { headers: snapshotHeaders });
+    }
+
     if (url.pathname === "/api/property-data/sources") {
       return Response.json(sourceRegistry, { headers: snapshotHeaders });
     }
@@ -907,10 +1238,19 @@ const worker = {
       return Response.json({
         provider: "ATTOM",
         connected: Boolean(env.ATTOM_API_KEY),
-        endpoint: "/api/integrations/attom/property?address1=...&address2=city,state,zip",
-        capabilities: ["property facts", "assessment", "recorded sale", "AVM range", "AVM confidence"],
+        endpoint: "/api/integrations/attom/property?address1=...&address2=city,state,zip&depth=core|underwriting",
+        capabilities: ["property facts", "assessment and tax", "recorded sale", "AVM range and confidence", "price per square foot", "monthly AVM change", "mortgage summary", "10-year sales history", "building permits", "home equity and LTV", "school context"],
+        requestProfiles: {
+          core: { maximumRequests: 1, endpoint: "attomavm/detail", use: "Routine property validation and market controls" },
+          underwriting: { maximumRequests: 6, endpoints: ["attomavm/detail", ...ATTOM_UNDERWRITING_MODULES.map((module) => module.endpoint)], use: "Explicit, on-demand property diligence; every module reports available, no result, not entitled or error" },
+        },
+        allowanceRule: "ATTOM documents that only HTTP 200 responses count toward monthly allowances and overages. BORO reports counted calls separately from attempted requests.",
         cache: { persistent: true, successTtlDays: ATTOM_SUCCESS_TTL_DAYS, failureTtlDays: ATTOM_FAILURE_TTL_DAYS, scheduledSamplePerMarket: ATTOM_MARKET_SAMPLE_SIZE },
-        privacy: "The API key stays server-side. The AVM Detail response is reduced to property facts, assessment, sale and AVM fields; owner, mortgage and mailing fields are discarded before storage.",
+        privacy: "The API key stays server-side. Responses are reduced to decision fields. Owner, buyer/seller, mailing, lender identity/contact, document-number and loan-number fields are discarded before storage.",
+        areaModules: [
+          { endpoint: "transaction/salestrend", use: "Area sale-price and count trends", activation: "Add after a stable GeoIDV4-to-cluster crosswalk" },
+          { endpoint: "v4/neighborhood/community", use: "Commercial demographic, hazard and neighborhood cross-check", activation: "Keep separate from Census/FHFA fundamentals until vintage and methodology are validated" },
+        ],
       }, { headers: { "Cache-Control": "private, no-store" } });
     }
 
@@ -939,7 +1279,7 @@ const worker = {
           retrievedAt: new Date().toISOString(),
           requestCost: 1,
           ...pilot,
-          methodology: "Twenty-four mapped listings span the leading, baseline and higher-diligence portions of up to 500 active listings returned in one regional request. Relative price/sf is normalized within property type; the score weights price/sf 30%, market time 22%, freshness 20%, field completeness 13% and regional data competency 15%.",
+          methodology: "Twenty-four mapped listings span the leading, baseline and higher-diligence portions of up to 500 active listings returned in one regional request. The raw signal is 65% property-type-normalized asking price/sf and 35% market time. Listing freshness, field completeness and regional model competency only shrink that signal toward neutral; they never earn opportunity points.",
           boundary: "This is a live-listing screen, not a valuation or recommendation. Verify status, source rights, condition, taxes, insurance, title, concessions and full deal inputs before underwriting.",
         }, { headers: { "Cache-Control": "private, max-age=21600" } });
       } catch (error) {
@@ -981,10 +1321,15 @@ const worker = {
       try {
         const propertyId = url.searchParams.get("propertyId")?.trim() || null;
         const marketId = url.searchParams.get("market")?.trim() || "ad-hoc";
-        const lookup = await cachedAttomProperty(env, { propertyId, marketId, address1, address2 });
-        if (lookup.status === "failed") return Response.json({ error: lookup.error, cacheHit: lookup.cacheHit, providerCalls: lookup.providerCalls }, { status: 404, headers: { "Cache-Control": "private, no-store" } });
+        const depth: AttomEvidenceDepth = url.searchParams.get("depth") === "underwriting" ? "underwriting" : "core";
+        if (depth === "underwriting" && url.searchParams.get("confirm") !== "full") return Response.json({ error: "Full property files can attempt up to six ATTOM requests. Resubmit with confirm=full." }, { status: 400, headers: { "Cache-Control": "private, no-store" } });
+        const lookup = await cachedAttomProperty(env, { propertyId, marketId, address1, address2 }, false, depth);
+        if (lookup.status === "failed") {
+          const status = lookup.error?.includes("authorization failed") ? 403 : 404;
+          return Response.json({ error: lookup.error, cacheHit: lookup.cacheHit, providerCalls: lookup.providerCalls, attemptedRequests: lookup.attemptedRequests }, { status, headers: { "Cache-Control": "private, no-store" } });
+        }
         const publicProperty = propertyId ? propertyValuations.properties.find((candidate) => candidate.id === propertyId) : null;
-        return Response.json({ provider: "ATTOM", retrievedAt: lookup.fetchedAt, cacheHit: lookup.cacheHit, providerCalls: lookup.providerCalls, property: lookup.property, secondarySignal: publicProperty ? attomSecondarySignal(publicProperty, lookup.property) : null, use: "Independent vendor cross-check with a capped 15% secondary weight. Agreement changes reliability; it does not manufacture investment edge." }, { headers: { "Cache-Control": "private, no-store" } });
+        return Response.json({ provider: "ATTOM", depth, retrievedAt: lookup.fetchedAt, cacheHit: lookup.cacheHit, providerCalls: lookup.providerCalls, attemptedRequests: lookup.attemptedRequests, property: lookup.property, secondarySignal: publicProperty ? attomSecondarySignal(publicProperty, lookup.property) : null, use: depth === "underwriting" ? "Full diligence evidence remains descriptive and does not automatically change the score. Verify every mortgage, permit, tax, school and sale-history field at its source." : "Independent vendor cross-check with a capped 15% secondary weight. Agreement changes reliability; it does not manufacture investment edge." }, { headers: { "Cache-Control": "private, no-store" } });
       } catch (error) {
         return Response.json({ error: error instanceof Error ? error.message : "ATTOM property not found" }, { status: 502, headers: { "Cache-Control": "private, no-store" } });
       }
@@ -1058,7 +1403,7 @@ const worker = {
       return handleImageOptimization(request, {
         fetchAsset: (path) => env.ASSETS.fetch(new Request(new URL(path, request.url))),
         transformImage: async (body, { width, format, quality }) => {
-          const result = await env.IMAGES.input(body).transform(width > 0 ? { width } : {}).output({ format, quality });
+          const result = await env.IMAGES.input(body).transform(width > 0 ? { width } : {}).output({ format: cloudflareImageFormat(format), quality });
           return result.response();
         },
       }, allowedWidths);

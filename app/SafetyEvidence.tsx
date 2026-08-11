@@ -29,7 +29,7 @@ export function SafetyEvidence({ marketId, lat, lng, address, locality }: { mark
     try {
       const params = new URLSearchParams({ market: marketId, lat: String(lat), lng: String(lng), locality });
       const response = await fetch(`/api/public-safety/local?${params}`);
-      const payload = await response.json();
+      const payload = await response.json() as SafetyResult & { error?: string };
       if (!response.ok) throw new Error(payload.error || "Public-safety lookup failed");
       setResult(payload);
     } catch (caught) {
