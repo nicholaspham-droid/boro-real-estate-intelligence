@@ -26,7 +26,13 @@ function rss(values) {
 }
 
 function extentCenter(geometry) {
-  const points = geometry?.rings?.flat() ?? [];
+  const points = [];
+  function collect(value) {
+    if (!Array.isArray(value)) return;
+    if (typeof value[0] === "number" && typeof value[1] === "number") points.push(value);
+    else value.forEach(collect);
+  }
+  collect(geometry?.coordinates);
   if (!points.length) return null;
   const lngs = points.map((point) => point[0]);
   const lats = points.map((point) => point[1]);
@@ -47,17 +53,17 @@ async function fetchCounty(state, county) {
   const parent = `05000US${state}${county}`;
   const dataUrl = `https://api.censusreporter.org/1.0/data/show/${config.release}?table_ids=${TABLES.join(",")}&geo_ids=140%7C${parent}`;
   const where = encodeURIComponent(`STATE='${state}' AND COUNTY='${county}'`);
-  const geometryUrl = `https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/Tracts_Blocks/MapServer/7/query?where=${where}&outFields=GEOID&returnGeometry=true&outSR=4326&f=json&geometryPrecision=4&maxAllowableOffset=0.002`;
+  const geometryUrl = `https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/Tracts_Blocks/MapServer/7/query?where=${where}&outFields=GEOID&returnGeometry=true&outSR=4326&f=geojson&geometryPrecision=4&maxAllowableOffset=0.001`;
   const [dataResponse, geometryResponse] = await Promise.all([fetchJson(dataUrl), fetchJson(geometryUrl)]);
   if (geometryResponse.error) throw new Error(`TIGERweb ${state}${county}: ${geometryResponse.error.message}`);
-  const geometry = new Map((geometryResponse.features ?? []).map((feature) => [feature.attributes.GEOID, extentCenter(feature.geometry)]));
+  const geometry = new Map((geometryResponse.features ?? []).map((feature) => [feature.properties.GEOID, { center: extentCenter(feature.geometry), geometry: feature.geometry }]));
   return Object.entries(dataResponse.data ?? {}).flatMap(([fullGeoid, tables]) => {
     const geoid = fullGeoid.replace(/^14000US/, "");
-    const point = geometry.get(geoid);
+    const shape = geometry.get(geoid);
     const estimates = Object.fromEntries(Object.entries(tables).map(([table, values]) => [table, values.estimate]));
     const errors = Object.fromEntries(Object.entries(tables).map(([table, values]) => [table, values.error]));
     const population = finite(estimates.B01003?.B01003001);
-    if (!point || !population || population < 100) return [];
+    if (!shape?.center || !population || population < 100) return [];
     const adult25 = finite(estimates.B15003?.B15003001);
     const bachelors = sum([estimates.B15003?.B15003022, estimates.B15003?.B15003023, estimates.B15003?.B15003024, estimates.B15003?.B15003025]);
     const laborForce = finite(estimates.B23025?.B23025003);
@@ -77,7 +83,8 @@ async function fetchCounty(state, county) {
     return [{
       geoid,
       name: dataResponse.geography?.[fullGeoid]?.name ?? `Census tract ${geoid.slice(-6)}`,
-      ...point,
+      ...shape.center,
+      geometry: shape.geometry,
       population,
       medianAge: finite(estimates.B01002?.B01002001),
       bachelorsPct: adult25 ? bachelors / adult25 * 100 : null,
@@ -131,6 +138,7 @@ for (const market of config.markets.filter((item) => PILOT_MARKETS.has(item.id))
   const aggregateMarket = clusterData.markets.find((item) => item.id === market.id);
   const pricingMarket = pricingData.markets.find((item) => item.id === market.id);
   const records = tracts.map((tract) => {
+    const tractEvidence = { ...tract, geometry: undefined };
     const clusterId = clusterFor(tract, market, centralRadius);
     const cluster = aggregateMarket?.clusters.find((item) => item.id === clusterId);
     const clusterPricing = pricingMarket?.clusters.find((item) => item.id === clusterId);
@@ -143,7 +151,7 @@ for (const market of config.markets.filter((item) => PILOT_MARKETS.has(item.id))
     const affordability = tract.medianIncome && tract.medianHomeValue ? tract.medianIncome / tract.medianHomeValue : null;
     const rentCapacity = tract.medianIncome && tract.medianRent ? tract.medianIncome / (tract.medianRent * 12) : null;
     return {
-      ...tract,
+      ...tractEvidence,
       clusterId,
       clusterName: cluster?.name ?? clusterId,
       demographic: percentile(dimensions.age, tract.medianAge, true),
@@ -169,5 +177,15 @@ for (const market of config.markets.filter((item) => PILOT_MARKETS.has(item.id))
     tractCount: records.length,
     tracts: records,
   }, null, 2) + "\n");
+  const geometryDir = new URL("geometry/", OUTPUT_DIR);
+  await mkdir(geometryDir, { recursive: true });
+  await writeFile(new URL(`${market.id}.geojson`, geometryDir), JSON.stringify({
+    type: "FeatureCollection",
+    features: tracts.map((tract) => ({
+      type: "Feature",
+      properties: { geoid: tract.geoid, clusterId: clusterFor(tract, market, centralRadius) },
+      geometry: tract.geometry,
+    })),
+  }));
   process.stdout.write(`Wrote ${records.length} ${market.label} tract records\n`);
 }

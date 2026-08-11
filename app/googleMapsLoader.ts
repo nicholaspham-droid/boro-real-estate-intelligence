@@ -2,15 +2,17 @@ export type GoogleDataFeature = { getProperty(name: string): unknown };
 export type GoogleDataMouseEvent = { feature: GoogleDataFeature; latLng: unknown };
 export type GoogleMapStyle = Record<string, string | number | boolean>;
 export type GoogleDataLayer = {
-  addGeoJson(geojson: unknown): unknown;
+  addGeoJson(geojson: unknown): GoogleDataFeature[];
   addListener(eventName: "click" | "mouseover", handler: (event: GoogleDataMouseEvent) => void): unknown;
   addListener(eventName: "mouseout", handler: () => void): unknown;
+  remove(feature: GoogleDataFeature): void;
   setStyle(style: (feature: GoogleDataFeature) => GoogleMapStyle): void;
 };
 export type GoogleMapInstance = {
   data: GoogleDataLayer;
   setCenter(center: { lat: number; lng: number }): void;
   setZoom(zoom: number): void;
+  fitBounds(bounds: { north: number; south: number; east: number; west: number }, padding?: number): void;
 };
 export type GoogleInfoWindow = {
   setContent(content: string): void;

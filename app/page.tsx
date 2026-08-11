@@ -107,6 +107,17 @@ function areaReportHref(marketId: string, clusterId: string, weights: FactorWeig
   return `/report?${params.toString()}`;
 }
 
+const NYC_BOROUGH_COUNTIES = new Set(["36005", "36047", "36061", "36081", "36085"]);
+
+function tractAction(tract: ScoredTract, layer: ExplorerLayer) {
+  if (tract.confidence < 65 || tract.coverage < 80) return { code: "REPAIR EVIDENCE", title: "Close the data gap first", detail: "The local signal is too fragile to advance. Verify rent, recent sales and parcel facts before comparing opportunities.", steps: ["Source recent arm’s-length sales", "Validate rent by unit type and recency", "Resolve missing parcel or pricing fields"] };
+  if (layer === "pricing" || tract.pricingCompetency < 65) return { code: "VERIFY PRICING", title: "Build a tract-level price anchor", detail: "Pricing still comes from the cluster benchmark. The useful next move is to establish a local price-per-square-foot and sale-recency distribution.", steps: ["Match five or more recent local sales", "Segment price per square foot by property type", "Compare listing ask with recorded-sale range"] };
+  if (tract.housing >= 65 && tract.economic >= 60) return { code: "PROPERTY SCREEN", title: "Advance to property-level diligence", detail: "Housing capacity and economic evidence clear the research screen. The tract is a candidate for deal testing—not a purchase recommendation.", steps: ["Join active listings and recent sales", "Validate rent and operating expenses", "Run financing and downside cases in Deal Studio"] };
+  if (tract.housing >= 65) return { code: "RENT CHECK", title: "Validate the income thesis", detail: "Housing capacity is the clearest operational signal. Confirm whether unit-level rents support it before placing the tract on a shortlist.", steps: ["Collect rent comps by beds and building type", "Measure concession and vacancy pressure", "Stress-test rent at the 25th percentile"] };
+  if (tract.economic >= 65 && tract.housing < 50) return { code: "TENSION TEST", title: "Stress-test affordability", detail: "Economic strength is not translating cleanly into housing capacity. Compare prices, taxes and realistic rent before treating demand as edge.", steps: ["Compare value-to-income with adjacent tracts", "Verify taxes, insurance and common charges", "Model a lower-rent downside case"] };
+  return { code: "PEER COMPARE", title: "Compare nearby alternatives", detail: "No operational factor is strong enough to advance alone. Use this tract as a benchmark and inspect higher-ranked adjacent tracts.", steps: ["Compare the next three ranked tracts", "Identify the factor driving score differences", "Advance only after property evidence agrees"] };
+}
+
 export default function Home() {
   const [activeView, setActiveView] = useState<ProductView>("overview");
   const [selectedMarketId, setSelectedMarketId] = useState(MARKET_EXPLORERS[0].id);
@@ -126,10 +137,12 @@ export default function Home() {
   const [sourceMarketId, setSourceMarketId] = useState(sourceRegistry.sources[0].marketIds[0]);
   const [explorerLevel, setExplorerLevel] = useState<"clusters" | "tracts">("clusters");
   const [tractPayloads, setTractPayloads] = useState<Record<string, TractPilotPayload>>({});
+  const [tractGeometries, setTractGeometries] = useState<Record<string, unknown>>({});
   const [tractStatus, setTractStatus] = useState<"idle" | "loading" | "error">("idle");
   const [tractMessage, setTractMessage] = useState("");
   const [selectedTractId, setSelectedTractId] = useState<string | null>(null);
   const [showAllTracts, setShowAllTracts] = useState(false);
+  const [tractScope, setTractScope] = useState<"cluster" | "city" | "market">("cluster");
 
   const baseMarket = MARKET_EXPLORERS.find((item) => item.id === selectedMarketId) ?? MARKET_EXPLORERS[0];
   const scoredClusters = useMemo(() => baseMarket.neighborhoods
@@ -148,28 +161,31 @@ export default function Home() {
     return preliminary.map((tract) => ({ ...tract, rank: 0, marketPercentile: Math.round(100 - ((marketRanks.get(tract.id)! - 1) / Math.max(1, sorted.length - 1)) * 100) }));
   }, [activeTractPayload, weights]);
   const scoredTracts = useMemo<ScoredTract[]>(() => marketScoredTracts
-    .filter((tract) => tract.clusterId === selectedCluster.id)
+    .filter((tract) => tractScope === "market" || (tractScope === "city" && market.id === "new-york" ? NYC_BOROUGH_COUNTIES.has(tract.geoid.slice(0, 5)) : tract.clusterId === selectedCluster.id))
     .sort((a, b) => b.composite - a.composite || b.confidence - a.confidence)
-    .map((tract, index) => ({ ...tract, rank: index + 1 })), [marketScoredTracts, selectedCluster.id]);
+    .map((tract, index) => ({ ...tract, rank: index + 1 })), [market.id, marketScoredTracts, selectedCluster.id, tractScope]);
   const filteredTracts = scoredTracts.filter((tract) => `${tract.name} ${tract.geoid}`.toLowerCase().includes(query.toLowerCase()));
   const selectedTract = scoredTracts.find((tract) => tract.id === selectedTractId) ?? scoredTracts[0] ?? null;
   const visibleTracts = showAllTracts ? filteredTracts : filteredTracts.slice(0, 10);
+  const tractScopeLabel = tractScope === "cluster" ? selectedCluster.name : tractScope === "city" ? "NYC five boroughs" : market.id === "new-york" ? "Nine-county market" : "Three-county market";
+  const selectedTractAction = selectedTract ? tractAction(selectedTract, layer) : null;
   const integratedCompetency = Math.round(market.acsCompetency * .5 + market.metro.competency * .25 + market.localPricingCompetency * .25);
   const totalTracts = MARKET_EXPLORERS.reduce((sum, item) => sum + item.tractCount, 0);
-  const hasLocalPricing = Boolean(selectedCluster.localPricing);
+  const activePricingCluster = explorerLevel === "tracts" && selectedTract ? scoredClusters.find((cluster) => cluster.id === selectedTract.clusterId) ?? selectedCluster : selectedCluster;
+  const hasLocalPricing = Boolean(activePricingCluster.localPricing);
   const showingLocalPricing = priceScope === "cluster" && hasLocalPricing;
-  const displayedPricing = showingLocalPricing ? selectedCluster.localPricing! : market.pricingHistory;
-  const latestChartYear = showingLocalPricing ? selectedCluster.localPricing!.latestYear : market.pricingHistory.history.at(-1)!.year;
+  const displayedPricing = showingLocalPricing ? activePricingCluster.localPricing! : market.pricingHistory;
+  const latestChartYear = showingLocalPricing ? activePricingCluster.localPricing!.latestYear : market.pricingHistory.history.at(-1)!.year;
   const chartPoints = useMemo<PriceChartPoint[]>(() => {
     if (showingLocalPricing) {
-      return selectedCluster.localPricing!.history
+      return activePricingCluster.localPricing!.history
         .filter((item) => historyRange === "full" || item.year >= latestChartYear - historyRange)
         .map((item) => ({ key: String(item.year), label: String(item.year), index: item.index }));
     }
     return market.pricingHistory.history
       .filter((item) => historyRange === "full" || item.year >= latestChartYear - historyRange)
       .map((item) => ({ key: item.period, label: item.quarter === 1 ? String(item.year) : item.period, index: item.index }));
-  }, [showingLocalPricing, selectedCluster.localPricing, historyRange, latestChartYear, market.pricingHistory]);
+  }, [showingLocalPricing, activePricingCluster.localPricing, historyRange, latestChartYear, market.pricingHistory]);
 
   const marketRanking = useMemo(() => MARKET_EXPLORERS
     .filter((item) => cohort === "all" || item.metro.cohort === cohort)
@@ -225,21 +241,24 @@ export default function Home() {
     setExplorerLevel("clusters");
     setSelectedTractId(null);
     setShowAllTracts(false);
+    setTractScope("cluster");
   }
 
   async function exploreTracts() {
     if (!TRACT_PILOT_MARKETS.has(market.id)) return;
     setQuery("");
     setShowAllTracts(false);
+    setTractScope("cluster");
     setExplorerLevel("tracts");
     setTractMessage("");
-    if (tractPayloads[market.id]) return;
+    if (tractPayloads[market.id] && tractGeometries[market.id]) return;
     setTractStatus("loading");
     try {
-      const response = await fetch(`/data/tract-pilot/${market.id}.json`);
-      if (!response.ok) throw new Error("The tract pilot data could not be loaded.");
-      const payload = await response.json() as TractPilotPayload;
+      const [dataResponse, geometryResponse] = await Promise.all([fetch(`/data/tract-pilot/${market.id}.json`), fetch(`/data/tract-pilot/geometry/${market.id}.geojson`)]);
+      if (!dataResponse.ok || !geometryResponse.ok) throw new Error("The tract pilot data could not be loaded.");
+      const [payload, geometry] = await Promise.all([dataResponse.json() as Promise<TractPilotPayload>, geometryResponse.json()]);
       setTractPayloads((current) => ({ ...current, [market.id]: payload }));
+      setTractGeometries((current) => ({ ...current, [market.id]: geometry }));
       setTractStatus("idle");
     } catch (reason) {
       setTractStatus("error");
@@ -252,6 +271,13 @@ export default function Home() {
     setSelectedTractId(null);
     setQuery("");
     setShowAllTracts(false);
+    setTractScope("cluster");
+  }
+
+  function selectTract(id: string) {
+    const tract = scoredTracts.find((item) => item.id === id);
+    setSelectedTractId(id);
+    if (tract && tract.clusterId !== selectedCluster.id) setSelectedClusterId(tract.clusterId);
   }
 
   function applyPreset(id: string) {
@@ -350,12 +376,13 @@ export default function Home() {
               <button onClick={returnToClusters}>{market.metro.short}</button><i>/</i><button onClick={returnToClusters}>{selectedCluster.name}</button>
               {explorerLevel === "tracts" && <><i>/</i><strong>{selectedTract ? `Tract ${selectedTract.geoid}` : "Census tracts"}</strong><span>PILOT</span></>}
             </div>
+            {explorerLevel === "tracts" && <div className="tract-scope-switch"><span>Geography</span><button className={tractScope === "cluster" ? "active" : ""} onClick={() => { setTractScope("cluster"); setQuery(""); setShowAllTracts(false); }}>{selectedCluster.name}</button>{market.id === "new-york" && <button className={tractScope === "city" ? "active" : ""} onClick={() => { setTractScope("city"); setQuery(""); setShowAllTracts(false); }}>NYC · 5 boroughs</button>}<button className={tractScope === "market" ? "active" : ""} onClick={() => { setTractScope("market"); setQuery(""); setShowAllTracts(false); }}>Full market</button><small>{market.id === "new-york" ? "Coverage: Manhattan 302 · Brooklyn 777 · Queens 683 · Bronx 347 · Staten Island 119" : "Coverage: Wake, Johnston and Durham county tracts"}</small></div>}
             <div className="map-toolbar">
               <label><span>Search {explorerLevel === "tracts" ? "tract" : "cluster"}</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={explorerLevel === "tracts" ? "GEOID or tract name…" : "Central, north, east…"} /></label>
               <div><span>Map layer</span>{(["composite", "demographic", "economic", "education", "housing", "pricing"] as ExplorerLayer[]).map((item) => <button key={item} className={layer === item ? "selected" : ""} onClick={() => setLayer(item)}>{item}</button>)}</div>
             </div>
             <div className="map-stage">
-              <NationalMarketMap market={market} neighborhoods={visibleClusters} tracts={filteredTracts} geographyMode={explorerLevel} focus={explorerLevel === "tracts" ? { center: { lat: selectedCluster.lat, lng: selectedCluster.lng }, zoom: market.id === "new-york" ? 12 : 11 } : undefined} layer={layer} selectedId={explorerLevel === "tracts" ? selectedTract?.id ?? "" : selectedCluster.id} onSelect={explorerLevel === "tracts" ? setSelectedTractId : setSelectedClusterId} onPropertySelect={(id) => { const property = propertyValuations.properties.find((item) => item.id === id); if (property) setValuationMarket(property.marketId); setSelectedPropertyId(id); window.location.hash = "valuation"; }} />
+              <NationalMarketMap market={market} neighborhoods={visibleClusters} tracts={filteredTracts} tractGeoJson={tractGeometries[market.id]} tractScopeLabel={tractScopeLabel} geographyMode={explorerLevel} focus={explorerLevel === "tracts" ? { center: { lat: selectedCluster.lat, lng: selectedCluster.lng }, zoom: market.id === "new-york" ? 10 : 11 } : undefined} layer={layer} selectedId={explorerLevel === "tracts" ? selectedTract?.id ?? "" : selectedCluster.id} onSelect={explorerLevel === "tracts" ? selectTract : setSelectedClusterId} onPropertySelect={(id) => { const property = propertyValuations.properties.find((item) => item.id === id); if (property) setValuationMarket(property.marketId); setSelectedPropertyId(id); window.location.hash = "valuation"; }} />
               {explorerLevel === "tracts" && tractStatus === "loading" && <div className="tract-loading"><i /> Loading official tract evidence…</div>}
               {explorerLevel === "tracts" && tractStatus === "error" && <div className="tract-loading error"><b>Tract data unavailable</b><span>{tractMessage}</span><button onClick={() => void exploreTracts()}>Try again</button></div>}
             </div>
@@ -380,7 +407,7 @@ export default function Home() {
             <a className="print-report-link" href={areaReportHref(market.id, selectedCluster.id, weights)} target="_blank" rel="noreferrer">Print 2-page area report →</a>
           </article> : selectedTract ? <article className="cluster-card tract-card">
             <button className="tract-back" onClick={returnToClusters}>← Back to cluster</button>
-            <div className="cluster-rank"><span>#{selectedTract.rank} within {selectedCluster.name}</span><b>{selectedTract[layer]}</b><small>/100</small></div>
+            <div className="cluster-rank"><span>#{selectedTract.rank} within {tractScopeLabel}</span><b>{selectedTract[layer]}</b><small>/100</small></div>
             <h3>Tract {selectedTract.geoid}</h3>
             <p>{selectedTract.name} · {compact(selectedTract.population)} residents</p>
             <div className="tract-baselines"><span><b>{selectedTract.composite}</b>Composite</span><span><b>{selectedTract.marketPercentile}<i>th</i></b>Market percentile</span></div>
@@ -394,28 +421,29 @@ export default function Home() {
               <div><dt>Median gross rent</dt><dd>{currency(selectedTract.medianRent)}</dd></div>
               <div><dt>ACS reliability</dt><dd>{selectedTract.reliability}%</dd></div>
             </dl>
-            <div className="cluster-read tract-gap"><b>Evidence boundary</b><p>ACS factors are tract-specific. Pricing is the {selectedCluster.name} FHFA benchmark, so it does not distinguish tracts yet and its competency is carried into the score.</p></div>
+            <div className="cluster-read tract-gap"><b>Evidence boundary</b><p>ACS factors are tract-specific. Pricing is the {activePricingCluster.name} FHFA benchmark, so it does not distinguish tracts yet and its competency is carried into the score.</p></div>
+            {selectedTractAction && <div className="tract-action-card"><span>{selectedTractAction.code}</span><h4>{selectedTractAction.title}</h4><p>{selectedTractAction.detail}</p><ol>{selectedTractAction.steps.map((step) => <li key={step}>{step}</li>)}</ol><small>Research action only. Demographic and education layers are context—not inputs for tenant targeting, protected-class decisions or steering.</small><div><button onClick={() => { const next = scoredTracts[selectedTract.rank % scoredTracts.length]; if (next) selectTract(next.id); }}>Compare next-ranked tract</button><button onClick={() => VALUATION_MARKET_IDS.includes(market.id) ? selectView("properties", "#valuation") : selectView("coverage", "#availability")}>{VALUATION_MARKET_IDS.includes(market.id) ? "Open property evidence" : "Review missing sources"}</button></div></div>}
           </article> : <article className="cluster-card tract-card empty"><h3>Loading tracts…</h3><p>The cluster view remains available while evidence loads.</p></article>}
         </div>
 
-        {explorerLevel === "tracts" && <div className="tract-price-boundary"><b>Pricing scope stays at cluster level</b><span>The tract selection changes ACS fundamentals on the map and card. Historical HPI below remains the {selectedCluster.name} benchmark until a qualified tract series is available.</span></div>}
-        <section className="pricing-history-panel" aria-label={`${showingLocalPricing ? selectedCluster.name : market.metro.short} historical home price trend`}>
-          <div className="pricing-history-copy"><p className="eyebrow">{showingLocalPricing ? "FHFA TRACT-CLUSTER HPI" : "FHFA METRO BENCHMARK"} · {showingLocalPricing ? selectedCluster.localPricing!.latestYear : market.pricingHistory.latestPeriod}</p><h3>{signed(displayedPricing.yoy)} <span>year over year</span></h3><p>{showingLocalPricing ? `${selectedCluster.name} aggregates observed tract-level annual changes. Latest population coverage is ${selectedCluster.localPricing!.history.at(-1)!.coveragePct}%.` : "Quarterly All-Transactions HPI, not seasonally adjusted. Divided metros use an equal-weight composite."}</p><a href={showingLocalPricing ? LOCAL_PRICING_META.source : PRICING_HISTORY_META.source} target="_blank" rel="noreferrer">Open FHFA source series →</a></div>
+        {explorerLevel === "tracts" && <div className="tract-price-boundary"><b>Pricing scope stays at cluster level</b><span>The tract selection changes ACS fundamentals on the map and card. Historical HPI below remains the {activePricingCluster.name} benchmark until a qualified tract series is available.</span></div>}
+        <section className="pricing-history-panel" aria-label={`${showingLocalPricing ? activePricingCluster.name : market.metro.short} historical home price trend`}>
+          <div className="pricing-history-copy"><p className="eyebrow">{showingLocalPricing ? "FHFA TRACT-CLUSTER HPI" : "FHFA METRO BENCHMARK"} · {showingLocalPricing ? activePricingCluster.localPricing!.latestYear : market.pricingHistory.latestPeriod}</p><h3>{signed(displayedPricing.yoy)} <span>year over year</span></h3><p>{showingLocalPricing ? `${activePricingCluster.name} aggregates observed tract-level annual changes. Latest population coverage is ${activePricingCluster.localPricing!.history.at(-1)!.coveragePct}%.` : "Quarterly All-Transactions HPI, not seasonally adjusted. Divided metros use an equal-weight composite."}</p><a href={showingLocalPricing ? LOCAL_PRICING_META.source : PRICING_HISTORY_META.source} target="_blank" rel="noreferrer">Open FHFA source series →</a></div>
           <div className="pricing-history-main">
             <div className="price-chart-controls"><div><span>Geography</span><button className={priceScope === "cluster" ? "selected" : ""} onClick={() => setPriceScope("cluster")} disabled={!hasLocalPricing}>Local cluster</button><button className={priceScope === "metro" || !hasLocalPricing ? "selected" : ""} onClick={() => setPriceScope("metro")}>Metro benchmark</button></div><div><span>History</span>{([5, 10, "full"] as const).map((range) => <button key={range} className={historyRange === range ? "selected" : ""} onClick={() => setHistoryRange(range)}>{range === "full" ? "Full" : `${range}Y`}</button>)}</div></div>
-            <PriceHistoryChart points={chartPoints} seriesLabel={showingLocalPricing ? `${selectedCluster.name} annual tract-cluster HPI` : `${market.metro.short} quarterly metro HPI`} />
+            <PriceHistoryChart points={chartPoints} seriesLabel={showingLocalPricing ? `${activePricingCluster.name} annual tract-cluster HPI` : `${market.metro.short} quarterly metro HPI`} />
           </div>
           <div className="pricing-history-metrics"><div><span>Momentum score</span><b>{displayedPricing.momentumScore}</b></div><div><span>3-year CAGR</span><b>{signed(displayedPricing.threeYearCagr)}</b></div><div><span>5-year growth</span><b>{signed(displayedPricing.fiveYearGrowth)}</b></div><div><span>YoY acceleration</span><b className={(displayedPricing.acceleration ?? 0) < 0 ? "negative" : ""}>{signed(displayedPricing.acceleration, " pts")}</b></div></div>
-          <small className="pricing-scope">{showingLocalPricing ? `This chart changes with the selected cluster. FHFA tract HPI is developmental; ${selectedCluster.localPricing!.history.at(-1)!.observedTracts} of ${selectedCluster.localPricing!.totalTractCount} tracts support the latest annual change, so the ${selectedCluster.localPricing!.pricingCompetency}% pricing competency should travel with the signal.` : `This is the entire metropolitan benchmark. Switch to Local cluster to see the selected map cluster; ${hasLocalPricing ? "a local series is available here." : "FHFA does not have enough repeat-transaction observations for this cluster."}`}</small>
+          <small className="pricing-scope">{showingLocalPricing ? `This chart follows the selected tract’s parent cluster. FHFA tract HPI is developmental; ${activePricingCluster.localPricing!.history.at(-1)!.observedTracts} of ${activePricingCluster.localPricing!.totalTractCount} tracts support the latest annual change, so the ${activePricingCluster.localPricing!.pricingCompetency}% pricing competency should travel with the signal.` : `This is the entire metropolitan benchmark. Switch to Local cluster to see the selected map cluster; ${hasLocalPricing ? "a local series is available here." : "FHFA does not have enough repeat-transaction observations for this cluster."}`}</small>
         </section>
 
         {explorerLevel === "clusters" ? <div className="cluster-table"><table><thead><tr><th>Rank</th><th>Local tract cluster</th><th>Composite</th><th>Demographic</th><th>Economic</th><th>Education</th><th>Housing</th><th>Pricing</th><th>Data competency</th></tr></thead><tbody>{visibleClusters.map((item) => <tr key={item.id} className={item.id === selectedCluster.id ? "active" : ""} onClick={() => setSelectedClusterId(item.id)}><td>{String(item.rank).padStart(2, "0")}</td><td><strong>{item.name}</strong><small>{item.tractCount} tracts · {compact(item.population)} people</small></td><td><b>{item.composite}</b></td><td>{item.demographic}</td><td>{item.economic}</td><td>{item.education}</td><td>{item.housing}</td><td>{item.pricing}</td><td><span>{item.confidence}%</span></td></tr>)}</tbody></table>{!visibleClusters.length && <p className="empty">No local cluster matches that search.</p>}</div> : <>
-          <div className="tract-table-head"><div><p className="eyebrow">TRACTS IN {selectedCluster.name.toUpperCase()}</p><h3>{filteredTracts.length} local observations</h3></div><p>Rank is within this cluster. Market percentile compares the same weighted score across all pilot tracts in {market.metro.short}.</p></div>
-          <div className="cluster-table tract-table"><table><thead><tr><th>Cluster rank</th><th>Census tract</th><th>Composite</th><th>Market pct.</th><th>Income</th><th>Home value</th><th>Rent</th><th>ACS reliability</th><th>Data competency</th></tr></thead><tbody>{visibleTracts.map((item) => <tr key={item.id} className={item.id === selectedTract?.id ? "active" : ""} onClick={() => setSelectedTractId(item.id)}><td>{String(item.rank).padStart(2, "0")}</td><td><strong>Tract {item.geoid}</strong><small>{compact(item.population)} people · {item.name}</small></td><td><b>{item.composite}</b></td><td>{item.marketPercentile}th</td><td>{currency(item.medianIncome)}</td><td>{currency(item.medianHomeValue)}</td><td>{currency(item.medianRent)}</td><td>{item.reliability}%</td><td><span>{item.confidence}%</span></td></tr>)}</tbody></table>{!filteredTracts.length && tractStatus !== "loading" && <p className="empty">No tract matches that search.</p>}</div>
+          <div className="tract-table-head"><div><p className="eyebrow">TRACTS IN {tractScopeLabel.toUpperCase()}</p><h3>{filteredTracts.length} local observations</h3></div><p>Rank is relative to the selected geography. Market percentile compares the same weighted score across all pilot tracts in {market.metro.short}.</p></div>
+          <div className="cluster-table tract-table"><table><thead><tr><th>Scope rank</th><th>Census tract</th><th>Composite</th><th>Research next</th><th>Market pct.</th><th>Income</th><th>Home value</th><th>Rent</th><th>ACS reliability</th><th>Data competency</th></tr></thead><tbody>{visibleTracts.map((item) => <tr key={item.id} className={item.id === selectedTract?.id ? "active" : ""} onClick={() => selectTract(item.id)}><td>{String(item.rank).padStart(2, "0")}</td><td><strong>Tract {item.geoid}</strong><small>{compact(item.population)} people · {item.name}</small></td><td><b>{item.composite}</b></td><td><em className="tract-action-chip">{tractAction(item, layer).code}</em></td><td>{item.marketPercentile}th</td><td>{currency(item.medianIncome)}</td><td>{currency(item.medianHomeValue)}</td><td>{currency(item.medianRent)}</td><td>{item.reliability}%</td><td><span>{item.confidence}%</span></td></tr>)}</tbody></table>{!filteredTracts.length && tractStatus !== "loading" && <p className="empty">No tract matches that search.</p>}</div>
           {filteredTracts.length > 10 && <button className="tract-view-all" onClick={() => setShowAllTracts((current) => !current)}>{showAllTracts ? "Show top 10 only" : `View all ${filteredTracts.length} tracts`} →</button>}
           <details className="pilot-review-guide">
             <summary><span>PILOT REVIEW GUIDE</span><b>Questions for your test</b><small>6 prompts · open when ready</small></summary>
-            <div><ol><li>Was “Explore individual tracts” visible at the right moment, or did you have to hunt for it?</li><li>Did the breadcrumb and back action make your location in the geography hierarchy obvious?</li><li>Do within-cluster rank and market percentile answer meaningfully different questions for you?</li><li>Which tract metric actually changed your view of this cluster—and which felt like noise?</li><li>Does the pricing benchmark label prevent you from mistaking cluster evidence for tract evidence?</li><li>For the next pass, would boundaries, side-by-side tract comparison, or property overlays add the most value?</li></ol><button onClick={() => selectView("feedback", "#feedback")}>Give tract-pilot feedback →</button></div>
+            <div><ol><li>Does the polygon heat map make spatial patterns easier to understand than the former point view?</li><li>Is the cluster, five-borough and full-market scope switch clear enough?</li><li>Do scope rank and market percentile answer meaningfully different questions for you?</li><li>Does “Research next” turn the tract signal into a useful diligence step?</li><li>Does the pricing benchmark label prevent you from mistaking cluster evidence for tract evidence?</li><li>Which next capability would add more value: property overlays, tract comparison, or a saved research queue?</li></ol><button onClick={() => selectView("feedback", "#feedback")}>Give tract-pilot feedback →</button></div>
           </details>
         </>}
       </section>
