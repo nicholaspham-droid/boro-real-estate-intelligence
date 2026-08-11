@@ -10,29 +10,6 @@ import pricingHistory from "../data/fhfa-pricing-history.json";
 import clusterPricingHistory from "../data/fhfa-cluster-pricing-history.json";
 import propertyValuations from "../data/property-valuations.json";
 
-interface Env {
-  ASSETS: Fetcher;
-  DB?: D1Database;
-  GOOGLE_MAPS_API_KEY?: string;
-  ATTOM_API_KEY?: string;
-  RENTCAST_API_KEY?: string;
-  REVIEW_PASSWORD?: string;
-  FEEDBACK_ADMIN_PASSWORD?: string;
-  FEEDBACK_ADMIN_EMAIL?: string;
-  IMAGES: {
-    input(stream: ReadableStream): {
-      transform(options: Record<string, unknown>): {
-        output(options: { format: string; quality: number }): Promise<{ response(): Response }>;
-      };
-    };
-  };
-}
-
-interface ExecutionContext {
-  waitUntil(promise: Promise<unknown>): void;
-  passThroughOnException(): void;
-}
-
 interface AttomProperty {
   identifier?: { attomId?: string | number; apn?: string };
   address?: { oneLine?: string };
@@ -833,7 +810,7 @@ const worker = {
 
     if (url.pathname === "/api/integrations/attom/property") {
       if (!env.ATTOM_API_KEY) {
-        return Response.json({ error: "ATTOM is not configured", setup: "Add ATTOM_API_KEY as a Sites secret." }, { status: 503, headers: { "Cache-Control": "private, no-store" } });
+        return Response.json({ error: "ATTOM is not configured", setup: "Add ATTOM_API_KEY as an encrypted hosting secret." }, { status: 503, headers: { "Cache-Control": "private, no-store" } });
       }
       const address1 = url.searchParams.get("address1")?.trim();
       const address2 = url.searchParams.get("address2")?.trim();

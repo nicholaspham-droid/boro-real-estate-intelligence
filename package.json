@@ -15,8 +15,11 @@
     "ingest:fhfa": "node scripts/ingestion/build-fhfa-pricing-history.mjs",
     "ingest:fhfa-tract": "node scripts/ingestion/build-fhfa-cluster-pricing-history.mjs",
     "ingest:valuations": "node scripts/ingestion/build-property-valuations.mjs",
-    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
-    "db:generate": "drizzle-kit generate"
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next --ignore-pattern worker-configuration.d.ts",
+    "db:generate": "drizzle-kit generate",
+    "cloudflare:types": "wrangler types --config wrangler.cloudflare.jsonc worker-configuration.d.ts",
+    "cloudflare:check": "pnpm run build && wrangler deploy --dry-run --config wrangler.cloudflare.jsonc",
+    "deploy:cloudflare": "pnpm run build && wrangler deploy --config wrangler.cloudflare.jsonc --keep-vars"
   },
   "dependencies": {
     "drizzle-orm": "0.45.2",

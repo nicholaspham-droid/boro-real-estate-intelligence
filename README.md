@@ -1,8 +1,8 @@
-# vinext-starter
+# BORO Real Estate Intelligence
 
-A clean full-stack starter running on
-[vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
-Drizzle support.
+BORO is a multi-market real-estate investment intelligence workspace. It joins
+public demographic, economic, pricing, safety, parcel, listing, rent, and vendor
+signals while keeping data confidence and source limitations visible.
 
 ## Prerequisites
 
@@ -16,7 +16,24 @@ npm run dev
 npm run build
 ```
 
-This starter does not use `wrangler.jsonc`.
+The existing Sites deployment and the owner-controlled Cloudflare deployment
+use separate hosting metadata. `.openai/hosting.json` remains the Sites source
+of truth; `wrangler.cloudflare.jsonc` is the Cloudflare source of truth.
+
+## Cloudflare setup
+
+- `pnpm run cloudflare:types`: regenerate Worker binding types.
+- `pnpm run cloudflare:check`: build and validate a Cloudflare upload without deploying.
+- `pnpm run deploy:cloudflare`: build and deploy after required secrets exist.
+- Required encrypted Worker secrets are listed in `wrangler.cloudflare.jsonc`:
+  the Google Maps, ATTOM, and RentCast keys plus the review and feedback-owner
+  access values. Enter them in Cloudflare or with interactive
+  `wrangler secret put` prompts; never commit them.
+- `boro-feedback` is bound to the Worker as `DB`; its schema is versioned in
+  `drizzle/`.
+- `workers_dev` is disabled, so deployment does not create a public Workers.dev
+  address. Add a custom domain or route only after validation and an intentional
+  cutover.
 
 ## Included Shape
 
