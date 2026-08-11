@@ -12,6 +12,7 @@ import { PropertyOpportunityMap } from "./PropertyOpportunityMap";
 import { AttomMarketAudit } from "./AttomMarketAudit";
 import { RentCastEvidence } from "./RentCastEvidence";
 import { MarketListingPilot } from "./RaleighListingPilot";
+import { RaleighDecisionLoop } from "./RaleighDecisionLoop";
 import { ReviewFeedback } from "./ReviewFeedback";
 import { PortfolioLab } from "./PortfolioLab";
 import {
@@ -314,6 +315,7 @@ export default function Home() {
         <span className="product-label">Real Estate Intelligence</span>
         <label className="global-market-picker"><span>Market</span><select value={market.id} onChange={(event) => chooseMarket(event.target.value)}>{MARKET_EXPLORERS.map((item) => <option key={item.id} value={item.id}>{item.metro.short}</option>)}</select></label>
         <nav className="product-tabs" aria-label="Product features">{PRODUCT_TABS.map((tab) => <button key={tab.id} aria-pressed={activeView === tab.id} className={activeView === tab.id ? "active" : ""} onClick={() => selectView(tab.id)}>{tab.label}</button>)}</nav>
+        <a className="profile-entry" href="/profile" aria-label="Open saved research profile"><span aria-hidden="true">♡</span> Saved</a>
       </header>
 
       <div className="workspace-guide"><div><span>Active product feature</span><b>{activeTab.label}</b></div><p><strong>Use it to:</strong> {activeTab.purpose}</p><p><strong>Decision boundary:</strong> {activeTab.boundary}</p></div>
@@ -474,8 +476,9 @@ export default function Home() {
 
       <div className={`product-view ${activeView === "properties" ? "active" : ""}`} aria-hidden={activeView !== "properties"}>
       <section className="valuation-section" id="valuation">
-        <div className="section-title"><div><p className="eyebrow">PROPERTY VALUATION LAB · MODEL V3.0</p><h2>Cross-check the property.<br />Keep the uncertainty.</h2></div><p>Qualified recorded sales, local assessments, building facts and FHFA tract-cluster history resolve to individual properties in three high-intent corridors. Version 3.0 excludes current assessments from historical tests, caps confidence by observed model quality and gates weak regional transferability.</p></div>
+        <div className="section-title"><div><p className="eyebrow">PROPERTY VALUATION LAB · MODEL V3.1</p><h2>Cross-check the property.<br />Keep the uncertainty.</h2></div><p>Qualified recorded sales, effective-dated assessments, building facts and FHFA tract-cluster history resolve to individual properties in three high-intent corridors. Version 3.1 adds leakage-safe Philadelphia assessment cohorts and more local subtype/ZIP comparable pools while keeping the region fail-closed because out-of-time error remains too high.</p></div>
         <MarketListingPilot />
+        <RaleighDecisionLoop />
         <div className="valuation-channel-heading"><div><p className="eyebrow">SEPARATE CHANNEL · RECORDED PUBLIC DATA</p><h3>Historical model library</h3></div><p>These controls change the public-record table below. The live-listing screen above now covers Raleigh, Chicago and Philadelphia; the historical library preserves each region’s recorded evidence and out-of-time error separately.</p></div>
         <div className="valuation-readiness">
           {liveValuationMarkets.map((item) => <button key={item.id} className={valuationMarket === item.id ? "active" : ""} onClick={() => { setValuationMarket(item.id); setSelectedPropertyId(null); }}><span>PUBLIC RECORD MODEL · {"decisionUse" in item ? item.decisionUse : "gap"}</span><b>{item.label}</b><i>{item.competency}% integrated competency</i><small>{"sourceCompetency" in item ? `${item.sourceCompetency}% source · ${item.modelCompetency}% model · ${item.diagnostics?.sampleSize ?? 0} leakage-controlled tests` : ""}</small></button>)}

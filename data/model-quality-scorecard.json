@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-08-11T09:33:02.617Z",
-  "modelVersion": "Public-record valuation watch model v3.0",
+  "generatedAt": "2026-08-11T22:50:16.412Z",
+  "modelVersion": "Public-record valuation watch model v3.1",
   "valuationAsOf": "2026-08-11",
   "decisionGate": {
     "pass": "At least 30 rolling-origin tests, median absolute percentage error <=15%, P80 error <=30%, and absolute median bias <=10%",
@@ -13,14 +13,14 @@
       "label": "Chicago · West Corridor",
       "decisionUse": "watch",
       "sourceCompetency": 91,
-      "modelCompetency": 63,
-      "integratedCompetency": 78,
+      "modelCompetency": 67,
+      "integratedCompetency": 80,
       "tests": 13,
-      "medianAbsoluteErrorPct": 12.1,
+      "medianAbsoluteErrorPct": 10.7,
       "p80AbsoluteErrorPct": 20.4,
       "biasPct": 6.2,
-      "priceRelatedDifferential": 1.007,
-      "coefficientOfDispersion": 12.3
+      "priceRelatedDifferential": 1.008,
+      "coefficientOfDispersion": 11.8
     },
     {
       "id": "philadelphia",
@@ -29,12 +29,12 @@
       "sourceCompetency": 90,
       "modelCompetency": 35,
       "integratedCompetency": 65,
-      "tests": 418,
-      "medianAbsoluteErrorPct": 36.4,
-      "p80AbsoluteErrorPct": 63.8,
-      "biasPct": -8.7,
-      "priceRelatedDifferential": 1.263,
-      "coefficientOfDispersion": 49.6
+      "tests": 578,
+      "medianAbsoluteErrorPct": 34.4,
+      "p80AbsoluteErrorPct": 62,
+      "biasPct": -3.3,
+      "priceRelatedDifferential": 1.205,
+      "coefficientOfDispersion": 45.5
     },
     {
       "id": "raleigh",
@@ -43,11 +43,11 @@
       "sourceCompetency": 82,
       "modelCompetency": 76,
       "integratedCompetency": 79,
-      "tests": 1210,
-      "medianAbsoluteErrorPct": 10.8,
-      "p80AbsoluteErrorPct": 21.3,
-      "biasPct": -0.5,
-      "priceRelatedDifferential": 1.049,
+      "tests": 1175,
+      "medianAbsoluteErrorPct": 10.7,
+      "p80AbsoluteErrorPct": 21.5,
+      "biasPct": -0.1,
+      "priceRelatedDifferential": 1.048,
       "coefficientOfDispersion": 14.3
     }
   ],
@@ -84,7 +84,7 @@
     }
   ],
   "enforcedControls": [
-    "Current subject assessments are excluded from historical tests",
+    "Assessments enter historical tests only when their source effective date precedes the sale, and calibration uses earlier eligible sales",
     "Only earlier comparable sales enter each rolling-origin valuation test",
     "Evidence quality shrinks scores toward neutral and never earns investment points",
     "ATTOM is capped at 15% secondary weight and disagreement reduces confidence",

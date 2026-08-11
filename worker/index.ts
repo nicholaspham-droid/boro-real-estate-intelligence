@@ -128,7 +128,21 @@ type RentCastRentEstimate = {
   rent?: number;
   rentRangeLow?: number;
   rentRangeHigh?: number;
-  comparables?: unknown[];
+  subjectProperty?: {
+    propertyType?: string;
+    bedrooms?: number;
+    bathrooms?: number;
+    squareFootage?: number;
+  };
+  comparables?: Array<{
+    price?: number;
+    squareFootage?: number;
+    distance?: number;
+    daysOld?: number;
+    correlation?: number;
+    lastSeenDate?: string;
+    propertyType?: string;
+  }>;
 };
 
 function normalizeRentCastListing(listing: RentCastListing | undefined) {
@@ -144,7 +158,7 @@ function normalizeRentCastListing(listing: RentCastListing | undefined) {
   };
 }
 
-async function rentCastRequest<T extends object>(apiKey: string, path: string, address: string) {
+async function rentCastRequest<T extends object>(apiKey: string, path: string, address: string, parameters: Record<string, string | number | boolean | null | undefined> = {}) {
   const endpoint = new URL(`https://api.rentcast.io/v1/${path}`);
   endpoint.searchParams.set("address", address);
   if (path.startsWith("listings/")) {
@@ -153,10 +167,26 @@ async function rentCastRequest<T extends object>(apiKey: string, path: string, a
   } else {
     endpoint.searchParams.set("compCount", "5");
   }
+  for (const [key, value] of Object.entries(parameters)) {
+    if (value !== null && value !== undefined && value !== "") endpoint.searchParams.set(key, String(value));
+  }
   const response = await fetch(endpoint, { headers: { Accept: "application/json", "X-Api-Key": apiKey } });
   const payload = await response.json() as T | { message?: string };
   if (!response.ok) throw new Error("message" in payload && payload.message ? payload.message : `RentCast request failed (${response.status})`);
   return payload as T;
+}
+
+function rentCastPropertyType(value: string) {
+  const normalized = value.toLowerCase();
+  if (normalized.includes("condo")) return "Condo";
+  if (normalized.includes("town") || normalized.includes("row")) return "Townhouse";
+  if (normalized.includes("manufactured") || normalized.includes("mobile")) return "Manufactured";
+  if (normalized.includes("multi") || normalized.includes("apartment") || /\b[234]\s*family\b/.test(normalized)) return "Multi-Family";
+  return "Single Family";
+}
+
+function roundedMonthlyRent(value: number) {
+  return Math.round(value / 25) * 25;
 }
 
 function bounded(value: number, minimum = 0, maximum = 100) {
@@ -974,6 +1004,183 @@ function feedbackAdminEmailAuthorized(request: Request, env: Env) {
   return Boolean(expected && supplied && safeEqual(supplied, expected));
 }
 
+type ProfileIdentity = {
+  userId: string;
+  email: string;
+  displayName: string;
+};
+
+type FavoriteRow = {
+  id: string;
+  target_type: string;
+  target_id: string;
+  target_name: string;
+  market_id: string | null;
+  snapshot_json: string;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+const FAVORITE_TARGET_TYPES = new Set(["area", "property"]);
+const FAVORITE_SNAPSHOT_KEYS = new Set([
+  "label", "score", "competency", "confidence", "marketLabel", "recommendation",
+  "price", "pricePerSqft", "observedAt", "sample", "sourceVersion",
+]);
+
+function profileIdentity(request: Request): ProfileIdentity | null {
+  const userId = request.headers.get("oai-authenticated-user-id")?.trim() ?? "";
+  const email = request.headers.get("oai-authenticated-user-email")?.trim() ?? "";
+  if (!userId || !email) return null;
+
+  const encodedName = request.headers.get("oai-authenticated-user-full-name");
+  let fullName = "";
+  if (encodedName && request.headers.get("oai-authenticated-user-full-name-encoding") === "percent-encoded-utf-8") {
+    try { fullName = decodeURIComponent(encodedName).trim(); } catch { fullName = ""; }
+  }
+  return {
+    userId: userId.slice(0, 240),
+    email: email.slice(0, 320),
+    displayName: (fullName || email).slice(0, 240),
+  };
+}
+
+function profileWriteAllowed(request: Request) {
+  const origin = request.headers.get("Origin");
+  if (origin && origin !== new URL(request.url).origin) return false;
+  const fetchSite = request.headers.get("Sec-Fetch-Site");
+  return !fetchSite || fetchSite === "same-origin" || fetchSite === "none";
+}
+
+function favoriteSnapshot(value: unknown) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const clean: Record<string, string | number | boolean> = {};
+  for (const [key, item] of Object.entries(value)) {
+    if (!FAVORITE_SNAPSHOT_KEYS.has(key)) continue;
+    if (typeof item === "string") clean[key] = item.trim().slice(0, 500);
+    else if (typeof item === "number" && Number.isFinite(item)) clean[key] = item;
+    else if (typeof item === "boolean") clean[key] = item;
+  }
+  return clean;
+}
+
+function parseFavoriteSnapshot(value: string) {
+  try {
+    const parsed = JSON.parse(value) as unknown;
+    return favoriteSnapshot(parsed);
+  } catch {
+    return {};
+  }
+}
+
+function favoriteFromRow(row: FavoriteRow) {
+  return {
+    id: row.id,
+    targetType: row.target_type,
+    targetId: row.target_id,
+    targetName: row.target_name,
+    marketId: row.market_id,
+    snapshot: parseFavoriteSnapshot(row.snapshot_json),
+    notes: row.notes,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+async function ensureUserProfile(db: D1Database, identity: ProfileIdentity) {
+  const now = new Date().toISOString();
+  await db.prepare(`INSERT INTO user_profiles (user_id, email, display_name, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?)
+    ON CONFLICT(user_id) DO UPDATE SET email = excluded.email, display_name = excluded.display_name, updated_at = excluded.updated_at`)
+    .bind(identity.userId, identity.email, identity.displayName, now, now).run();
+}
+
+async function profileApi(request: Request, env: Env, url: URL) {
+  const identity = profileIdentity(request);
+  if (!identity) return Response.json({ error: "ChatGPT sign-in required." }, { status: 401, headers: { "Cache-Control": "private, no-store" } });
+  if (!env.DB) return Response.json({ error: "Profile storage is not configured." }, { status: 503, headers: { "Cache-Control": "private, no-store" } });
+  if (!["GET", "HEAD"].includes(request.method) && !profileWriteAllowed(request)) {
+    return Response.json({ error: "Cross-origin profile writes are not allowed." }, { status: 403, headers: { "Cache-Control": "private, no-store" } });
+  }
+
+  await ensureUserProfile(env.DB, identity);
+  const responseHeaders = { "Cache-Control": "private, no-store", "Vary": "oai-authenticated-user-id" };
+
+  if (url.pathname === "/api/profile" && request.method === "GET") {
+    const profile = await env.DB.prepare("SELECT display_name, email, created_at FROM user_profiles WHERE user_id = ?")
+      .bind(identity.userId).first<{ display_name: string; email: string; created_at: string }>();
+    const result = await env.DB.prepare(`SELECT id, target_type, target_id, target_name, market_id, snapshot_json, notes, created_at, updated_at
+      FROM user_favorites WHERE user_id = ? ORDER BY updated_at DESC LIMIT 250`)
+      .bind(identity.userId).all<FavoriteRow>();
+    const favorites = (result.results ?? []).map(favoriteFromRow);
+    return Response.json({
+      profile: {
+        displayName: profile?.display_name ?? identity.displayName,
+        email: profile?.email ?? identity.email,
+        createdAt: profile?.created_at ?? new Date().toISOString(),
+      },
+      favorites,
+      counts: {
+        all: favorites.length,
+        areas: favorites.filter((favorite) => favorite.targetType === "area").length,
+        properties: favorites.filter((favorite) => favorite.targetType === "property").length,
+      },
+    }, { headers: responseHeaders });
+  }
+
+  if (url.pathname === "/api/profile/favorites" && request.method === "POST") {
+    let body: Record<string, unknown>;
+    try { body = await request.json() as Record<string, unknown>; } catch { return Response.json({ error: "Invalid favorite payload." }, { status: 400, headers: responseHeaders }); }
+    const targetType = limitedText(body.targetType, 20);
+    const targetId = limitedText(body.targetId, 180);
+    const targetName = limitedText(body.targetName, 240);
+    const marketId = limitedText(body.marketId, 80) || null;
+    const notes = limitedText(body.notes, 2000) || null;
+    if (!FAVORITE_TARGET_TYPES.has(targetType)) return Response.json({ error: "Favorite type must be area or property." }, { status: 400, headers: responseHeaders });
+    if (!targetId || !targetName) return Response.json({ error: "A typed target ID and display name are required." }, { status: 400, headers: responseHeaders });
+    const snapshotJson = JSON.stringify(favoriteSnapshot(body.snapshot));
+    const now = new Date().toISOString();
+    const id = crypto.randomUUID();
+    await env.DB.prepare(`INSERT INTO user_favorites
+      (id, user_id, target_type, target_id, target_name, market_id, snapshot_json, notes, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(user_id, target_type, target_id) DO UPDATE SET
+        target_name = excluded.target_name, market_id = excluded.market_id, snapshot_json = excluded.snapshot_json,
+        notes = COALESCE(excluded.notes, user_favorites.notes), updated_at = excluded.updated_at`)
+      .bind(id, identity.userId, targetType, targetId, targetName, marketId, snapshotJson, notes, now, now).run();
+    const saved = await env.DB.prepare(`SELECT id, target_type, target_id, target_name, market_id, snapshot_json, notes, created_at, updated_at
+      FROM user_favorites WHERE user_id = ? AND target_type = ? AND target_id = ?`)
+      .bind(identity.userId, targetType, targetId).first<FavoriteRow>();
+    return Response.json({ favorite: saved ? favoriteFromRow(saved) : null }, { status: 201, headers: responseHeaders });
+  }
+
+  const favoritePrefix = "/api/profile/favorites/";
+  if (url.pathname.startsWith(favoritePrefix)) {
+    const favoriteId = decodeURIComponent(url.pathname.slice(favoritePrefix.length));
+    if (!/^[0-9a-f-]{36}$/i.test(favoriteId)) return Response.json({ error: "Unknown favorite." }, { status: 404, headers: responseHeaders });
+
+    if (request.method === "PATCH") {
+      let body: Record<string, unknown>;
+      try { body = await request.json() as Record<string, unknown>; } catch { return Response.json({ error: "Invalid favorite update." }, { status: 400, headers: responseHeaders }); }
+      if (body.notes === undefined) return Response.json({ error: "No supported change supplied." }, { status: 400, headers: responseHeaders });
+      const notes = limitedText(body.notes, 2000) || null;
+      const result = await env.DB.prepare("UPDATE user_favorites SET notes = ?, updated_at = ? WHERE id = ? AND user_id = ?")
+        .bind(notes, new Date().toISOString(), favoriteId, identity.userId).run();
+      if (!result.meta.changes) return Response.json({ error: "Favorite not found." }, { status: 404, headers: responseHeaders });
+      return Response.json({ ok: true }, { headers: responseHeaders });
+    }
+
+    if (request.method === "DELETE") {
+      const result = await env.DB.prepare("DELETE FROM user_favorites WHERE id = ? AND user_id = ?")
+        .bind(favoriteId, identity.userId).run();
+      if (!result.meta.changes) return Response.json({ error: "Favorite not found." }, { status: 404, headers: responseHeaders });
+      return Response.json({ ok: true }, { headers: responseHeaders });
+    }
+  }
+
+  return Response.json({ error: "Unknown profile operation." }, { status: 405, headers: responseHeaders });
+}
+
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
@@ -1012,6 +1219,15 @@ const worker = {
       if (!authenticated) {
         if (url.pathname.startsWith("/api/")) return Response.json({ error: "Private review authentication required." }, { status: 401, headers: { "Cache-Control": "no-store" } });
         return new Response(reviewLoginHtml(), { status: 200, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex, nofollow", "Referrer-Policy": "no-referrer" } });
+      }
+    }
+
+    if (url.pathname === "/api/profile" || url.pathname === "/api/profile/favorites" || url.pathname.startsWith("/api/profile/favorites/")) {
+      try {
+        return await profileApi(request, env, url);
+      } catch (error) {
+        console.error(JSON.stringify({ event: "profile_api_error", path: url.pathname, message: error instanceof Error ? error.message : String(error) }));
+        return Response.json({ error: "Profile storage is temporarily unavailable." }, { status: 500, headers: { "Cache-Control": "private, no-store" } });
       }
     }
 
@@ -1259,8 +1475,9 @@ const worker = {
         provider: "RentCast",
         connected: Boolean(env.RENTCAST_API_KEY),
         endpoint: "/api/integrations/rentcast/property?address=...",
+        underwritingEndpoint: "/api/integrations/rentcast/rent-range?address=...&squareFootage=...",
         pilotEndpoint: "/api/listings/{raleigh|chicago|philadelphia}",
-        capabilities: ["active sale listing", "active rental listing", "rent estimate", "rental comps", "one-call 500-record regional listing screen", "cross-region model diagnostics"],
+        capabilities: ["active sale listing", "active rental listing", "property-specific rent estimate", "rental comp rent/sf distribution", "one-call 500-record regional listing screen", "cross-region model diagnostics"],
         privacy: "The API key stays server-side. Owner and listing-contact fields are not returned.",
       }, { headers: { "Cache-Control": "private, no-store" } });
     }
@@ -1284,6 +1501,75 @@ const worker = {
         }, { headers: { "Cache-Control": "private, max-age=21600" } });
       } catch (error) {
         return Response.json({ error: error instanceof Error ? error.message : "RentCast regional listing lookup failed" }, { status: 502, headers: { "Cache-Control": "private, no-store" } });
+      }
+    }
+
+    if (url.pathname === "/api/integrations/rentcast/rent-range") {
+      if (!env.RENTCAST_API_KEY) return Response.json({ error: "RentCast is not configured" }, { status: 503, headers: { "Cache-Control": "private, no-store" } });
+      const address = url.searchParams.get("address")?.trim() ?? "";
+      const rawType = url.searchParams.get("propertyType")?.trim() ?? "Single Family";
+      const propertyType = rentCastPropertyType(rawType);
+      const squareFootage = Number(url.searchParams.get("squareFootage"));
+      const bedroomsParam = url.searchParams.get("bedrooms");
+      const bathroomsParam = url.searchParams.get("bathrooms");
+      const bedrooms = bedroomsParam === null || bedroomsParam.trim() === "" ? Number.NaN : Number(bedroomsParam);
+      const bathrooms = bathroomsParam === null || bathroomsParam.trim() === "" ? Number.NaN : Number(bathroomsParam);
+      if (!address) return Response.json({ error: "address is required" }, { status: 400 });
+      if (!Number.isFinite(squareFootage) || squareFootage < 150 || squareFootage > 20_000) {
+        return Response.json({ error: "A credible subject-property living area between 150 and 20,000 square feet is required." }, { status: 400 });
+      }
+      if (propertyType === "Multi-Family" && url.searchParams.get("unitConfirmed") !== "true") {
+        return Response.json({ error: "Multi-family rent estimates require confirmed single-unit bedrooms, bathrooms and square footage." }, { status: 422 });
+      }
+      try {
+        const estimate = await rentCastRequest<RentCastRentEstimate>(env.RENTCAST_API_KEY, "avm/rent/long-term", address, {
+          propertyType,
+          bedrooms: Number.isFinite(bedrooms) && bedrooms >= 0 ? bedrooms : undefined,
+          bathrooms: Number.isFinite(bathrooms) && bathrooms > 0 ? bathrooms : undefined,
+          squareFootage,
+          maxRadius: 5,
+          daysOld: 270,
+          compCount: 20,
+          lookupSubjectAttributes: true,
+        });
+        const comparableRows = (estimate.comparables ?? []).filter((comp) => Number(comp.price) > 0 && Number(comp.squareFootage) >= 150);
+        const rentPerSqftValues = comparableRows.map((comp) => Number(comp.price) / Number(comp.squareFootage));
+        const comparableRange = comparableRows.length >= 5 ? {
+          p25: roundedMonthlyRent(quantileNumber(rentPerSqftValues, .25) * squareFootage),
+          median: roundedMonthlyRent(quantileNumber(rentPerSqftValues, .5) * squareFootage),
+          p75: roundedMonthlyRent(quantileNumber(rentPerSqftValues, .75) * squareFootage),
+          rentPerSqft: {
+            p25: Math.round(quantileNumber(rentPerSqftValues, .25) * 100) / 100,
+            median: Math.round(quantileNumber(rentPerSqftValues, .5) * 100) / 100,
+            p75: Math.round(quantileNumber(rentPerSqftValues, .75) * 100) / 100,
+          },
+        } : null;
+        const daysOldValues = comparableRows.map((comp) => Number(comp.daysOld)).filter(Number.isFinite);
+        const distanceValues = comparableRows.map((comp) => Number(comp.distance)).filter(Number.isFinite);
+        const medianDaysOld = daysOldValues.length ? Math.round(medianNumber(daysOldValues)) : null;
+        const medianDistance = distanceValues.length ? Math.round(medianNumber(distanceValues) * 10) / 10 : null;
+        const evidenceGrade = comparableRows.length >= 12 && (medianDaysOld ?? 999) <= 180 ? "strong"
+          : comparableRows.length >= 5 && (medianDaysOld ?? 999) <= 270 ? "moderate" : "weak";
+        return Response.json({
+          provider: "RentCast",
+          retrievedAt: new Date().toISOString(),
+          requestCost: 1,
+          subject: {
+            address,
+            propertyType,
+            bedrooms: Number.isFinite(bedrooms) && bedrooms >= 0 ? bedrooms : null,
+            bathrooms: Number.isFinite(bathrooms) && bathrooms > 0 ? bathrooms : null,
+            squareFootage,
+            providerSquareFootage: estimate.subjectProperty?.squareFootage ?? null,
+          },
+          comparableRange,
+          providerEstimate: { median: estimate.rent ?? null, low85: estimate.rentRangeLow ?? null, high85: estimate.rentRangeHigh ?? null },
+          evidence: { compCount: comparableRows.length, medianDaysOld, medianDistance, grade: evidenceGrade },
+          methodology: "P25, median and P75 are calculated from the returned comparable listings' monthly rent per square foot, then multiplied by the selected subject property's living area. RentCast's proprietary estimate and 85% range remain visible as a separate cross-check.",
+          boundary: comparableRange ? "This is a property-specific comparable-rent screen, not a lease quote. Verify unit condition, utilities, concessions, lease terms and current availability." : "Fewer than five comparables had both rent and living area. The property-specific percentile range is unavailable and underwriting must remain incomplete.",
+        }, { headers: { "Cache-Control": "private, max-age=900" } });
+      } catch (error) {
+        return Response.json({ error: error instanceof Error ? error.message : "RentCast property rent range failed" }, { status: 502, headers: { "Cache-Control": "private, no-store" } });
       }
     }
 

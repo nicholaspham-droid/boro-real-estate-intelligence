@@ -62,7 +62,19 @@ function typeGroup(label = "") {
   const value = label.toLowerCase();
   if (value.includes("condo")) return "condo";
   if (value.includes("multi") || value.includes("apartment") || value.includes("apt") || value.includes("2 family") || value.includes("3 family")) return "multifamily";
-  if (value.includes("single") || value.includes("singlfam") || value.includes("row")) return "single-family";
+  if (value.includes("single") || value.includes("singlfam") || value.includes("row") || value.includes("twin") || value.includes("conventional") || value.includes("cape") || value.includes("ranch")) return "single-family";
+  return "residential-other";
+}
+
+function propertySubtype(label = "") {
+  const value = label.toLowerCase();
+  if (value.includes("condo")) return "condo";
+  if (value.includes("row conv") || value.includes("apartment") || value.includes("apt")) return "row-conversion";
+  if (value.includes("row b/garage") || value.includes("row garage")) return "row-garage";
+  if (value.includes("row")) return "row-standard";
+  if (value.includes("twin")) return "twin-single-family";
+  if (value.includes("single")) return "detached-single-family";
+  if (value.includes("multi") || value.includes("2 family") || value.includes("3 family")) return "multifamily";
   return "residential-other";
 }
 
@@ -172,24 +184,27 @@ async function fetchCookCounty() {
 }
 
 async function fetchPhiladelphia() {
-  const sql = `select parcel_number,location,market_value,sale_date,sale_price,category_code_description,census_tract,number_of_bedrooms,number_of_bathrooms,total_livable_area,year_built,zip_code,st_x(the_geom) as lon,st_y(the_geom) as lat from opa_properties_public where sale_date >= '2023-01-01' and sale_date <= '${AS_OF}' and sale_price between 75000 and 3000000 and market_value > 30000 and total_livable_area between 500 and 8000 and category_code_description in ('SINGLE FAMILY','ROW B/GARAGE','ROW CONV/APT','2 STY ROW','3 STY ROW','CONDO') and st_x(the_geom) < -75.20 order by sale_date desc limit 700`;
+  const sql = `select p.parcel_number,p.location,p.market_value,p.assessment_date,r.display_date as qualified_sale_date,r.cash_consideration as qualified_sale_price,p.category_code_description,p.building_code_description_new,p.census_tract,p.number_of_bedrooms,p.number_of_bathrooms,p.total_livable_area,p.year_built,p.zip_code,st_x(p.the_geom) as lon,st_y(p.the_geom) as lat from opa_properties_public p join (select distinct on (opa_account_num) opa_account_num,display_date,cash_consideration from rtt_summary where document_type='DEED' and display_date >= '2023-01-01' and display_date <= '${AS_OF}' and property_count=1 and opa_account_num is not null and cash_consideration between 75000 and 3000000 and coalesce(other_consideration,0)=0 and state_tax_amount>0 and local_tax_amount>0 order by opa_account_num,display_date desc) r on r.opa_account_num=p.parcel_number where p.market_value > 30000 and p.total_livable_area between 500 and 8000 and p.category_code_description in ('SINGLE FAMILY','ROW B/GARAGE','ROW CONV/APT','2 STY ROW','3 STY ROW','CONDO') and st_x(p.the_geom) < -75.20 order by r.display_date desc limit 900`;
   const url = new URL("https://phl.carto.com/api/v2/sql");
   url.searchParams.set("q", sql);
   const payload = await fetchJson(url);
   return payload.rows.map((row) => ({
     id: `phl-${row.parcel_number}`,
-    marketId: "philadelphia", clusterId: "philadelphia-west", sourceId: "philadelphia-opa", sourceLabel: "Philadelphia OPA",
-    sourceUrl: "https://opendataphilly.org/datasets/opa-property-assessments/",
+    marketId: "philadelphia", clusterId: "philadelphia-west", sourceId: "philadelphia-opa", sourceLabel: "Philadelphia OPA + DOR Transfers",
+    sourceUrl: "https://opendataphilly.org/datasets/real-estate-transfers/",
     parcelId: row.parcel_number, address: row.location, locality: `Philadelphia, PA ${row.zip_code || ""}`.trim(), zip: row.zip_code || null,
-    lat: finite(row.lat), lng: finite(row.lon), propertyType: row.category_code_description || "Residential",
+    lat: finite(row.lat), lng: finite(row.lon), propertyType: row.building_code_description_new || row.category_code_description || "Residential",
+    propertyCategory: row.category_code_description || "Residential",
     yearBuilt: finite(row.year_built), sqft: finite(row.total_livable_area), lotSqft: null,
     beds: finite(row.number_of_bedrooms), baths: finite(row.number_of_bathrooms),
-    saleDate: row.sale_date.slice(0, 10), salePrice: finite(row.sale_price), assessedValue: finite(row.market_value),
-    qualification: "Residential OPA record · price, area and value sanity filters passed",
+    saleDate: row.qualified_sale_date.slice(0, 10), salePrice: finite(row.qualified_sale_price), assessedValue: finite(row.market_value),
+    assessmentDate: row.assessment_date?.slice(0, 10) ?? null,
+    qualification: "Single-parcel taxable deed joined to OPA · cash consideration, zero other consideration, area and value sanity filters passed",
   })).filter((row) => {
     const latDelta = row.lat - 39.97;
     const lngDelta = (row.lng + 75.17) * Math.cos(39.97 * Math.PI / 180);
-    return lngDelta < 0 && Math.abs(lngDelta) > Math.abs(latDelta) && row.salePrice / row.assessedValue > 0.35 && row.salePrice / row.assessedValue < 2.75;
+    const ppsf = row.salePrice / row.sqft;
+    return lngDelta < 0 && Math.abs(lngDelta) > Math.abs(latDelta) && ppsf >= 30 && ppsf <= 1200;
   });
 }
 
@@ -248,6 +263,8 @@ function calibrationFor(records) {
 function comparableEvidence(subject, candidates, price, targetDate) {
   const targetTime = targetDate.getTime();
   const targetType = typeGroup(subject.propertyType);
+  const targetSubtype = propertySubtype(subject.propertyType);
+  const isPhiladelphia = subject.marketId === "philadelphia";
   const scored = candidates
     .filter((candidate) => candidate.id !== subject.id && new Date(candidate.saleDate).getTime() <= targetTime)
     .map((candidate) => {
@@ -256,21 +273,43 @@ function comparableEvidence(subject, candidates, price, targetDate) {
       const ageDifference = subject.yearBuilt && candidate.yearBuilt ? Math.abs(subject.yearBuilt - candidate.yearBuilt) : 25;
       const monthsOld = Math.max(0, (targetTime - new Date(candidate.saleDate).getTime()) / (1000 * 60 * 60 * 24 * 30.44));
       const sameType = typeGroup(candidate.propertyType) === targetType;
-      const score = (sameType ? 32 : 0)
-        + clamp(30 - Math.abs(1 - sqftRatio) * 75, 0, 30)
-        + clamp(18 - (distance ?? 15) * 2.5, 0, 18)
-        + clamp(12 - ageDifference * 0.3, 0, 12)
-        + clamp(8 - monthsOld / 9, 0, 8);
-      return { candidate, distance, sqftRatio, monthsOld, sameType, score };
+      const sameSubtype = propertySubtype(candidate.propertyType) === targetSubtype;
+      const sameZip = Boolean(subject.zip && candidate.zip && String(subject.zip) === String(candidate.zip));
+      const score = isPhiladelphia
+        ? (sameSubtype ? 30 : sameType ? 9 : 0)
+          + (sameZip ? 22 : 0)
+          + clamp(24 - Math.abs(1 - sqftRatio) * 65, 0, 24)
+          + clamp(16 - (distance ?? 8) * 5, 0, 16)
+          + clamp(4 - ageDifference * 0.1, 0, 4)
+          + clamp(4 - monthsOld / 12, 0, 4)
+        : (sameType ? 32 : 0)
+          + clamp(30 - Math.abs(1 - sqftRatio) * 75, 0, 30)
+          + clamp(18 - (distance ?? 15) * 2.5, 0, 18)
+          + clamp(12 - ageDifference * 0.3, 0, 12)
+          + clamp(8 - monthsOld / 9, 0, 8);
+      return { candidate, distance, sqftRatio, monthsOld, sameType, sameSubtype, sameZip, score };
     })
-    .filter((item) => item.sqftRatio >= 0.55 && item.sqftRatio <= 1.8 && (item.distance === null || item.distance <= 20))
+    .filter((item) => item.sqftRatio >= 0.55 && item.sqftRatio <= 1.8 && (item.distance === null || item.distance <= (isPhiladelphia ? 5 : 20)))
     .sort((a, b) => b.score - a.score);
-  const preferred = scored.filter((item) => item.sameType && item.score >= 42);
-  const selected = (preferred.length >= 3 ? preferred : scored).slice(0, 12);
-  const ppsfEvidence = selected.map((item) => ({
+  const selected = isPhiladelphia
+    ? [
+        scored.filter((item) => item.sameSubtype && item.sameZip && item.monthsOld <= 36 && item.distance <= 2.5 && item.sqftRatio >= .65 && item.sqftRatio <= 1.55),
+        scored.filter((item) => item.sameSubtype && item.monthsOld <= 48 && item.distance <= 2.5 && item.sqftRatio >= .62 && item.sqftRatio <= 1.62),
+        scored.filter((item) => item.sameType && item.sameZip && item.monthsOld <= 48 && item.distance <= 3.5 && item.sqftRatio >= .6 && item.sqftRatio <= 1.65),
+        scored.filter((item) => item.sameType && item.monthsOld <= 60 && item.distance <= 5),
+      ].find((pool) => pool.length >= 4)?.slice(0, 12) ?? []
+    : (() => {
+        const preferred = scored.filter((item) => item.sameType && item.score >= 42);
+        return (preferred.length >= 3 ? preferred : scored).slice(0, 12);
+      })();
+  const rawPpsfEvidence = selected.map((item) => ({
     value: hpiAdjustedSale(item.candidate, price, targetDate) / item.candidate.sqft,
     weight: Math.max(0.1, item.score / 100),
   }));
+  const ppsfCenter = weightedMedian(rawPpsfEvidence);
+  const ppsfEvidence = isPhiladelphia && rawPpsfEvidence.length >= 6
+    ? rawPpsfEvidence.filter((item) => item.value >= ppsfCenter * .55 && item.value <= ppsfCenter * 1.8)
+    : rawPpsfEvidence;
   const ppsf = weightedMedian(ppsfEvidence);
   return {
     count: selected.length,
@@ -295,11 +334,22 @@ function backtestMarket(usable, price) {
     const comps = comparableEvidence(subject, prior, price, targetDate);
     if (!comps.ppsf || comps.count < 3 || prior.length < 6) continue;
     const compValue = subject.sqft * comps.ppsf;
-    // The current assessment is not guaranteed to have existed at the historical
-    // test date. Excluding it prevents post-sale assessment leakage.
-    const predicted = compValue;
+    // An assessment may enter a historical test only when its source effective
+    // date is on or before the subject sale. The calibration ratio is learned
+    // solely from earlier sales whose assessments also predate those sales.
+    const assessmentEligible = Boolean(subject.assessmentDate && subject.assessmentDate <= subject.saleDate);
+    const assessmentCalibrationRows = assessmentEligible ? prior.filter((candidate) => (
+      candidate.assessmentDate && candidate.assessmentDate <= candidate.saleDate
+      && candidate.assessedValue > 0
+      && typeGroup(candidate.propertyType) === typeGroup(subject.propertyType)
+    )) : [];
+    const localCalibrationRows = assessmentCalibrationRows.filter((candidate) => candidate.zip && subject.zip && String(candidate.zip) === String(subject.zip));
+    const calibrationRows = localCalibrationRows.length >= 12 ? localCalibrationRows : assessmentCalibrationRows;
+    const assessmentCalibration = calibrationRows.length >= 5 ? calibrationFor(calibrationRows) : null;
+    const assessmentValue = assessmentCalibration ? subject.assessedValue * assessmentCalibration : null;
+    const predicted = assessmentValue ? compValue * .15 + assessmentValue * .85 : compValue;
     const ratio = predicted / subject.salePrice;
-    tests.push({ id: subject.id, predicted, actual: subject.salePrice, ratio, absoluteError: Math.abs(predicted - subject.salePrice), absoluteErrorPct: Math.abs(ratio - 1) * 100, compCount: comps.count });
+    tests.push({ id: subject.id, predicted, actual: subject.salePrice, ratio, absoluteError: Math.abs(predicted - subject.salePrice), absoluteErrorPct: Math.abs(ratio - 1) * 100, compCount: comps.count, assessmentEligible: Boolean(assessmentValue) });
   }
   const ratios = tests.map((item) => item.ratio);
   const medianRatio = median(ratios) ?? 1;
@@ -309,10 +359,19 @@ function backtestMarket(usable, price) {
   const medianAbsoluteErrorPct = round(median(tests.map((item) => item.absoluteErrorPct)) ?? 50, 1);
   const p80AbsoluteErrorPct = round(quantile(tests.map((item) => item.absoluteErrorPct), 0.8) ?? 60, 1);
   const biasPct = round((medianRatio - 1) * 100, 1);
+  const segmentSummary = (items) => {
+    const segmentMedianRatio = median(items.map((item) => item.ratio)) ?? 1;
+    return {
+      sampleSize: items.length,
+      medianAbsoluteErrorPct: round(median(items.map((item) => item.absoluteErrorPct)) ?? 0, 1),
+      p80AbsoluteErrorPct: round(quantile(items.map((item) => item.absoluteErrorPct), .8) ?? 0, 1),
+      biasPct: round((segmentMedianRatio - 1) * 100, 1),
+    };
+  };
   const decisionUse = tests.length >= 30 && medianAbsoluteErrorPct <= 15 && p80AbsoluteErrorPct <= 30 && Math.abs(biasPct) <= 10 ? "pass"
     : tests.length >= 12 && medianAbsoluteErrorPct <= 25 && p80AbsoluteErrorPct <= 45 && Math.abs(biasPct) <= 15 ? "watch" : "compromised";
   return {
-    method: "Leakage-controlled rolling-origin backtest: each sale is estimated only from earlier comparable sales; current assessments are excluded because their historical effective date is unavailable",
+    method: "Leakage-controlled rolling-origin backtest: each sale is estimated only from earlier comparable sales; an assessment enters only when its source effective date precedes the subject sale and its calibration uses earlier eligible sales",
     sampleSize: tests.length,
     medianAbsoluteErrorPct,
     p80AbsoluteErrorPct,
@@ -325,6 +384,11 @@ function backtestMarket(usable, price) {
     coefficientOfDispersion: round(cod ?? 30, 1),
     within10Pct: round(tests.filter((item) => item.absoluteErrorPct <= 10).length / Math.max(1, tests.length) * 100, 1),
     within20Pct: round(tests.filter((item) => item.absoluteErrorPct <= 20).length / Math.max(1, tests.length) * 100, 1),
+    assessmentEligibleTests: tests.filter((item) => item.assessmentEligible).length,
+    validationSegments: {
+      datedAssessment: segmentSummary(tests.filter((item) => item.assessmentEligible)),
+      comparableOnly: segmentSummary(tests.filter((item) => !item.assessmentEligible)),
+    },
     decisionUse,
   };
 }
@@ -372,7 +436,7 @@ function modelMarket(records, clusterId) {
         pricePerSqft: { recordedSale: round(record.salePrice / record.sqft, 0), hpiAdjustedSale: round(saleAnchor / record.sqft, 0), assessmentCalibrated: round(assessmentAnchor / record.sqft, 0), comparableP25: round(comps.ppsfP25, 0), comparableMedian: round(comps.ppsf, 0), comparableP75: round(comps.ppsfP75, 0), modelCenter: round(estimate / record.sqft, 0) },
         recency: { saleAgeMonths: round(ageMonths, 1), score: round(recency, 0), band: recencyBand },
         comparableQuality: { nearestMiles: round(comps.nearestMiles ?? 0, 1), medianMiles: round(comps.medianMiles ?? 0, 1), medianAgeMonths: round(comps.medianAgeMonths ?? 0, 1), newestSaleDate: comps.newestSaleDate, oldestSaleDate: comps.oldestSaleDate, sameTypePct: round(comps.sameTypePct, 0), recordIds: comps.ids },
-        diagnostics: { modelVersion: "3.0", decisionUse: diagnostics.decisionUse, marketBacktestSample: diagnostics.sampleSize, marketMedianAbsoluteErrorPct: diagnostics.medianAbsoluteErrorPct, marketP80AbsoluteErrorPct: diagnostics.p80AbsoluteErrorPct },
+        diagnostics: { modelVersion: "3.1", decisionUse: diagnostics.decisionUse, marketBacktestSample: diagnostics.sampleSize, marketMedianAbsoluteErrorPct: diagnostics.medianAbsoluteErrorPct, marketP80AbsoluteErrorPct: diagnostics.p80AbsoluteErrorPct },
       },
       listing: null,
       vendorEstimates: [],
@@ -397,11 +461,11 @@ const output = {
   generatedAt: new Date().toISOString(),
   asOf: AS_OF,
   methodology: {
-    label: "Public-record valuation watch model v3.0",
+    label: "Public-record valuation watch model v3.1",
     value: "Recency-weighted prior sale + 20% locally calibrated assessment + 45–65% geographically, physically and price-per-square-foot matched comparable sales",
     range: "The larger of the market's out-of-time 80th-percentile error, anchor disagreement, or evidence-quality penalty",
     watchScore: "Cluster screening signal shrunk toward neutral in proportion to property evidence confidence; evidence quality and assessment gaps do not earn edge points",
-    validation: "Rolling-origin backtesting uses only earlier comparable sales and excludes current assessment values to prevent historical effective-date leakage",
+    validation: "Rolling-origin backtesting uses only earlier comparable sales; assessments enter only when their source effective date precedes the sale, with calibration learned from earlier eligible sales",
     boundary: "The assessment gap is not acquisition edge. A true price edge requires an asking price or licensed live listing joined to the record.",
   },
   markets: [

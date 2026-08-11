@@ -36,7 +36,7 @@ const output = {
     { id: "attom", mode: "live-on-demand", freshness: "provider vintage; 30-day property cache", use: "Independent AVM, assessment/tax, sales history, permits, equity and school context" },
   ],
   enforcedControls: [
-    "Current subject assessments are excluded from historical tests",
+    "Assessments enter historical tests only when their source effective date precedes the sale, and calibration uses earlier eligible sales",
     "Only earlier comparable sales enter each rolling-origin valuation test",
     "Evidence quality shrinks scores toward neutral and never earns investment points",
     "ATTOM is capped at 15% secondary weight and disagreement reduces confidence",

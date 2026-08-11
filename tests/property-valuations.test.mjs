@@ -11,7 +11,7 @@ test("property valuation snapshot is internally consistent", () => {
     const weights = record.model.weights;
     const expected = anchors.hpiAdjustedSale * weights.hpiAdjustedSale + anchors.assessmentCalibrated * weights.assessmentCalibrated + anchors.comparablePpsf * weights.comparableSales;
     assert.ok(Math.abs(expected - record.model.value) <= 1500, `${record.id} model center matches documented weights`);
-    assert.equal(record.model.diagnostics.modelVersion, "3.0");
+    assert.equal(record.model.diagnostics.modelVersion, "3.1");
     assert.ok(record.model.pricePerSqft.comparableP25 <= record.model.pricePerSqft.comparableMedian);
     assert.ok(record.model.pricePerSqft.comparableMedian <= record.model.pricePerSqft.comparableP75);
     assert.ok(record.model.pricePerSqft.recordedSale > 0);
@@ -43,19 +43,34 @@ test("market competency separates source coverage from observed model performanc
   assert.ok(philadelphia.modelCompetency < philadelphia.sourceCompetency);
   assert.ok(philadelphia.diagnostics.p80AbsoluteErrorPct > 50);
   assert.equal(philadelphia.decisionUse, "compromised");
+  assert.ok(philadelphia.diagnostics.sampleSize >= 500);
+  assert.ok(philadelphia.diagnostics.assessmentEligibleTests >= 150);
+  assert.ok(philadelphia.diagnostics.validationSegments.datedAssessment.medianAbsoluteErrorPct < philadelphia.diagnostics.validationSegments.comparableOnly.medianAbsoluteErrorPct);
+  assert.ok(philadelphia.diagnostics.priceRelatedDifferential < 1.263);
   assert.ok(raleigh.diagnostics.medianAbsoluteErrorPct <= 15);
   assert.equal(raleigh.decisionUse, "pass");
   assert.equal(live.find((market) => market.id === "chicago").decisionUse, "watch");
 });
 
 test("machine-readable scorecard mirrors the release gates", () => {
-  assert.match(scorecard.modelVersion, /v3\.0/);
+  assert.match(scorecard.modelVersion, /v3\.1/);
   assert.equal(scorecard.valuationAsOf, valuations.asOf);
   assert.equal(scorecard.markets.length, 3);
   for (const market of scorecard.markets) {
     assert.equal(market.decisionUse, valuations.markets.find((item) => item.id === market.id).decisionUse);
   }
-  assert.ok(scorecard.enforcedControls.some((control) => /assessments are excluded/i.test(control)));
+  assert.ok(scorecard.enforcedControls.some((control) => /assessments enter historical tests only/i.test(control)));
+});
+
+test("Philadelphia evidence is limited to qualified taxable cash deeds", () => {
+  const records = valuations.properties.filter((record) => record.marketId === "philadelphia");
+  assert.equal(records.length, 18);
+  for (const record of records) {
+    assert.match(record.qualification, /single-parcel taxable deed/i);
+    assert.match(record.qualification, /cash consideration/i);
+    assert.ok(record.assessmentDate);
+    assert.ok(record.propertyCategory);
+  }
 });
 
 test("Cook County assessments are normalized to market-equivalent residential values", () => {

@@ -53,9 +53,11 @@ test("server-renders the national Borocast workbench and verified registry", asy
   assert.match(html, /RentCast/);
   assert.match(html, /ATTOM/);
   assert.match(html, /DECISION STUDIO · EDITABLE UNDERWRITING/);
-  assert.match(html, /ACS CLUSTER RENT EVIDENCE/);
-  assert.match(html, /25th percentile/);
-  assert.match(html, /75th percentile/);
+  assert.match(html, /PROPERTY-SPECIFIC RENT RANGE/);
+  assert.match(html, /Load rental comps · 1 call/);
+  assert.match(html, /ACS CLUSTER CONTEXT · NOT USED IN CALCULATION/);
+  assert.match(html, /Cluster P25/);
+  assert.match(html, /Cluster P75/);
   assert.match(html, /Recorded sale \/ sf/);
   assert.match(html, /Comparable recency/);
   assert.match(html, /Advance only when at least four gates pass and none fail/);
@@ -66,6 +68,9 @@ test("server-renders the national Borocast workbench and verified registry", asy
   assert.match(html, /RENTCAST · LISTING \+ RENT CHANNEL/);
   assert.match(html, /REGIONAL LIVE LISTING SCREEN · SCALE TEST/);
   assert.match(html, /Up to 500 listings\. One market request/);
+  assert.match(html, /RALEIGH REFERENCE LOOP · SIGNAL TO DECISION MEMO/);
+  assert.match(html, /One candidate\. Five evidence gates\. One next action\./);
+  assert.match(html, /Add rent \+ ATTOM evidence/);
   assert.match(html, /Chicago/);
   assert.match(html, /Philadelphia/);
   assert.match(html, /Map ready · load listings to add scored pins/);
@@ -82,6 +87,7 @@ test("server-renders the national Borocast workbench and verified registry", asy
   assert.match(html, /true acquisition-edge percentage remains locked/i);
   assert.match(html, /No national PLUTO equivalent/);
   assert.match(html, /Give Feedback/);
+  assert.match(html, /Open saved research profile/);
   assert.match(html, /Help pressure-test/);
   assert.match(html, /Print 2-page area report/);
   assert.match(html, /Print 2-page property report/);
@@ -287,8 +293,67 @@ test("RentCast adapter stays server-side and closes property evidence without a 
   const lookup = await worker.fetch(new Request("http://localhost/api/integrations/rentcast/property?address=123%20Main%20St"), env, ctx);
   assert.equal(lookup.status, 503);
 
+  const rentRange = await worker.fetch(new Request("http://localhost/api/integrations/rentcast/rent-range?address=123%20Main%20St&squareFootage=1400"), env, ctx);
+  assert.equal(rentRange.status, 503);
+
   const pilot = await worker.fetch(new Request("http://localhost/api/listings/raleigh"), env, ctx);
   assert.equal(pilot.status, 503);
+});
+
+test("Deal Studio rent range uses one attribute-matched AVM call and comparable rent per square foot", async () => {
+  const originalFetch = globalThis.fetch;
+  let upstreamCalls = 0;
+  globalThis.fetch = async (input, init) => {
+    const upstreamUrl = new URL(String(input));
+    if (upstreamUrl.hostname === "api.rentcast.io" && upstreamUrl.pathname === "/v1/avm/rent/long-term") {
+      upstreamCalls += 1;
+      assert.equal(init.headers["X-Api-Key"], "test-key");
+      assert.equal(upstreamUrl.searchParams.get("propertyType"), "Single Family");
+      assert.equal(upstreamUrl.searchParams.get("bedrooms"), "3");
+      assert.equal(upstreamUrl.searchParams.get("bathrooms"), "2");
+      assert.equal(upstreamUrl.searchParams.get("squareFootage"), "1500");
+      assert.equal(upstreamUrl.searchParams.get("compCount"), "20");
+      assert.equal(upstreamUrl.searchParams.get("daysOld"), "270");
+      const comparables = Array.from({ length: 12 }, (_, index) => ({
+        price: 1800 + index * 90,
+        squareFootage: 1200 + index * 30,
+        distance: .4 + index * .1,
+        daysOld: 20 + index * 8,
+        correlation: .95 - index * .02,
+      }));
+      return Response.json({
+        rent: 2350,
+        rentRangeLow: 2100,
+        rentRangeHigh: 2600,
+        subjectProperty: { propertyType: "Single Family", bedrooms: 3, bathrooms: 2, squareFootage: 1500 },
+        comparables,
+      });
+    }
+    return originalFetch(input, init);
+  };
+  try {
+    const worker = await loadWorker();
+    const response = await worker.fetch(new Request("http://localhost/api/integrations/rentcast/rent-range?address=123%20Main%20St%2C%20Raleigh%2C%20NC&propertyType=SINGLFAM&bedrooms=3&bathrooms=2&squareFootage=1500"), { ...env, RENTCAST_API_KEY: "test-key" }, ctx);
+    assert.equal(response.status, 200);
+    const payload = await response.json();
+    assert.equal(upstreamCalls, 1);
+    assert.equal(payload.requestCost, 1);
+    assert.equal(payload.subject.squareFootage, 1500);
+    assert.equal(payload.evidence.compCount, 12);
+    assert.equal(payload.evidence.grade, "strong");
+    assert.ok(payload.comparableRange.p25 < payload.comparableRange.median);
+    assert.ok(payload.comparableRange.median < payload.comparableRange.p75);
+    assert.ok(payload.comparableRange.rentPerSqft.p25 < payload.comparableRange.rentPerSqft.p75);
+    assert.deepEqual(payload.providerEstimate, { median: 2350, low85: 2100, high85: 2600 });
+    assert.match(payload.methodology, /monthly rent per square foot/i);
+
+    const multiFamily = await worker.fetch(new Request("http://localhost/api/integrations/rentcast/rent-range?address=125%20Main%20St&propertyType=Multi-Family&bedrooms=3&bathrooms=2&squareFootage=2600"), { ...env, RENTCAST_API_KEY: "test-key" }, ctx);
+    assert.equal(multiFamily.status, 422);
+    assert.equal(upstreamCalls, 1);
+    assert.match((await multiFamily.json()).error, /single-unit/i);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
 
 test("regional listing routes score up to 500 records from one upstream response per market", async () => {
@@ -359,7 +424,7 @@ test("property-data APIs expose health and market evidence", async () => {
   const quality = await worker.fetch(new Request("http://localhost/api/model-quality"), env, ctx);
   assert.equal(quality.status, 200);
   const qualityPayload = await quality.json();
-  assert.match(qualityPayload.modelVersion, /v3\.0/);
+  assert.match(qualityPayload.modelVersion, /v3\.1/);
   assert.equal(qualityPayload.markets.find((market) => market.id === "philadelphia").decisionUse, "compromised");
   assert.deepEqual(healthPayload.adapters.sort(), ["arcgis", "carto", "socrata"]);
   assert.equal(healthPayload.acs.marketCount, 20);

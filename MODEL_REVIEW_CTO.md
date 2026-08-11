@@ -2,7 +2,7 @@
 
 **Audience:** CTO and product/model-risk leadership  
 **Review date:** 2026-08-11  
-**Reviewed release:** Public-record valuation model v3.0 plus live ATTOM and RentCast adapters
+**Reviewed release:** Public-record valuation model v3.1 plus live ATTOM and RentCast adapters
 
 ## Executive decision
 
@@ -14,22 +14,23 @@ Current property-model disposition:
 
 | Market | Gate | Rolling tests | Median error | P80 error | Median bias | PRD | CTO disposition |
 |---|---:|---:|---:|---:|---:|---:|---|
-| Raleigh | Pass | 1,210 | 10.8% | 21.3% | -0.5% | 1.049 | Usable for screening with the published interval and verified deal inputs |
-| Chicago | Watch | 13 | 12.1% | 20.4% | +6.2% | 1.007 | Error is promising, but the test sample is too small for equal-confidence comparison |
-| Philadelphia | Compromised | 418 | 36.4% | 63.8% | -8.7% | 1.263 | Do not use for property decisions; retain for diagnosis while rebuilding strata and sale qualification |
+| Raleigh | Pass | 1,175 | 10.7% | 21.5% | -0.1% | 1.048 | Usable for screening with the published interval and verified deal inputs |
+| Chicago | Watch | 13 | 10.7% | 20.4% | +6.2% | 1.008 | Error is promising, but the test sample is too small for equal-confidence comparison |
+| Philadelphia | Compromised | 578 | 34.4% | 62.0% | -3.3% | 1.205 | Bias and price-level distortion improved, but property decisions remain blocked while condition/renovation evidence is missing |
 
-The Philadelphia result is not a cosmetic warning. A PRD of 1.263 and 63.8% P80 error indicate material price-level non-uniformity and insufficient local specification. The product now exposes this as a hard regional gate.
+The Philadelphia result is not a cosmetic warning. Version 3.1 improves PRD from 1.263 to 1.205, P80 error from 63.8% to 62.0% and median bias from -8.7% to -3.3%, but the remaining error still indicates material price-level non-uniformity and missing point-in-time property condition. The product continues to expose this as a hard regional gate.
 
 ## Material changes implemented in this review
 
-1. **Removed historical assessment leakage.** Earlier tests used a subject's current assessment even though its effective date was not historically aligned. Version 3.0 excludes current subject assessments from the rolling-origin backtest. Production may still use a current assessment as one visible anchor, but the validation no longer claims it was known at the test date.
-2. **Capped property confidence by observed market performance.** Good field completeness or close comparable proximity can no longer overwhelm a weak regional model-quality score.
-3. **Separated signal from reliability.** Area composites are shrunk toward 50 when competency is weak. Live-listing freshness, completeness and regional competency also shrink the raw signal instead of earning opportunity points.
-4. **Simplified the live-listing signal.** The raw score is now 65% property-type-normalized asking price per square foot and 35% market time. It remains a within-response screen, not intrinsic value.
-5. **Introduced explicit decision gates.** Pass, watch and compromised states are encoded in the generated model output and the machine-readable `/api/model-quality` scorecard.
-6. **Expanded ATTOM with bounded, auditable cost.** Core diligence uses one AVM Detail request. Explicit full diligence can add Expanded Profile, Sales History, Building Permits, Home Equity and Schools for a maximum of six successful responses. All six modules were validated under the current license on one Raleigh property and cached.
-7. **Reduced persisted vendor data.** Owner, buyer/seller, mailing, lender identity/contact, loan number and document-number fields are discarded before storage. Mortgage terms, permit facts, sales history, equity and schools remain descriptive and do not automatically change edge.
-8. **Removed the temporary validation schedule.** Full ATTOM diligence is on-demand only; the production configuration contains no recurring cron.
+1. **Removed historical assessment leakage.** Earlier tests used a subject's current assessment even though its effective date was not historically aligned. Version 3.1 admits an assessment only when its effective date precedes the tested sale and learns calibration from earlier eligible observations. Production may still use a current assessment as one visible anchor, but validation never claims it was known at the test date.
+2. **Remediated Philadelphia without relaxing the gate.** The pipeline now joins qualified taxable single-parcel cash deeds to OPA, preserves granular building styles, selects ZIP/subtype/recency/distance comparable pools and trims PPSF outliers inside each historical fold. The effective-dated assessment cohort improves to 26.8% median and 47.9% P80 error, but the combined market remains compromised.
+3. **Capped property confidence by observed market performance.** Good field completeness or close comparable proximity can no longer overwhelm a weak regional model-quality score.
+4. **Separated signal from reliability.** Area composites are shrunk toward 50 when competency is weak. Live-listing freshness, completeness and regional competency also shrink the raw signal instead of earning opportunity points.
+5. **Simplified the live-listing signal.** The raw score is now 65% property-type-normalized asking price per square foot and 35% market time. It remains a within-response screen, not intrinsic value.
+6. **Introduced explicit decision gates.** Pass, watch and compromised states are encoded in the generated model output and the machine-readable `/api/model-quality` scorecard.
+7. **Expanded ATTOM with bounded, auditable cost.** Core diligence uses one AVM Detail request. Explicit full diligence can add Expanded Profile, Sales History, Building Permits, Home Equity and Schools for a maximum of six successful responses. All six modules were validated under the current license on one Raleigh property and cached.
+8. **Reduced persisted vendor data.** Owner, buyer/seller, mailing, lender identity/contact, loan number and document-number fields are discarded before storage. Mortgage terms, permit facts, sales history, equity and schools remain descriptive and do not automatically change edge.
+9. **Removed the temporary validation schedule.** Full ATTOM diligence is on-demand only; the production configuration contains no recurring cron.
 
 ## Output clarity and precision review
 
@@ -65,7 +66,7 @@ The new rolling-origin validation is materially more honest, but it is still not
 
 RentCast is appropriately used as a live candidate feed. A single request can return up to 500 active listings, which is efficient for MVP testing. The resulting score is still a relative screen within one provider response. It must not be called a valuation until a listing is joined to the subject property model and the match is verified.
 
-The next precision improvement is a local matched cohort: same property type, similar living area, bedroom band, age band and distance radius. Citywide property-type median price per square foot is too coarse for heterogeneous metros.
+Deal Studio now requests a property-specific rent AVM with address, property type, bedrooms, bathrooms and living area, then calculates P25/median/P75 monthly rent from returned comparable rent per square foot. It requires at least five comparables with both rent and area, shows comp recency and distance, keeps the provider's 85% range separate and never inserts the ACS cluster rent into underwriting. The remaining listing-score precision improvement is a local matched sale cohort; citywide property-type median asking price per square foot is still too coarse for heterogeneous metros.
 
 ### ATTOM outputs
 
@@ -108,7 +109,7 @@ Feature treatment:
 
 ### Production champion now
 
-Keep v3.0 as the explainable champion while data collection improves. Its output should remain a range with a gate, never a single authoritative number.
+Keep v3.1 as the explainable champion while data collection improves. Its output should remain a range with a gate, never a single authoritative number.
 
 ### First challenger: CatBoost or LightGBM quantile ensemble
 
@@ -149,6 +150,7 @@ IAAO's [Standard on Ratio Studies](https://www.iaao.org/wp-content/uploads/Stand
 | ACS/TIGER | Versioned official release | On release | Never imply five-year estimates are current monthly facts |
 | FHFA HPI | Versioned official series | Quarterly metro / annual tract | Fall back from tract to metro only with an explicit geography badge |
 | RentCast listings | On-demand, six-hour market cache | Request-time | Keep map shell; show provider error; do not substitute stale listings silently |
+| RentCast property rent | One explicit AVM call, 15-minute private cache | Underwriting request | Require subject attributes and at least five usable rent/sf comps; leave rent blank otherwise |
 | ATTOM core | On-demand, 30-day success cache | Property request | Return module-level unavailable/no-result/error state |
 | ATTOM full | Explicit user action, max six counted responses | Diligence only | Never schedule; retain privacy-reduced fields only |
 | Crime/open safety | Local official adapters | Source-specific | Context unavailable; never impute a national average into a neighborhood |
@@ -185,7 +187,7 @@ Automatic downgrade to `watch` when freshness or coverage crosses its threshold.
 ### Next 30 days
 
 - Keep Raleigh as the principal live MVP and Chicago as a watch-market scale test.
-- Diagnose Philadelphia by property type, price quartile, deed/sale qualification and geography before changing model weights.
+- Acquire point-in-time permit, renovation and property-condition evidence for Philadelphia; do not tune weights against the remaining comparable-only error tail.
 - Build timestamped property identity and listing-to-parcel match tables.
 - Replace citywide type PPSF with local matched listing cohorts.
 - Measure ATTOM core match/completeness on a small stratified cached sample per market; do not infer national coverage from the six-address test.
@@ -196,7 +198,7 @@ Automatic downgrade to `watch` when freshness or coverage crosses its threshold.
 - Expand qualified transaction history to at least 5,000 rows in the first challenger market.
 - Add spatial-temporal fold generation and conformal interval evaluation.
 - Train CatBoost, LightGBM quantile and TabPFN offline challengers against the same frozen split.
-- Add rental-unit matching and a real rent-comps interval before relying on cap rate or cash-on-cash outputs.
+- Backtest the new property rent/sf interval against subsequently observed leases before treating cap rate or cash-on-cash outputs as validated forecasts.
 - Version features, data dictionaries, licensing terms and model cards.
 
 ### Days 61–90
@@ -210,4 +212,4 @@ Automatic downgrade to `watch` when freshness or coverage crosses its threshold.
 
 The right near-term product is not “AI predicts which neighborhood will win.” It is “BORO makes heterogeneous real-estate evidence comparable, exposes uncertainty and failure modes, and tells the user exactly what must be verified next.”
 
-Version 3.0 moves the implementation materially closer to that standard. Raleigh is the strongest property-level pilot. Chicago is a valuable small-sample watch case. Philadelphia should remain visibly compromised until the data-generating process is understood. Cutting-edge models should enter as controlled challengers, not as marketing replacements for validation.
+Version 3.1 moves the implementation materially closer to that standard. Raleigh is the strongest property-level pilot. Chicago is a valuable small-sample watch case. Philadelphia remains visibly compromised after principled remediation because the public data still lacks point-in-time condition and renovation quality. Cutting-edge models should enter as controlled challengers, not as marketing replacements for validation.

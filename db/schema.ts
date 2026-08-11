@@ -1,4 +1,4 @@
-import { index, integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { index, integer, real, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 export const reviewFeedback = sqliteTable("review_feedback", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -41,4 +41,28 @@ export const attomEnrichment = sqliteTable("attom_enrichment", {
   index("idx_attom_enrichment_market").on(table.marketId),
   index("idx_attom_enrichment_expiry").on(table.expiresAt),
   index("idx_attom_enrichment_property").on(table.propertyId),
+]);
+
+export const userProfiles = sqliteTable("user_profiles", {
+  userId: text("user_id").primaryKey(),
+  email: text("email").notNull(),
+  displayName: text("display_name").notNull(),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+
+export const userFavorites = sqliteTable("user_favorites", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => userProfiles.userId, { onDelete: "cascade" }),
+  targetType: text("target_type", { enum: ["area", "property"] }).notNull(),
+  targetId: text("target_id").notNull(),
+  targetName: text("target_name").notNull(),
+  marketId: text("market_id"),
+  snapshotJson: text("snapshot_json").notNull().default("{}"),
+  notes: text("notes"),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+}, (table) => [
+  uniqueIndex("idx_user_favorites_owner_target").on(table.userId, table.targetType, table.targetId),
+  index("idx_user_favorites_owner_created").on(table.userId, table.createdAt),
 ]);
