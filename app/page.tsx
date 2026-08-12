@@ -41,6 +41,7 @@ const FACTORS: Array<{ key: keyof FactorWeights; label: string; description: str
 ];
 
 type ProductView = "overview" | "explore" | "areas" | "underwrite" | "properties" | "portfolio" | "coverage" | "feedback";
+type PropertyStage = "live" | "decision" | "models" | "evidence";
 
 const PRODUCT_TABS: Array<{ id: ProductView; label: string; purpose: string; boundary: string; hash: string }> = [
   { id: "overview", label: "Overview", purpose: "Understand the evidence workflow and where each decision belongs.", boundary: "Orientation only—no market or property conclusion is made here.", hash: "#overview" },
@@ -52,6 +53,32 @@ const PRODUCT_TABS: Array<{ id: ProductView; label: string; purpose: string; bou
   { id: "coverage", label: "Data Coverage", purpose: "See feature availability, expansion waves, source quality and known gaps.", boundary: "A market appears only where the selected feature has current usable data.", hash: "#availability" },
   { id: "feedback", label: "Give Feedback", purpose: "Share a short, private review of the MVP after exploring the workflow.", boundary: "Comments are product research, not an investment recommendation or mailing-list signup.", hash: "#feedback" },
 ];
+
+const JOURNEY_STEPS: Array<{ id: "discover" | "evaluate" | "underwrite" | "monitor"; label: string; short: string; view: ProductView }> = [
+  { id: "discover", label: "Discover markets", short: "Discover", view: "explore" },
+  { id: "evaluate", label: "Evaluate properties", short: "Evaluate", view: "properties" },
+  { id: "underwrite", label: "Underwrite a deal", short: "Underwrite", view: "underwrite" },
+  { id: "monitor", label: "Monitor a portfolio", short: "Monitor", view: "portfolio" },
+];
+
+const NEXT_VIEW: Record<ProductView, { view: ProductView; label: string }> = {
+  overview: { view: "explore", label: "Start market research" },
+  explore: { view: "areas", label: "Review ranked areas" },
+  areas: { view: "properties", label: "Evaluate properties" },
+  properties: { view: "underwrite", label: "Underwrite a deal" },
+  underwrite: { view: "portfolio", label: "Add to portfolio lab" },
+  portfolio: { view: "feedback", label: "Share product feedback" },
+  coverage: { view: "explore", label: "Return to research" },
+  feedback: { view: "overview", label: "Return to overview" },
+};
+
+function journeyStepFor(view: ProductView) {
+  if (["overview", "explore", "areas", "coverage"].includes(view)) return 0;
+  if (view === "properties") return 1;
+  if (view === "underwrite") return 2;
+  if (view === "portfolio") return 3;
+  return -1;
+}
 
 function viewFromHash(hash: string): ProductView {
   if (["#workspace"].includes(hash)) return "explore";
@@ -144,6 +171,7 @@ export default function Home() {
   const [selectedTractId, setSelectedTractId] = useState<string | null>(null);
   const [showAllTracts, setShowAllTracts] = useState(false);
   const [tractScope, setTractScope] = useState<"cluster" | "city" | "market">("cluster");
+  const [propertyStage, setPropertyStage] = useState<PropertyStage>("live");
 
   const baseMarket = MARKET_EXPLORERS.find((item) => item.id === selectedMarketId) ?? MARKET_EXPLORERS[0];
   const scoredClusters = useMemo(() => baseMarket.neighborhoods
@@ -220,6 +248,8 @@ export default function Home() {
   const connectedSourceMarketIds = Array.from(new Set(sourceRegistry.sources.flatMap((item) => item.marketIds)));
   const visibleSources = sourceRegistry.sources.filter((item) => item.marketIds.includes(sourceMarketId));
   const activeTab = PRODUCT_TABS.find((item) => item.id === activeView) ?? PRODUCT_TABS[0];
+  const activeJourneyStep = journeyStepFor(activeView);
+  const nextView = NEXT_VIEW[activeView];
 
   useEffect(() => {
     const syncHash = () => { setActiveView(viewFromHash(window.location.hash)); window.scrollTo({ top: 0 }); };
@@ -310,15 +340,23 @@ export default function Home() {
 
   return (
     <main id="top">
+      <a className="skip-link" href="#main-workspace">Skip to workspace</a>
       <header className="topbar product-topbar">
-        <a className="brand" href="#overview" aria-label="BORO home" onClick={() => setActiveView("overview")}><span>BORO</span></a>
+        <a className="brand" href="#overview" aria-label="BORO home" onClick={() => selectView("overview")}><span>BORO</span></a>
         <span className="product-label">Real Estate Intelligence</span>
         <label className="global-market-picker"><span>Market</span><select value={market.id} onChange={(event) => chooseMarket(event.target.value)}>{MARKET_EXPLORERS.map((item) => <option key={item.id} value={item.id}>{item.metro.short}</option>)}</select></label>
-        <nav className="product-tabs" aria-label="Product features">{PRODUCT_TABS.map((tab) => <button key={tab.id} aria-pressed={activeView === tab.id} className={activeView === tab.id ? "active" : ""} onClick={() => selectView(tab.id)}>{tab.label}</button>)}</nav>
-        <a className="profile-entry" href="/profile" aria-label="Open saved research profile"><span aria-hidden="true">♡</span> Saved</a>
+        <nav className="product-tabs" aria-label="Research journey">{JOURNEY_STEPS.map((step, index) => <button key={step.id} aria-current={activeJourneyStep === index ? "page" : undefined} className={activeJourneyStep === index ? "active" : ""} onClick={() => selectView(step.view)}><span>{String(index + 1).padStart(2, "0")}</span>{step.short}</button>)}</nav>
+        <details className="product-utility"><summary aria-label="Open supporting tools">More</summary><div><button onClick={() => selectView("coverage")}>Data & methodology</button><button onClick={() => selectView("feedback")}>Give Feedback</button><a href="/profile" aria-label="Open saved research profile">Saved research</a></div></details>
       </header>
 
-      <div className="workspace-guide"><div><span>Active product feature</span><b>{activeTab.label}</b></div><p><strong>Use it to:</strong> {activeTab.purpose}</p><p><strong>Decision boundary:</strong> {activeTab.boundary}</p></div>
+      <div className="research-context" id="main-workspace">
+        <nav aria-label="Current workspace views">
+          {activeJourneyStep === 0 ? <>{([['overview','Brief'],['explore','Map & clusters'],['areas','Top areas']] as const).map(([id, label]) => <button key={id} aria-current={activeView === id ? "page" : undefined} onClick={() => selectView(id)}>{label}</button>)}</> : <span>{activeJourneyStep >= 0 ? `Step ${activeJourneyStep + 1} of 4` : "Supporting tool"}</span>}
+        </nav>
+        <div className="research-selection"><span>Current context</span><b>{activeTab.label} · {market.metro.short}</b><small>{activeTab.purpose}</small></div>
+        <details className="decision-boundary"><summary>Decision boundary</summary><p>{activeTab.boundary}</p></details>
+        <button className="next-action" onClick={() => selectView(nextView.view)}>{nextView.label}<span aria-hidden="true">→</span></button>
+      </div>
 
       <div className={`product-view ${activeView === "overview" ? "active" : ""}`} aria-hidden={activeView !== "overview"}>
       <section className="product-hero">
@@ -337,15 +375,14 @@ export default function Home() {
       </section>
 
       <section className="product-overview" id="overview">
-        <div className="section-title"><div><p className="eyebrow">PRODUCT OVERVIEW · FROM SIGNAL TO MEMO</p><h2>One workflow.<br />Five explicit decisions.</h2></div><p>BORO is an evidence-first screening and underwriting workbench. It helps an investor narrow markets, inspect local fundamentals, challenge a property value, model an actual deal and document why it should advance—or stop.</p></div>
+        <div className="section-title"><div><p className="eyebrow">PRODUCT OVERVIEW · FROM SIGNAL TO MEMO</p><h2>One workflow.<br />Four clear stages.</h2></div><p>BORO is an evidence-first screening and underwriting workbench. It helps an investor narrow markets, inspect local fundamentals, challenge a property value, model an actual deal and document why it should advance—or stop.</p></div>
         <div className="product-journey">
-          <article><span>01</span><b>Configure</b><p>Choose a growth, income, balanced or value-add lens. The active weights and hurdles stay visible.</p><a href="#workspace">Set the market lens →</a></article>
-          <article><span>02</span><b>Rank</b><p>Compare 97 tract clusters on demographic, economic, education, housing and measured price momentum.</p><a href="#leaders">Review local leaders →</a></article>
-          <article><span>03</span><b>Audit</b><p>Carry source coverage, model validation, local safety context and uncertainty with every signal. Weak evidence lowers competency.</p><a href="#quality">Inspect controls →</a></article>
-          <article><span>04</span><b>Cross-check</b><p>Compare qualified sales, assessments, matched comps and an independent vendor AVM without hiding disagreement.</p><a href="#valuation">Open valuation lab →</a></article>
-          <article><span>05</span><b>Decide</b><p>Enter the actual price and operations. Advance only when evidence, price, yield, debt and cash gates agree.</p><a href="#decision-studio">Build a decision memo →</a></article>
+          <article><span>01</span><b>Discover</b><p>Choose a market lens, compare local clusters and understand what creates the signal.</p><a href="#workspace">Open market research →</a></article>
+          <article><span>02</span><b>Evaluate</b><p>Move a short list into property facts, listing evidence and independent valuation checks.</p><a href="#valuation">Review opportunities →</a></article>
+          <article><span>03</span><b>Underwrite</b><p>Use subject-specific rent, price, operating costs and financing to build a decision memo.</p><a href="#decision-studio">Test a deal →</a></article>
+          <article><span>04</span><b>Monitor</b><p>Save the thesis, inspect concentration and pressure-test a hypothetical portfolio.</p><a href="#portfolio">Open portfolio lab →</a></article>
         </div>
-        <div className="evidence-ladder"><div><p className="eyebrow">EVIDENCE LADDER</p><h3>Each layer answers a different question.</h3></div><ol><li><b>National fundamentals</b><span>Which metros deserve attention?</span></li><li><b>Local history</b><span>Which tract clusters show measured momentum?</span></li><li><b>Property context</b><span>What traded, and what local incidents were reported?</span></li><li><b>Independent AVM</b><span>Does a separate model corroborate the range?</span></li><li><b>Live deal facts</b><span>Does the actual price, rent and cost structure work?</span></li></ol></div>
+        <details className="evidence-ladder"><summary><span><small>EVIDENCE LADDER</small><b>See how every layer supports the decision</b></span><i>Expand</i></summary><ol><li><b>National fundamentals</b><span>Which metros deserve attention?</span></li><li><b>Local history</b><span>Which tract clusters show measured momentum?</span></li><li><b>Property context</b><span>What traded, and what local incidents were reported?</span></li><li><b>Independent AVM</b><span>Does a separate model corroborate the range?</span></li><li><b>Live deal facts</b><span>Does the actual price, rent and cost structure work?</span></li></ol></details>
         <div className="product-boundaries"><b>Decision boundaries</b><span>A cluster score is not a property forecast.</span><span>An assessment gap is not acquisition edge.</span><span>Evidence quality is not a probability of profit.</span><span>A scenario is not investment or appraisal advice.</span></div>
       </section>
       </div>
@@ -477,8 +514,10 @@ export default function Home() {
       <div className={`product-view ${activeView === "properties" ? "active" : ""}`} aria-hidden={activeView !== "properties"}>
       <section className="valuation-section" id="valuation">
         <div className="section-title"><div><p className="eyebrow">PROPERTY VALUATION LAB · MODEL V3.1</p><h2>Cross-check the property.<br />Keep the uncertainty.</h2></div><p>Qualified recorded sales, effective-dated assessments, building facts and FHFA tract-cluster history resolve to individual properties in three high-intent corridors. Version 3.1 adds leakage-safe Philadelphia assessment cohorts and more local subtype/ZIP comparable pools while keeping the region fail-closed because out-of-time error remains too high.</p></div>
-        <MarketListingPilot />
-        <RaleighDecisionLoop />
+        <nav className="property-stage-nav" aria-label="Property evaluation stages">{([['live','Live opportunities','Map and compare connected listings'],['decision','Decision loop','Validate a short list before underwriting'],['models','Public models','Inspect recorded-sale model ranges'],['evidence','Evidence stack','Audit vendors, sources and methodology']] as const).map(([id, label, description], index) => <button key={id} className={propertyStage === id ? "active" : ""} aria-current={propertyStage === id ? "step" : undefined} onClick={() => setPropertyStage(id)}><span>{String(index + 1).padStart(2, '0')}</span><b>{label}</b><small>{description}</small></button>)}</nav>
+        <div className={`property-stage-panel ${propertyStage === "live" ? "active" : ""}`} aria-hidden={propertyStage !== "live"}><MarketListingPilot /></div>
+        <div className={`property-stage-panel ${propertyStage === "decision" ? "active" : ""}`} aria-hidden={propertyStage !== "decision"}><RaleighDecisionLoop /></div>
+        <div className={`property-stage-panel ${propertyStage === "models" ? "active" : ""}`} aria-hidden={propertyStage !== "models"}>
         <div className="valuation-channel-heading"><div><p className="eyebrow">SEPARATE CHANNEL · RECORDED PUBLIC DATA</p><h3>Historical model library</h3></div><p>These controls change the public-record table below. The live-listing screen above now covers Raleigh, Chicago and Philadelphia; the historical library preserves each region’s recorded evidence and out-of-time error separately.</p></div>
         <div className="valuation-readiness">
           {liveValuationMarkets.map((item) => <button key={item.id} className={valuationMarket === item.id ? "active" : ""} onClick={() => { setValuationMarket(item.id); setSelectedPropertyId(null); }}><span>PUBLIC RECORD MODEL · {"decisionUse" in item ? item.decisionUse : "gap"}</span><b>{item.label}</b><i>{item.competency}% integrated competency</i><small>{"sourceCompetency" in item ? `${item.sourceCompetency}% source · ${item.modelCompetency}% model · ${item.diagnostics?.sampleSize ?? 0} leakage-controlled tests` : ""}</small></button>)}
@@ -503,11 +542,14 @@ export default function Home() {
             <div className="valuation-links"><a className="print-report-link" href={`/report?type=property&id=${encodeURIComponent(selectedProperty.id)}`} target="_blank" rel="noreferrer">Print 2-page property report →</a><a href={selectedProperty.sourceUrl} target="_blank" rel="noreferrer">Open official source →</a><a href={`https://www.google.com/maps/search/?api=1&query=${selectedProperty.lat},${selectedProperty.lng}`} target="_blank" rel="noreferrer">Open in Google Maps →</a><a href={`/api/valuation/properties/${selectedProperty.id}`} target="_blank" rel="noreferrer">Open model JSON →</a></div>
           </article>}
         </div> : <article className="valuation-gap-card"><p className="eyebrow">PRINCIPAL GAP</p><h3>{valuationMarketMeta.label}</h3><p>{valuationMarketMeta.gap}</p><b>The market remains in the neighborhood leaderboard, but property sorting is intentionally disabled until a reusable sale-price source or licensed vendor connection is verified.</b></article>}
+        </div>
+        <div className={`property-stage-panel ${propertyStage === "evidence" ? "active" : ""}`} aria-hidden={propertyStage !== "evidence"}>
         <div className="provider-heading"><div><p className="eyebrow">INDEPENDENT CROSS-REFERENCE STACK</p><h3>Agreement matters more than another opaque average.</h3></div><p>Public records establish the factual base. Aggregate market series check direction. Paid AVMs and MLS listings remain separate evidence channels so correlated estimates do not masquerade as independent confirmation.</p></div>
         <div className="provider-grid">{propertyValuations.providers.map((provider) => <a key={provider.id} href={provider.url} target="_blank" rel="noreferrer"><span className={`provider-status ${provider.status}`}>{provider.status.replace("-", " ")}</span><b>{provider.name}</b><small>{provider.layer}</small><p>{provider.scope}</p><i>{provider.independence}</i></a>)}</div>
         <AttomConnector />
         <AttomMarketAudit />
         <div className="valuation-method"><span><b>Model center</b>{propertyValuations.methodology.value}</span><span><b>Validation</b>{propertyValuations.methodology.validation}</span><span><b>Uncertainty</b>{propertyValuations.methodology.range}</span><span><b>Sorting</b>{propertyValuations.methodology.watchScore}</span><span><b>Hard boundary</b>{propertyValuations.methodology.boundary}</span></div>
+        </div>
       </section>
       </div>
 
