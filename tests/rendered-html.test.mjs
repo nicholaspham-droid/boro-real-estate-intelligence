@@ -158,7 +158,14 @@ test("private review gate rejects unknown visitors and issues an HttpOnly review
   const cookie = setCookie.split(";")[0];
   const showcase = await worker.fetch(new Request("http://localhost/showcase", { headers: { Cookie: cookie, accept: "text/html" } }), protectedEnv, ctx);
   assert.equal(showcase.status, 200);
-  assert.match(await showcase.text(), /CAPABILITY PREVIEW/);
+  const showcaseHtml = await showcase.text();
+  assert.match(showcaseHtml, /THE PRODUCT IN THREE MOVES/);
+  assert.match(showcaseHtml, /THREE MARKET CASES/);
+  assert.match(showcaseHtml, /New York/);
+  assert.match(showcaseHtml, /Raleigh/);
+  assert.match(showcaseHtml, /Chicago/);
+  assert.doesNotMatch(showcaseHtml, /Four business cases/);
+  assert.doesNotMatch(showcaseHtml, /Northwest Arkansas/);
   assert.match(showcase.headers.get("x-robots-tag"), /noindex/);
 
   const workspaceRedirect = await worker.fetch(new Request("http://localhost/", { headers: { Cookie: cookie }, redirect: "manual" }), protectedEnv, ctx);
@@ -167,6 +174,8 @@ test("private review gate rejects unknown visitors and issues an HttpOnly review
 
   const ownerApiLocked = await worker.fetch(new Request("http://localhost/api/property-data/health", { headers: { Cookie: cookie } }), protectedEnv, ctx);
   assert.equal(ownerApiLocked.status, 403);
+  const profileAuthLocked = await worker.fetch(new Request("http://localhost/api/auth/config", { headers: { Cookie: cookie } }), protectedEnv, ctx);
+  assert.equal(profileAuthLocked.status, 403);
 });
 
 test("owner second factor unlocks the internal workspace and experimental APIs", async () => {

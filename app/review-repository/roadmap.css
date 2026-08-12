@@ -1,0 +1,41 @@
+.feedback-repository > header nav { display: flex; gap: 14px; margin-left: 12px; }
+.feedback-repository > header nav a { color: #65737d; font-size: 7px; letter-spacing: .06em; text-transform: uppercase; }
+.roadmap-notebook { padding: 70px 5vw; border-bottom: 1px solid #c4c9c3; background: #e6e9e1; }
+.roadmap-compose { padding: 25px; border: 1px solid #c2c8c1; background: #fff; }
+.roadmap-compose > div { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.roadmap-compose > div:last-of-type { grid-template-columns: 130px 130px 150px 1fr; align-items: end; }
+.roadmap-compose label,.roadmap-card-editor label,.roadmap-card-controls label { display: grid; gap: 6px; margin-bottom: 14px; color: #6f7c85; font-size: 7px; font-weight: 900; text-transform: uppercase; }
+.roadmap-compose input,.roadmap-compose textarea,.roadmap-compose select,.roadmap-card-editor input,.roadmap-card-editor textarea,.roadmap-card-controls select { width: 100%; border: 1px solid #bdc4bd; background: #fbfaf6; color: #071a38; font: inherit; font-size: 10px; text-transform: none; }
+.roadmap-compose input,.roadmap-compose select,.roadmap-card-editor input,.roadmap-card-controls select { height: 42px; padding: 0 11px; }
+.roadmap-compose textarea,.roadmap-card-editor textarea { min-height: 82px; padding: 11px; resize: vertical; }
+.roadmap-compose button { height: 42px; border: 0; background: #071a38; color: #fff; font-size: 8px; font-weight: 900; text-transform: uppercase; }
+.roadmap-compose > p { min-height: 16px; margin: 9px 0 0; color: #66737c; font-size: 8px; }
+.roadmap-lanes { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-top: 24px; }
+.roadmap-lanes > section { min-width: 0; border: 1px solid #c2c8c1; background: #f3f0e7; }
+.roadmap-lanes > section > header { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid #c2c8c1; }
+.roadmap-lanes > section > header b { font-size: 9px; text-transform: uppercase; }
+.roadmap-lanes > section > header span { display: grid; width: 22px; height: 22px; place-items: center; border-radius: 50%; background: #071a38; color: #fff; font-size: 8px; }
+.roadmap-lanes > section > div { display: grid; gap: 10px; padding: 10px; }
+.roadmap-card { padding: 16px; border-left: 4px solid #97a0a5; background: #fff; }
+.roadmap-card.priority-high { border-left-color: #e36e5f; }
+.roadmap-card.priority-medium { border-left-color: #d7a73d; }
+.roadmap-card.priority-low { border-left-color: #77a313; }
+.roadmap-card > header { display: flex; justify-content: space-between; gap: 12px; color: #71808a; font-size: 7px; text-transform: uppercase; }
+.roadmap-card > header b { color: #071a38; }
+.roadmap-card h3 { margin: 13px 0 8px; font-size: 17px; line-height: 1.15; }
+.roadmap-card > p { margin: 0; color: #53616b; font-size: 9px; line-height: 1.55; white-space: pre-wrap; }
+.roadmap-next { display: grid; gap: 5px; margin-top: 14px; padding: 11px; background: #eaf1d9; }
+.roadmap-next b { font-size: 7px; text-transform: uppercase; }
+.roadmap-next span { color: #394750; font-size: 8px; line-height: 1.45; }
+.roadmap-card-controls { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; margin-top: 16px; }
+.roadmap-card-controls label { margin: 0; }
+.roadmap-card-controls select { height: 34px; padding: 0 6px; font-size: 8px; }
+.roadmap-card > footer { display: flex; justify-content: space-between; gap: 10px; align-items: center; margin-top: 14px; padding-top: 11px; border-top: 1px solid #d8dcd7; }
+.roadmap-card > footer small { color: #7b878f; font-size: 7px; }
+.roadmap-card > footer div { display: flex; gap: 4px; }
+.roadmap-card > footer button { padding: 7px 8px; border: 1px solid #c2c8c1; background: #f4f2eb; color: #071a38; font-size: 7px; font-weight: 900; text-transform: uppercase; }
+.roadmap-card > footer .roadmap-remove { color: #9a4239; }
+.roadmap-card-editor { margin-top: 13px; }
+.roadmap-empty { margin: 0; padding: 28px 14px; color: #7b878f; font-size: 8px; text-align: center; }
+@media(max-width:1000px){.roadmap-lanes{grid-template-columns:1fr}.roadmap-compose>div:last-of-type{grid-template-columns:1fr 1fr}}
+@media(max-width:650px){.feedback-repository>header nav{display:none}.roadmap-notebook{padding:50px 5vw}.roadmap-compose>div,.roadmap-compose>div:last-of-type,.roadmap-card-controls{grid-template-columns:1fr}.roadmap-card>footer{align-items:flex-start;flex-direction:column}.roadmap-card>footer div{flex-wrap:wrap}}

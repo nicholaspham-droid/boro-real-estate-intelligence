@@ -938,6 +938,9 @@ const FEEDBACK_BUCKETS = [
 const FEEDBACK_BUCKET_IDS = new Set<string>(FEEDBACK_BUCKETS.map((item) => item.id));
 const FEEDBACK_STATUSES = new Set(["new", "reviewing", "actioned", "closed"]);
 const FEEDBACK_LANES = new Set(["untriaged", "model_review", "data_pipeline", "product_ux", "engineering", "product_strategy"]);
+const ROADMAP_PRIORITIES = new Set(["high", "medium", "low"]);
+const ROADMAP_STATUSES = new Set(["idea", "researching", "building", "validating", "ready"]);
+const ROADMAP_HORIZONS = new Set(["now", "next", "later"]);
 
 function cookieValue(request: Request, name: string) {
   const cookie = request.headers.get("Cookie") ?? "";
@@ -1025,6 +1028,14 @@ function feedbackAdminEmailAuthorized(request: Request, env: Env) {
   const expected = env.FEEDBACK_ADMIN_EMAIL?.trim().toLowerCase() ?? "";
   const supplied = request.headers.get("oai-authenticated-user-email")?.trim().toLowerCase() ?? "";
   return Boolean(expected && supplied && safeEqual(supplied, expected));
+}
+
+function roadmapNoteFromRow(row: Record<string, unknown>) {
+  return {
+    id: String(row.id), ownerKey: String(row.owner_key), title: String(row.title), businessCase: String(row.business_case),
+    notes: String(row.notes), nextAction: row.next_action ? String(row.next_action) : null, priority: String(row.priority),
+    status: String(row.status), horizon: String(row.horizon), createdAt: String(row.created_at), updatedAt: String(row.updated_at),
+  };
 }
 
 type ProfileIdentity = {
@@ -1319,6 +1330,16 @@ const worker = {
       return Response.json({ ok: true }, { headers: { "Cache-Control": "no-store", "Set-Cookie": `${FEEDBACK_ADMIN_COOKIE}=${encodeURIComponent(token)}; Path=/; Max-Age=1209600; HttpOnly; Secure; SameSite=Lax` } });
     }
 
+    if (url.pathname.startsWith("/api/auth/") && env.REVIEW_PASSWORD) {
+      const expected = await reviewToken(env.REVIEW_PASSWORD);
+      if (!safeEqual(reviewCookieValue(request), expected)) {
+        return Response.json({ error: "Private review authentication required." }, { status: 401, headers: gatedResponseHeaders() });
+      }
+      if (!(await ownerWorkspaceAuthorized(request, env))) {
+        return Response.json({ error: "Owner workspace authorization required.", access: "reviewer", available: "/showcase" }, { status: 403, headers: gatedResponseHeaders() });
+      }
+    }
+
     if (url.pathname === "/api/auth/config") {
       if (request.method !== "GET") return Response.json({ error: "Method not allowed" }, { status: 405 });
       return Response.json({ configured: Boolean(env.GOOGLE_OAUTH_CLIENT_ID && env.AUTH_SESSION_SECRET), googleClientId: env.GOOGLE_OAUTH_CLIENT_ID || null }, { headers: { "Cache-Control": "public, max-age=300" } });
@@ -1343,8 +1364,8 @@ const worker = {
       return Response.json({ ok: true }, { headers: { "Cache-Control": "no-store", "Set-Cookie": `${PROFILE_SESSION_COOKIE}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax` } });
     }
 
-    const isFeedbackRepository = url.pathname === "/review-repository" || url.pathname.startsWith("/review-repository/") || url.pathname === "/api/review/admin/login" || url.pathname === "/api/review/repository" || url.pathname.startsWith("/api/review/repository/");
-    const isPlatformAuthPath = url.pathname === "/signin-with-chatgpt" || url.pathname === "/signout-with-chatgpt" || url.pathname === "/callback" || url.pathname.startsWith("/api/auth/");
+    const isFeedbackRepository = url.pathname === "/review-repository" || url.pathname.startsWith("/review-repository/") || url.pathname === "/api/review/admin/login" || url.pathname === "/api/review/repository" || url.pathname.startsWith("/api/review/repository/") || url.pathname === "/api/review/roadmap" || url.pathname.startsWith("/api/review/roadmap/");
+    const isPlatformAuthPath = url.pathname === "/signin-with-chatgpt" || url.pathname === "/signout-with-chatgpt" || url.pathname === "/callback";
     if (env.REVIEW_PASSWORD && !isFeedbackRepository && !isPlatformAuthPath && !url.pathname.startsWith("/_next/") && !url.pathname.startsWith("/favicon") && url.pathname !== "/robots.txt") {
       const expected = await reviewToken(env.REVIEW_PASSWORD);
       const authenticated = safeEqual(reviewCookieValue(request), expected);
@@ -1369,6 +1390,75 @@ const worker = {
         console.error(JSON.stringify({ event: "profile_api_error", path: url.pathname, message: error instanceof Error ? error.message : String(error) }));
         return Response.json({ error: "Profile storage is temporarily unavailable." }, { status: 500, headers: { "Cache-Control": "private, no-store" } });
       }
+    }
+
+    if (url.pathname === "/api/review/roadmap" || url.pathname.startsWith("/api/review/roadmap/")) {
+      if (!env.FEEDBACK_ADMIN_PASSWORD || !env.FEEDBACK_ADMIN_EMAIL) return Response.json({ error: "Owner roadmap access is not configured." }, { status: 503 });
+      if (!feedbackAdminEmailAuthorized(request, env)) return Response.json({ error: "Approved ChatGPT owner authentication required." }, { status: 403, headers: { "Cache-Control": "no-store" } });
+      const expectedAdmin = await feedbackAdminToken(env.FEEDBACK_ADMIN_PASSWORD);
+      if (!safeEqual(cookieValue(request, FEEDBACK_ADMIN_COOKIE), expectedAdmin)) return Response.json({ error: "Owner workspace authentication required." }, { status: 401, headers: { "Cache-Control": "no-store" } });
+      if (!env.DB) return Response.json({ error: "Roadmap storage is not configured." }, { status: 503 });
+      if (!["GET", "HEAD"].includes(request.method) && !profileWriteAllowed(request)) return Response.json({ error: "Cross-origin roadmap writes are not allowed." }, { status: 403, headers: { "Cache-Control": "no-store" } });
+      const ownerKey = env.FEEDBACK_ADMIN_EMAIL.trim().toLowerCase();
+
+      if (url.pathname === "/api/review/roadmap" && request.method === "GET") {
+        const result = await env.DB.prepare(`SELECT id, owner_key, title, business_case, notes, next_action, priority, status, horizon, created_at, updated_at
+          FROM roadmap_notes WHERE owner_key = ?
+          ORDER BY CASE horizon WHEN 'now' THEN 0 WHEN 'next' THEN 1 ELSE 2 END, updated_at DESC`)
+          .bind(ownerKey).all() as { results?: Array<Record<string, unknown>> };
+        return Response.json({ notes: (result.results ?? []).map(roadmapNoteFromRow) }, { headers: { "Cache-Control": "private, no-store" } });
+      }
+
+      if (url.pathname === "/api/review/roadmap" && request.method === "POST") {
+        let body: Record<string, unknown>;
+        try { body = await request.json() as Record<string, unknown>; } catch { return Response.json({ error: "Invalid roadmap note." }, { status: 400 }); }
+        const title = limitedText(body.title, 180);
+        const businessCase = limitedText(body.businessCase, 80) || "overall";
+        const notes = limitedText(body.notes, 4000);
+        const nextAction = limitedText(body.nextAction, 1000) || null;
+        const priority = limitedText(body.priority, 20) || "medium";
+        const status = limitedText(body.status, 30) || "idea";
+        const horizon = limitedText(body.horizon, 20) || "next";
+        if (!title || !notes) return Response.json({ error: "A roadmap title and working note are required." }, { status: 400 });
+        if (!ROADMAP_PRIORITIES.has(priority) || !ROADMAP_STATUSES.has(status) || !ROADMAP_HORIZONS.has(horizon)) return Response.json({ error: "Unknown roadmap classification." }, { status: 400 });
+        const id = crypto.randomUUID();
+        const now = new Date().toISOString();
+        await env.DB.prepare(`INSERT INTO roadmap_notes
+          (id, owner_key, title, business_case, notes, next_action, priority, status, horizon, created_at, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+          .bind(id, ownerKey, title, businessCase, notes, nextAction, priority, status, horizon, now, now).run();
+        return Response.json({ note: { id, ownerKey, title, businessCase, notes, nextAction, priority, status, horizon, createdAt: now, updatedAt: now } }, { status: 201, headers: { "Cache-Control": "no-store" } });
+      }
+
+      const noteId = decodeURIComponent(url.pathname.slice("/api/review/roadmap/".length));
+      if (!/^[0-9a-f-]{36}$/i.test(noteId)) return Response.json({ error: "Unknown roadmap note." }, { status: 404, headers: { "Cache-Control": "no-store" } });
+      if (request.method === "DELETE") {
+        const result = await env.DB.prepare("DELETE FROM roadmap_notes WHERE id = ? AND owner_key = ?").bind(noteId, ownerKey).run();
+        if (!result.meta.changes) return Response.json({ error: "Roadmap note not found." }, { status: 404, headers: { "Cache-Control": "no-store" } });
+        return Response.json({ ok: true }, { headers: { "Cache-Control": "no-store" } });
+      }
+      if (request.method === "PATCH") {
+        let body: Record<string, unknown>;
+        try { body = await request.json() as Record<string, unknown>; } catch { return Response.json({ error: "Invalid roadmap update." }, { status: 400 }); }
+        const existing = await env.DB.prepare(`SELECT id, owner_key, title, business_case, notes, next_action, priority, status, horizon, created_at, updated_at
+          FROM roadmap_notes WHERE id = ? AND owner_key = ?`).bind(noteId, ownerKey).first<Record<string, unknown>>();
+        if (!existing) return Response.json({ error: "Roadmap note not found." }, { status: 404, headers: { "Cache-Control": "no-store" } });
+        const current = roadmapNoteFromRow(existing);
+        const title = body.title === undefined ? current.title : limitedText(body.title, 180);
+        const businessCase = body.businessCase === undefined ? current.businessCase : limitedText(body.businessCase, 80);
+        const notes = body.notes === undefined ? current.notes : limitedText(body.notes, 4000);
+        const nextAction = body.nextAction === undefined ? current.nextAction : limitedText(body.nextAction, 1000) || null;
+        const priority = body.priority === undefined ? current.priority : limitedText(body.priority, 20);
+        const status = body.status === undefined ? current.status : limitedText(body.status, 30);
+        const horizon = body.horizon === undefined ? current.horizon : limitedText(body.horizon, 20);
+        if (!title || !businessCase || !notes) return Response.json({ error: "Title, business case and notes cannot be empty." }, { status: 400 });
+        if (!ROADMAP_PRIORITIES.has(priority) || !ROADMAP_STATUSES.has(status) || !ROADMAP_HORIZONS.has(horizon)) return Response.json({ error: "Unknown roadmap classification." }, { status: 400 });
+        const updatedAt = new Date().toISOString();
+        await env.DB.prepare(`UPDATE roadmap_notes SET title = ?, business_case = ?, notes = ?, next_action = ?, priority = ?, status = ?, horizon = ?, updated_at = ?
+          WHERE id = ? AND owner_key = ?`).bind(title, businessCase, notes, nextAction, priority, status, horizon, updatedAt, noteId, ownerKey).run();
+        return Response.json({ note: { ...current, title, businessCase, notes, nextAction, priority, status, horizon, updatedAt } }, { headers: { "Cache-Control": "no-store" } });
+      }
+      return Response.json({ error: "Unknown roadmap operation." }, { status: 405, headers: { "Cache-Control": "no-store" } });
     }
 
     if (url.pathname === "/api/review/repository" || url.pathname.startsWith("/api/review/repository/")) {

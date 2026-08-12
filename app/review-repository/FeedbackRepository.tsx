@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { RoadmapNotebook } from "./RoadmapNotebook";
 
 type Entry = {
   id: number;
@@ -100,8 +101,9 @@ export function FeedbackRepository({ ownerEmail }: { ownerEmail: string }) {
   if (access === "error" || !repository) return <main className="repository-lock"><h1>Repository unavailable.</h1><p>{message}</p><button onClick={() => void load()}>Try again</button></main>;
 
   return <main className="feedback-repository">
-    <header><div><Link href="/">BORO</Link><span>Owner workspace</span></div><button onClick={() => void load()}>Refresh</button></header>
+    <header><div><Link href="/">BORO</Link><span>Owner workspace</span><nav><a href="#roadmap">Roadmap notes</a></nav></div><button onClick={() => void load()}>Refresh feedback</button></header>
     <section className="repository-hero"><div><p>FEEDBACK REPOSITORY · FAILURE-MODE TRIAGE</p><h1>Turn comments into<br />testable decisions.</h1></div><aside><b>Model change rule</b><p>Qualitative feedback creates a review candidate—not a score change. Reproduce the issue, audit the affected data, define a measurable hypothesis, and backtest before changing weights or rankings.</p></aside></section>
+    <RoadmapNotebook />
     <section className="repository-metrics"><article><span>Total responses</span><b>{repository.summary.total}</b></article><article><span>Usefulness</span><b>{repository.summary.averageUsefulness.toFixed(1)}<i>/5</i></b></article><article><span>Evidence trust</span><b>{repository.summary.averageTrust.toFixed(1)}<i>/5</i></b></article><article><span>Workflow clarity</span><b>{repository.summary.averageClarity.toFixed(1)}<i>/5</i></b></article><article className="attention"><span>Model-review candidates</span><b>{repository.summary.modelReviewCount}</b></article><article><span>Would use stronger version</span><b>{repository.summary.wouldUseCount}</b></article></section>
     <section className="failure-buckets"><div className="repository-title"><div><p>FAILURE-MODE BUCKETS</p><h2>Where confidence breaks.</h2></div><span>Click a bucket to filter the review queue.</span></div><div><button className={bucket === "all" ? "active" : ""} onClick={() => setBucket("all")}><b>{repository.summary.total}</b><span>All feedback</span><small>Full repository</small></button>{repository.buckets.map((item) => <button key={item.id} className={bucket === item.id ? "active" : ""} onClick={() => setBucket(item.id)}><b>{item.count}</b><span>{item.label}</span><small>{label(item.lane)}</small></button>)}</div></section>
     <section className="review-queue"><div className="repository-title"><div><p>REVIEW QUEUE</p><h2>{visible.length} matching response{visible.length === 1 ? "" : "s"}</h2></div><div className="repository-filters"><label>Status<select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}><option value="all">All statuses</option>{STATUS_OPTIONS.map((item) => <option key={item} value={item}>{label(item)}</option>)}</select></label><label>Feature<select value={featureFilter} onChange={(event) => setFeatureFilter(event.target.value)}><option value="all">All features</option>{features.map((item) => <option key={item} value={item}>{label(item)}</option>)}</select></label></div></div>

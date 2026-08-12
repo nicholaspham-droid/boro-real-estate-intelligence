@@ -66,3 +66,19 @@ export const userFavorites = sqliteTable("user_favorites", {
   uniqueIndex("idx_user_favorites_owner_target").on(table.userId, table.targetType, table.targetId),
   index("idx_user_favorites_owner_created").on(table.userId, table.createdAt),
 ]);
+
+export const roadmapNotes = sqliteTable("roadmap_notes", {
+  id: text("id").primaryKey(),
+  ownerKey: text("owner_key").notNull(),
+  title: text("title").notNull(),
+  businessCase: text("business_case").notNull().default("overall"),
+  notes: text("notes").notNull(),
+  nextAction: text("next_action"),
+  priority: text("priority", { enum: ["high", "medium", "low"] }).notNull().default("medium"),
+  status: text("status", { enum: ["idea", "researching", "building", "validating", "ready"] }).notNull().default("idea"),
+  horizon: text("horizon", { enum: ["now", "next", "later"] }).notNull().default("next"),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+}, (table) => [
+  index("idx_roadmap_notes_owner_horizon_updated").on(table.ownerKey, table.horizon, table.updatedAt),
+]);
