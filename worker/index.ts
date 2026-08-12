@@ -1008,7 +1008,82 @@ type ProfileIdentity = {
   userId: string;
   email: string;
   displayName: string;
+  provider: "google" | "chatgpt";
 };
+
+type GoogleIdClaims = {
+  sub: string;
+  email: string;
+  email_verified: boolean;
+  name?: string;
+  picture?: string;
+  aud: string;
+  iss: string;
+  exp: number;
+  iat: number;
+};
+
+const PROFILE_SESSION_COOKIE = "boro_profile_session";
+const GOOGLE_CERTS_URL = "https://www.googleapis.com/oauth2/v3/certs";
+const textEncoder = new TextEncoder();
+
+function base64UrlDecode(value: string) {
+  const normalized = value.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(value.length / 4) * 4, "=");
+  const binary = atob(normalized);
+  return Uint8Array.from(binary, (character) => character.charCodeAt(0));
+}
+
+function base64UrlEncode(value: Uint8Array) {
+  let binary = "";
+  for (const byte of value) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
+}
+
+async function hmac(value: string, secret: string) {
+  const key = await crypto.subtle.importKey("raw", textEncoder.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  return new Uint8Array(await crypto.subtle.sign("HMAC", key, textEncoder.encode(value)));
+}
+
+async function profileSessionToken(claims: GoogleIdClaims, env: Env) {
+  const now = Math.floor(Date.now() / 1000);
+  const payload = base64UrlEncode(textEncoder.encode(JSON.stringify({ sub: claims.sub, email: claims.email, name: claims.name || claims.email, provider: "google", iat: now, exp: now + 60 * 60 * 24 * 30 })));
+  return `${payload}.${base64UrlEncode(await hmac(payload, env.AUTH_SESSION_SECRET))}`;
+}
+
+async function googleSessionIdentity(request: Request, env: Env): Promise<ProfileIdentity | null> {
+  if (!env.AUTH_SESSION_SECRET) return null;
+  const token = cookieValue(request, PROFILE_SESSION_COOKIE);
+  const [payload, signature, extra] = token.split(".");
+  if (!payload || !signature || extra) return null;
+  const expected = base64UrlEncode(await hmac(payload, env.AUTH_SESSION_SECRET));
+  if (!safeEqual(signature, expected)) return null;
+  try {
+    const session = JSON.parse(new TextDecoder().decode(base64UrlDecode(payload))) as { sub?: string; email?: string; name?: string; provider?: string; exp?: number };
+    if (!session.sub || !session.email || session.provider !== "google" || !session.exp || session.exp <= Math.floor(Date.now() / 1000)) return null;
+    return { userId: `google:${session.sub}`.slice(0, 240), email: session.email.slice(0, 320), displayName: (session.name || session.email).slice(0, 240), provider: "google" };
+  } catch { return null; }
+}
+
+async function verifyGoogleCredential(credential: string, env: Env): Promise<GoogleIdClaims | null> {
+  if (!env.GOOGLE_OAUTH_CLIENT_ID) return null;
+  const [encodedHeader, encodedPayload, encodedSignature, extra] = credential.split(".");
+  if (!encodedHeader || !encodedPayload || !encodedSignature || extra) return null;
+  let header: { alg?: string; kid?: string }; let claims: GoogleIdClaims;
+  try {
+    header = JSON.parse(new TextDecoder().decode(base64UrlDecode(encodedHeader))) as typeof header;
+    claims = JSON.parse(new TextDecoder().decode(base64UrlDecode(encodedPayload))) as GoogleIdClaims;
+  } catch { return null; }
+  const now = Math.floor(Date.now() / 1000);
+  if (header.alg !== "RS256" || !header.kid || claims.aud !== env.GOOGLE_OAUTH_CLIENT_ID || !["accounts.google.com", "https://accounts.google.com"].includes(claims.iss) || claims.exp <= now || claims.iat > now + 300 || !claims.sub || !claims.email || claims.email_verified !== true) return null;
+  const certsResponse = await fetch(GOOGLE_CERTS_URL, { headers: { Accept: "application/json" }, cf: { cacheTtl: 21600, cacheEverything: true } });
+  if (!certsResponse.ok) return null;
+  const jwks = await certsResponse.json() as { keys?: Array<JsonWebKey & { kid?: string; alg?: string; use?: string }> };
+  const jwk = jwks.keys?.find((key) => key.kid === header.kid && key.alg === "RS256" && key.use === "sig");
+  if (!jwk) return null;
+  const key = await crypto.subtle.importKey("jwk", jwk, { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["verify"]);
+  const verified = await crypto.subtle.verify("RSASSA-PKCS1-v1_5", key, base64UrlDecode(encodedSignature), textEncoder.encode(`${encodedHeader}.${encodedPayload}`));
+  return verified ? claims : null;
+}
 
 type FavoriteRow = {
   id: string;
@@ -1028,7 +1103,7 @@ const FAVORITE_SNAPSHOT_KEYS = new Set([
   "price", "pricePerSqft", "observedAt", "sample", "sourceVersion",
 ]);
 
-function profileIdentity(request: Request): ProfileIdentity | null {
+function chatGPTProfileIdentity(request: Request): ProfileIdentity | null {
   const userId = request.headers.get("oai-authenticated-user-id")?.trim() ?? "";
   const email = request.headers.get("oai-authenticated-user-email")?.trim() ?? "";
   if (!userId || !email) return null;
@@ -1042,7 +1117,12 @@ function profileIdentity(request: Request): ProfileIdentity | null {
     userId: userId.slice(0, 240),
     email: email.slice(0, 320),
     displayName: (fullName || email).slice(0, 240),
+    provider: "chatgpt",
   };
+}
+
+async function profileIdentity(request: Request, env: Env): Promise<ProfileIdentity | null> {
+  return chatGPTProfileIdentity(request) ?? await googleSessionIdentity(request, env);
 }
 
 function profileWriteAllowed(request: Request) {
@@ -1096,8 +1176,8 @@ async function ensureUserProfile(db: D1Database, identity: ProfileIdentity) {
 }
 
 async function profileApi(request: Request, env: Env, url: URL) {
-  const identity = profileIdentity(request);
-  if (!identity) return Response.json({ error: "ChatGPT sign-in required." }, { status: 401, headers: { "Cache-Control": "private, no-store" } });
+  const identity = await profileIdentity(request, env);
+  if (!identity) return Response.json({ error: "Google or ChatGPT sign-in required." }, { status: 401, headers: { "Cache-Control": "private, no-store" } });
   if (!env.DB) return Response.json({ error: "Profile storage is not configured." }, { status: 503, headers: { "Cache-Control": "private, no-store" } });
   if (!["GET", "HEAD"].includes(request.method) && !profileWriteAllowed(request)) {
     return Response.json({ error: "Cross-origin profile writes are not allowed." }, { status: 403, headers: { "Cache-Control": "private, no-store" } });
@@ -1125,6 +1205,7 @@ async function profileApi(request: Request, env: Env, url: URL) {
         areas: favorites.filter((favorite) => favorite.targetType === "area").length,
         properties: favorites.filter((favorite) => favorite.targetType === "property").length,
       },
+      auth: { provider: identity.provider },
     }, { headers: responseHeaders });
   }
 
@@ -1211,8 +1292,32 @@ const worker = {
       return Response.json({ ok: true }, { headers: { "Cache-Control": "no-store", "Set-Cookie": `${FEEDBACK_ADMIN_COOKIE}=${encodeURIComponent(token)}; Path=/; Max-Age=1209600; HttpOnly; Secure; SameSite=Lax` } });
     }
 
+    if (url.pathname === "/api/auth/config") {
+      if (request.method !== "GET") return Response.json({ error: "Method not allowed" }, { status: 405 });
+      return Response.json({ configured: Boolean(env.GOOGLE_OAUTH_CLIENT_ID && env.AUTH_SESSION_SECRET), googleClientId: env.GOOGLE_OAUTH_CLIENT_ID || null }, { headers: { "Cache-Control": "public, max-age=300" } });
+    }
+
+    if (url.pathname === "/api/auth/google") {
+      if (request.method !== "POST") return Response.json({ error: "Method not allowed" }, { status: 405 });
+      if (!profileWriteAllowed(request)) return Response.json({ error: "Cross-origin sign-in is not allowed." }, { status: 403 });
+      if (!env.GOOGLE_OAUTH_CLIENT_ID || !env.AUTH_SESSION_SECRET) return Response.json({ error: "Google sign-in is not configured." }, { status: 503 });
+      let body: { credential?: unknown } = {};
+      try { body = await request.json() as typeof body; } catch { return Response.json({ error: "A Google credential is required." }, { status: 400 }); }
+      const credential = limitedText(body.credential, 10000);
+      const claims = credential ? await verifyGoogleCredential(credential, env) : null;
+      if (!claims) return Response.json({ error: "Google could not verify this account." }, { status: 401, headers: { "Cache-Control": "no-store" } });
+      const token = await profileSessionToken(claims, env);
+      return Response.json({ ok: true }, { headers: { "Cache-Control": "no-store", "Set-Cookie": `${PROFILE_SESSION_COOKIE}=${encodeURIComponent(token)}; Path=/; Max-Age=2592000; HttpOnly; Secure; SameSite=Lax` } });
+    }
+
+    if (url.pathname === "/api/auth/logout") {
+      if (request.method !== "POST") return Response.json({ error: "Method not allowed" }, { status: 405 });
+      if (!profileWriteAllowed(request)) return Response.json({ error: "Cross-origin sign-out is not allowed." }, { status: 403 });
+      return Response.json({ ok: true }, { headers: { "Cache-Control": "no-store", "Set-Cookie": `${PROFILE_SESSION_COOKIE}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax` } });
+    }
+
     const isFeedbackRepository = url.pathname === "/review-repository" || url.pathname.startsWith("/review-repository/") || url.pathname === "/api/review/admin/login" || url.pathname === "/api/review/repository" || url.pathname.startsWith("/api/review/repository/");
-    const isPlatformAuthPath = url.pathname === "/signin-with-chatgpt" || url.pathname === "/signout-with-chatgpt" || url.pathname === "/callback";
+    const isPlatformAuthPath = url.pathname === "/signin-with-chatgpt" || url.pathname === "/signout-with-chatgpt" || url.pathname === "/callback" || url.pathname.startsWith("/api/auth/");
     if (env.REVIEW_PASSWORD && !isFeedbackRepository && !isPlatformAuthPath && !url.pathname.startsWith("/_next/") && !url.pathname.startsWith("/favicon") && url.pathname !== "/robots.txt") {
       const expected = await reviewToken(env.REVIEW_PASSWORD);
       const authenticated = safeEqual(reviewCookieValue(request), expected);

@@ -62,22 +62,38 @@ function createProfileDb() {
   };
 }
 
-test("profile API requires server-provided ChatGPT identity", async () => {
+test("profile API requires a verified Google or ChatGPT identity", async () => {
   const worker = await loadWorker();
   const response = await worker.fetch(new Request("http://localhost/api/profile"), { ASSETS: assets }, ctx);
   assert.equal(response.status, 401);
-  assert.match((await response.json()).error, /ChatGPT sign-in/i);
+  assert.match((await response.json()).error, /Google or ChatGPT sign-in/i);
 });
 
-test("profile page is SIWC-gated and renders the signed-in research workspace", async () => {
+test("profile page stays connected to BORO while account state loads", async () => {
   const worker = await loadWorker();
-  const response = await worker.fetch(new Request("http://localhost/profile", { headers: { accept: "text/html", ...identityHeaders } }), { ASSETS: assets }, ctx);
+  const response = await worker.fetch(new Request("http://localhost/profile", { headers: { accept: "text/html" } }), { ASSETS: assets }, ctx);
   assert.equal(response.status, 200);
   const html = await response.text();
-  assert.match(html, /PERSONAL RESEARCH WORKSPACE/);
-  assert.match(html, /Maya Chen/);
-  assert.match(html, /LIKES \+ FAVORITES/);
-  assert.match(html, /SAMPLE COLLECTION/);
+  assert.match(html, /Back to BORO/);
+  const source = await readFile(new URL("../app/profile/ProfileWorkspace.tsx", import.meta.url), "utf8");
+  assert.match(source, /YOUR RESEARCH, ACROSS DEVICES/);
+  assert.match(source, /Continue with ChatGPT/);
+  assert.match(source, /Continue with Google/);
+});
+
+test("Google auth config fails closed until server credentials are configured", async () => {
+  const worker = await loadWorker();
+  const response = await worker.fetch(new Request("http://localhost/api/auth/config"), { ASSETS: assets }, ctx);
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { configured: false, googleClientId: null });
+});
+
+test("Google profile logout clears only the BORO session cookie", async () => {
+  const worker = await loadWorker();
+  const response = await worker.fetch(new Request("http://localhost/api/auth/logout", { method: "POST", headers: { Origin: "http://localhost" } }), { ASSETS: assets }, ctx);
+  assert.equal(response.status, 200);
+  assert.match(response.headers.get("set-cookie"), /boro_profile_session=;/);
+  assert.match(response.headers.get("set-cookie"), /HttpOnly/);
 });
 
 test("profile API upserts identity and returns only that user’s saved areas and properties", async () => {
@@ -88,6 +104,7 @@ test("profile API upserts identity and returns only that user’s saved areas an
   assert.equal(response.headers.get("cache-control"), "private, no-store");
   const payload = await response.json();
   assert.equal(payload.profile.displayName, "Maya Chen");
+  assert.equal(payload.auth.provider, "chatgpt");
   assert.equal(payload.counts.all, 1);
   assert.equal(payload.counts.areas, 1);
   assert.equal(payload.favorites[0].targetId, "raleigh-west-corridor");

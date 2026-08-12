@@ -347,6 +347,7 @@ export default function Home() {
         <label className="global-market-picker"><span>Market</span><select value={market.id} onChange={(event) => chooseMarket(event.target.value)}>{MARKET_EXPLORERS.map((item) => <option key={item.id} value={item.id}>{item.metro.short}</option>)}</select></label>
         <nav className="product-tabs" aria-label="Research journey">{JOURNEY_STEPS.map((step, index) => <button key={step.id} aria-current={activeJourneyStep === index ? "page" : undefined} className={activeJourneyStep === index ? "active" : ""} onClick={() => selectView(step.view)}><span>{String(index + 1).padStart(2, "0")}</span>{step.short}</button>)}</nav>
         <details className="product-utility"><summary aria-label="Open supporting tools">More</summary><div><button onClick={() => selectView("coverage")}>Data & methodology</button><button onClick={() => selectView("feedback")}>Give Feedback</button><a href="/profile" aria-label="Open saved research profile">Saved research</a></div></details>
+        <a className="profile-entry" href="/profile" aria-label="Open persistent research profile"><span aria-hidden="true">♡</span> Profile</a>
       </header>
 
       <div className="research-context" id="main-workspace">

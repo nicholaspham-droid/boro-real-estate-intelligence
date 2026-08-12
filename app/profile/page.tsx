@@ -1,14 +1,13 @@
-import { chatGPTSignOutPath, requireChatGPTUser } from "../chatgpt-auth";
+import { chatGPTSignOutPath, getChatGPTUser } from "../chatgpt-auth";
 import { ProfileWorkspace } from "./ProfileWorkspace";
 
 export const dynamic = "force-dynamic";
 
 export default async function ProfilePage() {
-  const user = await requireChatGPTUser("/profile");
-
+  const user = await getChatGPTUser();
   return (
     <ProfileWorkspace
-      identity={{ displayName: user.displayName, email: user.email }}
+      initialIdentity={user ? { displayName: user.displayName, email: user.email } : null}
       signOutPath={chatGPTSignOutPath("/")}
     />
   );

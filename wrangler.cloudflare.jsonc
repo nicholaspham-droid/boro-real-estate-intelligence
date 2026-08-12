@@ -40,7 +40,9 @@
       "RENTCAST_API_KEY",
       "REVIEW_PASSWORD",
       "FEEDBACK_ADMIN_PASSWORD",
-      "FEEDBACK_ADMIN_EMAIL"
+      "FEEDBACK_ADMIN_EMAIL",
+      "GOOGLE_OAUTH_CLIENT_ID",
+      "AUTH_SESSION_SECRET"
     ]
   },
   "observability": {

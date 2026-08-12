@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type TargetType = "area" | "property";
 type Snapshot = {
@@ -33,7 +33,16 @@ type ProfilePayload = {
   profile: { displayName: string; email: string; createdAt: string };
   favorites: Favorite[];
   counts: { all: number; areas: number; properties: number };
+  auth: { provider: "google" | "chatgpt" };
 };
+
+type GoogleCredentialResponse = { credential?: string };
+type GoogleIdentityApi = {
+  initialize(config: { client_id: string; callback: (response: GoogleCredentialResponse) => void; auto_select?: boolean; cancel_on_tap_outside?: boolean }): void;
+  renderButton(element: HTMLElement, options: Record<string, string | number>): void;
+};
+
+type GoogleWindow = Window & typeof globalThis & { google?: { accounts?: { id?: GoogleIdentityApi } } };
 
 type SampleFavorite = {
   targetType: TargetType;
@@ -80,22 +89,71 @@ function numberLabel(value: number | undefined) {
   return typeof value === "number" ? value.toLocaleString("en-US") : "—";
 }
 
-export function ProfileWorkspace({ identity, signOutPath }: { identity: { displayName: string; email: string }; signOutPath: string }) {
+function GoogleSignIn({ onAuthenticated }: { onAuthenticated: () => void }) {
+  const buttonRef = useRef<HTMLDivElement>(null);
+  const [state, setState] = useState<"loading" | "ready" | "unavailable" | "error">("loading");
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    async function prepare() {
+      try {
+        const response = await fetch("/api/auth/config", { headers: { Accept: "application/json" } });
+        const config = await response.json() as { googleClientId?: string; configured?: boolean };
+        if (!active) return;
+        if (!config.configured || !config.googleClientId) { setState("unavailable"); return; }
+        const render = () => {
+          const googleIdentity = (window as GoogleWindow).google?.accounts?.id;
+          if (!active || !buttonRef.current || !googleIdentity) return;
+          googleIdentity.initialize({
+            client_id: config.googleClientId!, auto_select: false, cancel_on_tap_outside: true,
+            callback: async ({ credential }: GoogleCredentialResponse) => {
+              if (!credential) return;
+              setMessage("Verifying your Google account…");
+              const authResponse = await fetch("/api/auth/google", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ credential }) });
+              const payload = await authResponse.json() as { error?: string };
+              if (!authResponse.ok) { setMessage(payload.error || "Google sign-in could not be completed."); setState("error"); return; }
+              onAuthenticated();
+            },
+          });
+          buttonRef.current.replaceChildren();
+          googleIdentity.renderButton(buttonRef.current, { type: "standard", theme: "outline", size: "large", text: "continue_with", shape: "rectangular", width: 320, logo_alignment: "left" });
+          setState("ready");
+        };
+        if ((window as GoogleWindow).google?.accounts?.id) { render(); return; }
+        const script = document.createElement("script");
+        script.src = "https://accounts.google.com/gsi/client"; script.async = true; script.defer = true;
+        script.onload = render;
+        script.onerror = () => { if (active) { setState("error"); setMessage("Google sign-in could not load. Try again or use ChatGPT sign-in."); } };
+        document.head.appendChild(script);
+      } catch { if (active) { setState("error"); setMessage("The sign-in service is temporarily unavailable."); } }
+    }
+    void prepare();
+    return () => { active = false; };
+  }, [onAuthenticated]);
+
+  return <div className="google-auth-control"><div ref={buttonRef} aria-label="Continue with Google" />{state === "loading" && <span>Preparing secure sign-in…</span>}{state === "unavailable" && <span>Google sign-in needs its web client ID before it can be enabled.</span>}{message && <span className={state === "error" ? "error" : ""}>{message}</span>}</div>;
+}
+
+export function ProfileWorkspace({ signOutPath, initialIdentity }: { signOutPath: string; initialIdentity?: { displayName: string; email: string } | null }) {
   const [data, setData] = useState<ProfilePayload | null>(null);
   const [filter, setFilter] = useState<"all" | TargetType>("all");
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [message, setMessage] = useState("");
   const [busyId, setBusyId] = useState<string | null>(null);
   const [draftNotes, setDraftNotes] = useState<Record<string, string>>({});
+  const [needsSignIn, setNeedsSignIn] = useState(false);
 
   const loadProfile = useCallback(async () => {
     setStatus("loading");
     setMessage("");
+    setNeedsSignIn(false);
     try {
       const response = await fetch("/api/profile", { headers: { Accept: "application/json" } });
       const payload = await response.json() as ProfilePayload & { error?: string };
       if (response.status === 401) {
-        window.location.assign("/signin-with-chatgpt?return_to=%2Fprofile");
+        setNeedsSignIn(true);
+        setStatus("ready");
         return;
       }
       if (!response.ok) throw new Error(payload.error || "Your research profile is unavailable.");
@@ -114,12 +172,13 @@ export function ProfileWorkspace({ identity, signOutPath }: { identity: { displa
       .then(async (response) => {
         const payload = await response.json() as ProfilePayload & { error?: string };
         if (response.status === 401) {
-          window.location.assign("/signin-with-chatgpt?return_to=%2Fprofile");
+          if (active) { setNeedsSignIn(true); setStatus("ready"); }
           return;
         }
         if (!response.ok) throw new Error(payload.error || "Your research profile is unavailable.");
         if (!active) return;
         setData(payload);
+        setNeedsSignIn(false);
         setDraftNotes(Object.fromEntries(payload.favorites.map((favorite) => [favorite.id, favorite.notes ?? ""])));
         setStatus("ready");
       })
@@ -196,13 +255,28 @@ export function ProfileWorkspace({ identity, signOutPath }: { identity: { displa
     }
   }
 
-  const profile = data?.profile ?? { displayName: identity.displayName, email: identity.email, createdAt: new Date().toISOString() };
+  async function signOut() {
+    if (data?.auth.provider === "chatgpt") { window.location.assign(signOutPath); return; }
+    await fetch("/api/auth/logout", { method: "POST" });
+    window.location.assign("/");
+  }
+
+  if (needsSignIn) return <main className="profile-workspace profile-auth-page">
+    <header className="profile-topbar"><Link href="/" className="profile-brand">BORO<span>●</span></Link><Link href="/" className="profile-back">← Back to BORO</Link></header>
+    <section className="profile-auth-shell">
+      <div className="profile-auth-copy"><p className="profile-kicker">YOUR RESEARCH, ACROSS DEVICES</p><h1>Pick up where<br />you left off.</h1><p>Sign in to keep saved areas, properties and private diligence notes attached to your account. BORO never uses an email address as the ownership key.</p><div><span>01</span>Save a market or property screen</div><div><span>02</span>Carry evidence snapshots into diligence</div><div><span>03</span>Return from any browser</div></div>
+      <aside className="profile-auth-card"><span>SECURE ACCOUNT ACCESS</span><h2>Continue to your profile</h2><p>Google credentials are verified by BORO’s server before a private session is created.</p><GoogleSignIn onAuthenticated={() => void loadProfile()} /><i>or</i><a href="/signin-with-chatgpt?return_to=%2Fprofile">Continue with ChatGPT</a><small>Each provider uses a separate stable account identifier. Profiles are never merged by matching email alone.</small></aside>
+    </section>
+  </main>;
+
+  const profile = data?.profile ?? { displayName: initialIdentity?.displayName ?? "Your research profile", email: initialIdentity?.email ?? "", createdAt: new Date().toISOString() };
 
   return <main className="profile-workspace">
     <header className="profile-topbar">
       <Link href="/" className="profile-brand">BORO<span>●</span></Link>
+      <Link href="/" className="profile-back">← Back to BORO</Link>
       <nav aria-label="Profile navigation"><Link href="/#workspace">Market explorer</Link><Link href="/#valuation">Properties</Link><b>Research profile</b></nav>
-      <a href={signOutPath} className="profile-signout">Sign out</a>
+      <button onClick={() => void signOut()} className="profile-signout">Sign out</button>
     </header>
 
     <section className="profile-hero">
@@ -218,7 +292,7 @@ export function ProfileWorkspace({ identity, signOutPath }: { identity: { displa
         <p className="profile-kicker">YOUR PROFILE</p>
         <h2>One place for the evidence you want to revisit.</h2>
         <dl><div><dt>Saved research</dt><dd>{data?.counts.all ?? 0}</dd></div><div><dt>Areas</dt><dd>{data?.counts.areas ?? 0}</dd></div><div><dt>Properties</dt><dd>{data?.counts.properties ?? 0}</dd></div></dl>
-        <small>Profile active since {dateLabel(profile.createdAt)}. Saves are private to this signed-in ChatGPT identity.</small>
+        <small>Profile active since {dateLabel(profile.createdAt)}. Saves are private to this signed-in {data?.auth.provider === "google" ? "Google" : "ChatGPT"} identity and persist across devices.</small>
       </aside>
 
       <div className="profile-content">
