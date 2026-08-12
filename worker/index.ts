@@ -941,6 +941,18 @@ const FEEDBACK_LANES = new Set(["untriaged", "model_review", "data_pipeline", "p
 const ROADMAP_PRIORITIES = new Set(["high", "medium", "low"]);
 const ROADMAP_STATUSES = new Set(["idea", "researching", "building", "validating", "ready"]);
 const ROADMAP_HORIZONS = new Set(["now", "next", "later"]);
+const PRIORITY_ROADMAP_STAGES = new Set(["queue", "active", "validation", "done"]);
+
+const DEFAULT_PRIORITY_ROADMAP = [
+  { seedKey: "property-evidence-truth", title: "Complete the property evidence truth loop", businessCase: "Property screening", description: "Join exact active-listing facts, attribute-matched rent, taxes, insurance, ATTOM disagreement and source recency into one fail-closed decision memo.", nextAction: "Cross-verify 20 candidates across Raleigh, Chicago and Philadelphia; measure match failure and vendor disagreement.", stage: "active", estimatedTokens: 18000, impact: 5, urgency: 5, evidence: 5, deliveryRisk: 3, feedbackBucket: "property_workflow" },
+  { seedKey: "model-calibration", title: "Calibrate confidence across regional models", businessCase: "Decision trust", description: "Normalize out-of-time error, bias, sample depth and source competency so cross-market rankings never imply equal precision.", nextAction: "Publish one release-gate scorecard and keep compromised cohorts excluded from underwriting decisions.", stage: "validation", estimatedTokens: 24000, impact: 5, urgency: 5, evidence: 5, deliveryRisk: 4, feedbackBucket: "model_scoring" },
+  { seedKey: "tract-actions", title: "Turn tract detail into an actionable research queue", businessCase: "Neighborhood discovery", description: "Convert granular heat-map signals into shortlist, verify-pricing, rent-check or evidence-repair actions without adding map noise.", nextAction: "Test whether five reviewers can identify the next diligence action in under 30 seconds.", stage: "queue", estimatedTokens: 12000, impact: 4, urgency: 4, evidence: 4, deliveryRisk: 2, feedbackBucket: "map_visualization" },
+  { seedKey: "property-market-expansion", title: "Deepen Chicago and Philadelphia property coverage", businessCase: "Market expansion", description: "Increase qualified sales, listing joins and condition-aware property evidence before expanding to another metro.", nextAction: "Prioritize the lowest-lift local permit and condition sources, then rerun the transferability gate.", stage: "queue", estimatedTokens: 30000, impact: 5, urgency: 4, evidence: 4, deliveryRisk: 4, feedbackBucket: "data_coverage" },
+  { seedKey: "portfolio-monitor", title: "Validate the portfolio monitor retention loop", businessCase: "Portfolio monitoring", description: "Make source → verify → add useful after acquisition by tracking thesis changes, evidence decay and concentration risk.", nextAction: "Define three recurring alerts that would cause an investor to return weekly and test them with model positions.", stage: "queue", estimatedTokens: 18000, impact: 4, urgency: 3, evidence: 3, deliveryRisk: 3, feedbackBucket: "property_workflow" },
+  { seedKey: "safety-normalization", title: "Normalize local safety evidence responsibly", businessCase: "Risk context", description: "Add jurisdiction-aware incident context without creating a misleading national crime score or steering proxy.", nextAction: "Define comparable denominators, refresh windows and prohibited-use guidance before adding another agency feed.", stage: "queue", estimatedTokens: 26000, impact: 3, urgency: 2, evidence: 2, deliveryRisk: 5, feedbackBucket: "data_coverage" },
+  { seedKey: "reviewer-gate", title: "Ship focused reviewer capability preview", businessCase: "MVP validation", description: "Show three useful workflows and representative markets while keeping experimental tools, live calls and raw data owner-gated.", nextAction: "Collect structured usefulness, trust and clarity feedback; promote only validated business cases.", stage: "done", estimatedTokens: 9000, impact: 4, urgency: 5, evidence: 4, deliveryRisk: 2, feedbackBucket: "value_proposition" },
+  { seedKey: "market-context", title: "Synchronize market context across property workflows", businessCase: "Workflow clarity", description: "Keep the global selector, current-context label, listing map, public models and Deal Studio on one supported property market.", nextAction: "Monitor reviewer navigation feedback for any remaining context breaks.", stage: "done", estimatedTokens: 4500, impact: 4, urgency: 5, evidence: 5, deliveryRisk: 1, feedbackBucket: "ux_navigation" },
+] as const;
 
 function cookieValue(request: Request, name: string) {
   const cookie = request.headers.get("Cookie") ?? "";
@@ -1036,6 +1048,35 @@ function roadmapNoteFromRow(row: Record<string, unknown>) {
     notes: String(row.notes), nextAction: row.next_action ? String(row.next_action) : null, priority: String(row.priority),
     status: String(row.status), horizon: String(row.horizon), createdAt: String(row.created_at), updatedAt: String(row.updated_at),
   };
+}
+
+function priorityRoadmapItemFromRow(row: Record<string, unknown>, feedbackSignals = 0) {
+  const estimatedTokens = Math.max(500, Math.min(200000, Math.round(Number(row.estimated_tokens) || 8000)));
+  const impact = Math.max(1, Math.min(5, Math.round(Number(row.impact) || 3)));
+  const urgency = Math.max(1, Math.min(5, Math.round(Number(row.urgency) || 3)));
+  const evidence = Math.max(1, Math.min(5, Math.round(Number(row.evidence) || 3)));
+  const deliveryRisk = Math.max(1, Math.min(5, Math.round(Number(row.delivery_risk) || 3)));
+  const valueScore = impact * 9 + urgency * 6 + evidence * 3 + (6 - deliveryRisk) * 2;
+  const tokenEfficiency = Math.min(100, Math.round(800000 / estimatedTokens));
+  const reviewPressure = Math.min(10, feedbackSignals * 2);
+  const queueScore = Math.min(100, Math.round(valueScore * .72 + tokenEfficiency * .18 + reviewPressure));
+  return {
+    id: String(row.id), ownerKey: String(row.owner_key), seedKey: row.seed_key ? String(row.seed_key) : null,
+    title: String(row.title), businessCase: String(row.business_case), description: String(row.description), nextAction: row.next_action ? String(row.next_action) : null,
+    stage: String(row.stage), estimatedTokens, tokenLow: Math.round(estimatedTokens * .75 / 500) * 500, tokenHigh: Math.round(estimatedTokens * 1.35 / 500) * 500,
+    impact, urgency, evidence, deliveryRisk, feedbackBucket: row.feedback_bucket ? String(row.feedback_bucket) : null, feedbackSignals,
+    valueScore, tokenEfficiency, reviewPressure, queueScore, createdAt: String(row.created_at), updatedAt: String(row.updated_at),
+  };
+}
+
+function roadmapRating(value: unknown, fallback = 3) {
+  const parsed = Math.round(Number(value));
+  return Number.isFinite(parsed) && parsed >= 1 && parsed <= 5 ? parsed : fallback;
+}
+
+function roadmapTokenEstimate(value: unknown, fallback = 8000) {
+  const parsed = Math.round(Number(value));
+  return Number.isFinite(parsed) && parsed >= 500 && parsed <= 200000 ? parsed : fallback;
 }
 
 type ProfileIdentity = {
@@ -1364,7 +1405,7 @@ const worker = {
       return Response.json({ ok: true }, { headers: { "Cache-Control": "no-store", "Set-Cookie": `${PROFILE_SESSION_COOKIE}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax` } });
     }
 
-    const isFeedbackRepository = url.pathname === "/review-repository" || url.pathname.startsWith("/review-repository/") || url.pathname === "/api/review/admin/login" || url.pathname === "/api/review/repository" || url.pathname.startsWith("/api/review/repository/") || url.pathname === "/api/review/roadmap" || url.pathname.startsWith("/api/review/roadmap/");
+    const isFeedbackRepository = url.pathname === "/review-repository" || url.pathname.startsWith("/review-repository/") || url.pathname === "/api/review/admin/login" || url.pathname === "/api/review/repository" || url.pathname.startsWith("/api/review/repository/") || url.pathname === "/api/review/roadmap" || url.pathname.startsWith("/api/review/roadmap/") || url.pathname === "/api/review/priority-roadmap" || url.pathname.startsWith("/api/review/priority-roadmap/");
     const isPlatformAuthPath = url.pathname === "/signin-with-chatgpt" || url.pathname === "/signout-with-chatgpt" || url.pathname === "/callback";
     if (env.REVIEW_PASSWORD && !isFeedbackRepository && !isPlatformAuthPath && !url.pathname.startsWith("/_next/") && !url.pathname.startsWith("/favicon") && url.pathname !== "/robots.txt") {
       const expected = await reviewToken(env.REVIEW_PASSWORD);
@@ -1390,6 +1431,115 @@ const worker = {
         console.error(JSON.stringify({ event: "profile_api_error", path: url.pathname, message: error instanceof Error ? error.message : String(error) }));
         return Response.json({ error: "Profile storage is temporarily unavailable." }, { status: 500, headers: { "Cache-Control": "private, no-store" } });
       }
+    }
+
+    if (url.pathname === "/api/review/priority-roadmap" || url.pathname.startsWith("/api/review/priority-roadmap/")) {
+      if (!env.FEEDBACK_ADMIN_PASSWORD || !env.FEEDBACK_ADMIN_EMAIL) return Response.json({ error: "Owner priority roadmap access is not configured." }, { status: 503 });
+      if (!feedbackAdminEmailAuthorized(request, env)) return Response.json({ error: "Approved ChatGPT owner authentication required." }, { status: 403, headers: { "Cache-Control": "no-store" } });
+      const expectedAdmin = await feedbackAdminToken(env.FEEDBACK_ADMIN_PASSWORD);
+      if (!safeEqual(cookieValue(request, FEEDBACK_ADMIN_COOKIE), expectedAdmin)) return Response.json({ error: "Owner workspace authentication required." }, { status: 401, headers: { "Cache-Control": "no-store" } });
+      if (!env.DB) return Response.json({ error: "Priority roadmap storage is not configured." }, { status: 503 });
+      if (!["GET", "HEAD"].includes(request.method) && !profileWriteAllowed(request)) return Response.json({ error: "Cross-origin roadmap writes are not allowed." }, { status: 403, headers: { "Cache-Control": "no-store" } });
+      const ownerKey = env.FEEDBACK_ADMIN_EMAIL.trim().toLowerCase();
+      const roadmapSelect = `SELECT id, owner_key, seed_key, title, business_case, description, next_action, stage, estimated_tokens,
+        impact, urgency, evidence, delivery_risk, feedback_bucket, created_at, updated_at
+        FROM priority_roadmap_items WHERE owner_key = ?`;
+
+      async function priorityRoadmapPayload() {
+        let result = await env.DB.prepare(roadmapSelect).bind(ownerKey).all() as { results?: Array<Record<string, unknown>> };
+        if (!(result.results ?? []).length) {
+          const now = new Date().toISOString();
+          await env.DB.batch(DEFAULT_PRIORITY_ROADMAP.map((item) => env.DB.prepare(`INSERT OR IGNORE INTO priority_roadmap_items
+            (id, owner_key, seed_key, title, business_case, description, next_action, stage, estimated_tokens, impact, urgency, evidence, delivery_risk, feedback_bucket, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+            .bind(crypto.randomUUID(), ownerKey, item.seedKey, item.title, item.businessCase, item.description, item.nextAction, item.stage, item.estimatedTokens, item.impact, item.urgency, item.evidence, item.deliveryRisk, item.feedbackBucket, now, now)));
+          result = await env.DB.prepare(roadmapSelect).bind(ownerKey).all() as { results?: Array<Record<string, unknown>> };
+        }
+        const feedback = await env.DB.prepare("SELECT failure_modes FROM review_feedback WHERE triage_status != 'closed' ORDER BY created_at DESC LIMIT 500").all() as { results?: Array<Record<string, unknown>> };
+        const signalCounts = new Map<string, number>();
+        for (const row of feedback.results ?? []) for (const mode of parseStoredModes(row.failure_modes)) signalCounts.set(mode, (signalCounts.get(mode) ?? 0) + 1);
+        const items = (result.results ?? []).map((row) => priorityRoadmapItemFromRow(row, signalCounts.get(String(row.feedback_bucket)) ?? 0))
+          .sort((left, right) => right.queueScore - left.queueScore || left.estimatedTokens - right.estimatedTokens);
+        const unfinished = items.filter((item) => item.stage !== "done");
+        return {
+          items,
+          summary: {
+            unfinishedTokens: unfinished.reduce((sum, item) => sum + item.estimatedTokens, 0),
+            activeTokens: items.filter((item) => item.stage === "active" || item.stage === "validation").reduce((sum, item) => sum + item.estimatedTokens, 0),
+            lowLiftWins: unfinished.filter((item) => item.estimatedTokens <= 15000).slice(0, 3).map((item) => item.id),
+            reviewSignals: [...signalCounts.values()].reduce((sum, count) => sum + count, 0),
+          },
+          formula: {
+            queueScore: "72% strategic value + 18% token efficiency + up to 10 points from open reviewer failure-mode signals",
+            strategicValue: "Impact 45% + urgency 30% + evidence strength 15% + inverse delivery risk 10%",
+            tokenEstimate: "Planning P50 with a displayed 75%–135% uncertainty band; not a usage commitment",
+          },
+        };
+      }
+
+      if (url.pathname === "/api/review/priority-roadmap" && request.method === "GET") {
+        return Response.json(await priorityRoadmapPayload(), { headers: { "Cache-Control": "private, no-store" } });
+      }
+
+      if (url.pathname === "/api/review/priority-roadmap" && request.method === "POST") {
+        let body: Record<string, unknown>;
+        try { body = await request.json() as Record<string, unknown>; } catch { return Response.json({ error: "Invalid roadmap item." }, { status: 400 }); }
+        const title = limitedText(body.title, 180);
+        const businessCase = limitedText(body.businessCase, 100) || "Product strategy";
+        const description = limitedText(body.description, 2500);
+        const nextAction = limitedText(body.nextAction, 1200) || null;
+        const stage = limitedText(body.stage, 30) || "queue";
+        const estimatedTokens = roadmapTokenEstimate(body.estimatedTokens);
+        const impact = roadmapRating(body.impact);
+        const urgency = roadmapRating(body.urgency);
+        const evidence = roadmapRating(body.evidence);
+        const deliveryRisk = roadmapRating(body.deliveryRisk);
+        const feedbackBucket = FEEDBACK_BUCKET_IDS.has(limitedText(body.feedbackBucket, 40)) ? limitedText(body.feedbackBucket, 40) : null;
+        if (!title || !description) return Response.json({ error: "A workstream title and decision-oriented description are required." }, { status: 400 });
+        if (!PRIORITY_ROADMAP_STAGES.has(stage)) return Response.json({ error: "Unknown roadmap stage." }, { status: 400 });
+        const id = crypto.randomUUID();
+        const now = new Date().toISOString();
+        await env.DB.prepare(`INSERT INTO priority_roadmap_items
+          (id, owner_key, seed_key, title, business_case, description, next_action, stage, estimated_tokens, impact, urgency, evidence, delivery_risk, feedback_bucket, created_at, updated_at)
+          VALUES (?, ?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+          .bind(id, ownerKey, title, businessCase, description, nextAction, stage, estimatedTokens, impact, urgency, evidence, deliveryRisk, feedbackBucket, now, now).run();
+        return Response.json(await priorityRoadmapPayload(), { status: 201, headers: { "Cache-Control": "no-store" } });
+      }
+
+      const itemId = decodeURIComponent(url.pathname.slice("/api/review/priority-roadmap/".length));
+      if (!/^[0-9a-f-]{36}$/i.test(itemId)) return Response.json({ error: "Unknown priority roadmap item." }, { status: 404, headers: { "Cache-Control": "no-store" } });
+      const existing = await env.DB.prepare(`${roadmapSelect} AND id = ?`).bind(ownerKey, itemId).first<Record<string, unknown>>();
+      if (!existing) return Response.json({ error: "Priority roadmap item not found." }, { status: 404, headers: { "Cache-Control": "no-store" } });
+      if (request.method === "DELETE") {
+        if (existing.seed_key) return Response.json({ error: "Seeded roadmap workstreams can be moved or edited, but not removed." }, { status: 409, headers: { "Cache-Control": "no-store" } });
+        await env.DB.prepare("DELETE FROM priority_roadmap_items WHERE id = ? AND owner_key = ?").bind(itemId, ownerKey).run();
+        return Response.json(await priorityRoadmapPayload(), { headers: { "Cache-Control": "no-store" } });
+      }
+      if (request.method === "PATCH") {
+        let body: Record<string, unknown>;
+        try { body = await request.json() as Record<string, unknown>; } catch { return Response.json({ error: "Invalid roadmap update." }, { status: 400 }); }
+        const current = priorityRoadmapItemFromRow(existing);
+        const title = body.title === undefined ? current.title : limitedText(body.title, 180);
+        const businessCase = body.businessCase === undefined ? current.businessCase : limitedText(body.businessCase, 100);
+        const description = body.description === undefined ? current.description : limitedText(body.description, 2500);
+        const nextAction = body.nextAction === undefined ? current.nextAction : limitedText(body.nextAction, 1200) || null;
+        const stage = body.stage === undefined ? current.stage : limitedText(body.stage, 30);
+        const estimatedTokens = body.estimatedTokens === undefined ? current.estimatedTokens : roadmapTokenEstimate(body.estimatedTokens, current.estimatedTokens);
+        const impact = body.impact === undefined ? current.impact : roadmapRating(body.impact, current.impact);
+        const urgency = body.urgency === undefined ? current.urgency : roadmapRating(body.urgency, current.urgency);
+        const evidence = body.evidence === undefined ? current.evidence : roadmapRating(body.evidence, current.evidence);
+        const deliveryRisk = body.deliveryRisk === undefined ? current.deliveryRisk : roadmapRating(body.deliveryRisk, current.deliveryRisk);
+        const requestedBucket = body.feedbackBucket === undefined ? current.feedbackBucket : limitedText(body.feedbackBucket, 40);
+        const feedbackBucket = requestedBucket && FEEDBACK_BUCKET_IDS.has(requestedBucket) ? requestedBucket : null;
+        if (!title || !businessCase || !description) return Response.json({ error: "Title, business case and description cannot be empty." }, { status: 400 });
+        if (!PRIORITY_ROADMAP_STAGES.has(stage)) return Response.json({ error: "Unknown roadmap stage." }, { status: 400 });
+        const updatedAt = new Date().toISOString();
+        await env.DB.prepare(`UPDATE priority_roadmap_items SET title = ?, business_case = ?, description = ?, next_action = ?, stage = ?, estimated_tokens = ?,
+          impact = ?, urgency = ?, evidence = ?, delivery_risk = ?, feedback_bucket = ?, updated_at = ? WHERE id = ? AND owner_key = ?`)
+          .bind(title, businessCase, description, nextAction, stage, estimatedTokens, impact, urgency, evidence, deliveryRisk, feedbackBucket, updatedAt, itemId, ownerKey).run();
+        return Response.json(await priorityRoadmapPayload(), { headers: { "Cache-Control": "no-store" } });
+      }
+      return Response.json({ error: "Unknown priority roadmap operation." }, { status: 405, headers: { "Cache-Control": "no-store" } });
     }
 
     if (url.pathname === "/api/review/roadmap" || url.pathname.startsWith("/api/review/roadmap/")) {

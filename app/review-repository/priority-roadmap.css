@@ -1,0 +1,74 @@
+.priority-roadmap { padding: 72px 4vw 82px; border-bottom: 1px solid #264261; background: #071a38; color: #fff; scroll-margin-top: 70px; }
+.priority-roadmap-heading { display: grid; grid-template-columns: 1.2fr .8fr; gap: 7vw; align-items: end; max-width: 1500px; margin: 0 auto 34px; }
+.priority-roadmap-heading > div > p { margin: 0; color: #70dfcc; font-size: 8px; font-weight: 950; letter-spacing: .15em; }
+.priority-roadmap-heading h2 { margin: 13px 0 0; font-size: clamp(44px, 5vw, 74px); line-height: .92; letter-spacing: -.06em; }
+.priority-roadmap-heading aside { padding: 20px 22px; border-left: 3px solid #d9ff55; background: #0d274c; }
+.priority-roadmap-heading aside b { color: #d9ff55; font-size: 8px; letter-spacing: .08em; text-transform: uppercase; }
+.priority-roadmap-heading aside p { margin: 9px 0 0; color: #b7c4d4; font-size: 9px; line-height: 1.65; }
+.priority-roadmap-state { max-width: 1500px; margin: 0 auto; padding: 44px; border: 1px dashed #3b5778; color: #95a9bf; font-size: 10px; text-align: center; }
+.priority-roadmap-state.error { display: grid; gap: 8px; border-color: #a95951; color: #ffaaa4; }
+.priority-roadmap-metrics { display: grid; grid-template-columns: repeat(4, 1fr); max-width: 1500px; margin: 0 auto; border: 1px solid #284564; background: #284564; gap: 1px; }
+.priority-roadmap-metrics article { display: grid; min-height: 118px; align-content: center; padding: 20px 24px; background: #0b2344; }
+.priority-roadmap-metrics span,.priority-roadmap-metrics small { color: #8fa3bb; font-size: 7px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+.priority-roadmap-metrics b { margin: 6px 0 3px; color: #d9ff55; font-size: 31px; letter-spacing: -.04em; }
+.priority-roadmap-formula { display: grid; grid-template-columns: repeat(3, 1fr); max-width: 1500px; margin: 14px auto 24px; border: 1px solid #284564; }
+.priority-roadmap-formula > div { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; padding: 17px 20px; border-right: 1px solid #284564; }
+.priority-roadmap-formula > div span { grid-row: 1 / 3; align-self: center; color: #70dfcc; font-size: 22px; font-weight: 950; }
+.priority-roadmap-formula > div b { align-self: end; font-size: 8px; text-transform: uppercase; }
+.priority-roadmap-formula > div small { color: #879bb3; font-size: 7px; line-height: 1.35; }
+.priority-roadmap-formula > p { grid-column: 1 / -1; margin: 0; padding: 12px 20px; border-top: 1px solid #284564; color: #879bb3; font-size: 7px; line-height: 1.5; }
+.priority-roadmap-message { max-width: 1500px; margin: 0 auto 14px; padding: 12px 16px; border: 1px solid #9c4c47; background: #381a25; color: #ffaaa4; font-size: 8px; }
+.priority-kanban { display: grid; grid-template-columns: repeat(4, minmax(255px, 1fr)); gap: 10px; max-width: 1500px; margin: 0 auto; overflow-x: auto; padding-bottom: 8px; }
+.priority-lane { min-width: 255px; border: 1px solid #284564; background: #0a203f; }
+.priority-lane > header { padding: 17px; border-bottom: 1px solid #284564; }
+.priority-lane > header > div { display: grid; grid-template-columns: 24px 1fr auto; align-items: center; }
+.priority-lane > header span { color: #70dfcc; font-size: 7px; font-weight: 950; }
+.priority-lane > header b { font-size: 10px; text-transform: uppercase; }
+.priority-lane > header small { grid-column: 2; margin-top: 4px; color: #8296ad; font-size: 7px; }
+.priority-lane > header i { float: right; display: grid; width: 24px; height: 24px; margin-top: -24px; place-items: center; border-radius: 50%; background: #163257; color: #fff; font-size: 8px; font-style: normal; }
+.priority-lane-stack { display: grid; gap: 9px; align-content: start; padding: 9px; }
+.priority-card { padding: 17px; border-top: 3px solid #56708d; background: #f8f6ef; color: #071a38; box-shadow: 0 10px 24px rgba(0,0,0,.12); }
+.priority-card.low-lift { border-top-color: #d9ff55; }
+.priority-card > header { display: flex; justify-content: space-between; gap: 12px; align-items: start; }
+.priority-card > header > span { max-width: 150px; color: #77838b; font-size: 7px; font-weight: 950; letter-spacing: .05em; text-transform: uppercase; }
+.priority-card > header strong { display: grid; min-width: 43px; height: 43px; place-items: center; border-radius: 50%; background: #071a38; color: #d9ff55; font-size: 15px; line-height: .8; }
+.priority-card > header strong small { color: #8294aa; font-size: 6px; }
+.priority-card h3 { margin: 15px 0 8px; font-size: 19px; line-height: 1.1; letter-spacing: -.035em; }
+.priority-card > p { margin: 0; color: #4c5a64; font-size: 8px; line-height: 1.55; }
+.priority-token-band { display: grid; grid-template-columns: auto 1fr; gap: 1px 9px; margin: 15px 0 10px; padding: 12px; background: #e6ebdd; }
+.priority-token-band b { grid-row: 1 / 3; align-self: center; color: #506d0c; font-size: 22px; }
+.priority-token-band span { align-self: end; color: #33414b; font-size: 7px; font-weight: 950; text-transform: uppercase; }
+.priority-token-band small { color: #6e7a81; font-size: 7px; }
+.priority-factor-grid { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid #d2d7d0; }
+.priority-factor-grid span { display: grid; gap: 3px; padding: 8px 4px; border-right: 1px solid #d2d7d0; color: #7a858c; font-size: 6px; text-align: center; text-transform: uppercase; }
+.priority-factor-grid span:last-child { border: 0; }
+.priority-factor-grid b { color: #071a38; font-size: 9px; }
+.priority-signals { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 9px; }
+.priority-signals span { padding: 5px 7px; background: #dce8c2; color: #50680d; font-size: 6px; font-weight: 950; text-transform: uppercase; }
+.priority-next { margin-top: 12px; padding: 11px; border-left: 3px solid #70dfcc; background: #e5efeb; }
+.priority-next b { color: #287b6b; font-size: 6px; text-transform: uppercase; }
+.priority-next p { margin: 5px 0 0; color: #3b4c53; font-size: 7px; line-height: 1.5; }
+.priority-stage-control,.priority-card-tune label,.priority-roadmap-add label { display: grid; gap: 5px; color: #758189; font-size: 6px; font-weight: 950; text-transform: uppercase; }
+.priority-stage-control { margin-top: 12px; }
+.priority-stage-control select,.priority-card-tune input,.priority-card-tune select,.priority-card-tune textarea,.priority-roadmap-add input,.priority-roadmap-add select,.priority-roadmap-add textarea { width: 100%; border: 1px solid #c4cbc4; background: #fff; color: #071a38; font: inherit; font-size: 8px; text-transform: none; }
+.priority-stage-control select,.priority-card-tune input,.priority-card-tune select,.priority-roadmap-add input,.priority-roadmap-add select { height: 35px; padding: 0 8px; }
+.priority-card-tune { margin-top: 10px; border-top: 1px solid #d2d7d0; }
+.priority-card-tune > summary { padding-top: 10px; color: #54650c; cursor: pointer; font-size: 7px; font-weight: 950; text-transform: uppercase; }
+.priority-card-tune form { display: grid; gap: 9px; margin-top: 11px; }
+.priority-card-tune form > div { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.priority-card-tune textarea { min-height: 72px; padding: 8px; resize: vertical; }
+.priority-card-tune footer { display: flex; gap: 5px; }
+.priority-card-tune button,.priority-roadmap-add button { min-height: 36px; padding: 0 11px; border: 0; background: #071a38; color: #fff; font-size: 7px; font-weight: 950; text-transform: uppercase; }
+.priority-card-tune .priority-remove { background: #eee7e2; color: #92433d; }
+.priority-lane-empty { margin: 0; padding: 30px 10px; color: #7187a0; font-size: 8px; text-align: center; }
+.priority-roadmap-add { max-width: 1500px; margin: 18px auto 0; border: 1px solid #2f4c6d; background: #0b2344; }
+.priority-roadmap-add > summary { padding: 17px 20px; color: #d9ff55; cursor: pointer; font-size: 8px; font-weight: 950; text-transform: uppercase; }
+.priority-roadmap-add form { display: grid; gap: 12px; padding: 0 20px 20px; }
+.priority-roadmap-add form > div { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.priority-roadmap-add .priority-add-classification { grid-template-columns: 1fr 1fr 1.5fr; }
+.priority-roadmap-add .priority-add-ratings { grid-template-columns: repeat(4, 1fr); }
+.priority-roadmap-add label { color: #94a8bf; }
+.priority-roadmap-add textarea { min-height: 80px; padding: 10px; resize: vertical; }
+.priority-roadmap-add button { background: #d9ff55; color: #071a38; }
+@media(max-width:1050px){.priority-roadmap-heading{grid-template-columns:1fr}.priority-roadmap-metrics{grid-template-columns:1fr 1fr}.priority-roadmap-formula{grid-template-columns:1fr}.priority-roadmap-formula>div{border-right:0;border-bottom:1px solid #284564}.priority-roadmap-formula>p{border-top:0}.priority-kanban{grid-template-columns:repeat(4,300px)}}
+@media(max-width:650px){.priority-roadmap{padding:55px 5vw}.priority-roadmap-heading h2{font-size:44px}.priority-roadmap-metrics{grid-template-columns:1fr 1fr}.priority-roadmap-metrics article{min-height:98px;padding:16px}.priority-roadmap-add form>div,.priority-roadmap-add .priority-add-classification,.priority-roadmap-add .priority-add-ratings{grid-template-columns:1fr}.priority-kanban{grid-template-columns:repeat(4,82vw)}}

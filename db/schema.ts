@@ -82,3 +82,25 @@ export const roadmapNotes = sqliteTable("roadmap_notes", {
 }, (table) => [
   index("idx_roadmap_notes_owner_horizon_updated").on(table.ownerKey, table.horizon, table.updatedAt),
 ]);
+
+export const priorityRoadmapItems = sqliteTable("priority_roadmap_items", {
+  id: text("id").primaryKey(),
+  ownerKey: text("owner_key").notNull(),
+  seedKey: text("seed_key"),
+  title: text("title").notNull(),
+  businessCase: text("business_case").notNull(),
+  description: text("description").notNull(),
+  nextAction: text("next_action"),
+  stage: text("stage", { enum: ["queue", "active", "validation", "done"] }).notNull().default("queue"),
+  estimatedTokens: integer("estimated_tokens").notNull(),
+  impact: integer("impact").notNull(),
+  urgency: integer("urgency").notNull(),
+  evidence: integer("evidence").notNull(),
+  deliveryRisk: integer("delivery_risk").notNull(),
+  feedbackBucket: text("feedback_bucket"),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+}, (table) => [
+  uniqueIndex("idx_priority_roadmap_owner_seed").on(table.ownerKey, table.seedKey),
+  index("idx_priority_roadmap_owner_stage_updated").on(table.ownerKey, table.stage, table.updatedAt),
+]);

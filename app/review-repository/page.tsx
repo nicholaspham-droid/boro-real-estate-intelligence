@@ -3,6 +3,7 @@ import { env } from "cloudflare:workers";
 import Link from "next/link";
 import { chatGPTSignOutPath, requireChatGPTUser } from "../chatgpt-auth";
 import "./roadmap.css";
+import "./priority-roadmap.css";
 
 export const dynamic = "force-dynamic";
 
