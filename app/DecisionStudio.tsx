@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import propertyValuations from "../data/property-valuations.json";
 import { VALUATION_MARKET_IDS } from "./featureAvailability";
 import { ACS_AGGREGATION_META, MARKET_EXPLORERS } from "./marketNeighborhoods";
@@ -40,9 +40,8 @@ function payment(principal: number, annualRate: number, years: number) {
   return principal * rate * (1 + rate) ** periods / ((1 + rate) ** periods - 1);
 }
 
-export function DecisionStudio() {
+export function DecisionStudio({ marketId, onMarketChange }: { marketId: string; onMarketChange: (marketId: string) => void }) {
   const liveMarkets = propertyValuations.markets.filter((item) => VALUATION_MARKET_IDS.includes(item.id));
-  const [marketId, setMarketId] = useState(liveMarkets[0].id);
   const marketProperties = propertyValuations.properties.filter((item) => item.marketId === marketId);
   const [propertyId, setPropertyId] = useState(marketProperties[0].id);
   const selected = propertyValuations.properties.find((item) => item.id === propertyId) ?? marketProperties[0];
@@ -75,9 +74,7 @@ export function DecisionStudio() {
   const [targetCap, setTargetCap] = useState<number>(strategy.targetCap);
 
   function chooseMarket(id: string) {
-    const property = propertyValuations.properties.find((item) => item.marketId === id)!;
-    setMarketId(id);
-    chooseProperty(property.id);
+    onMarketChange(id);
   }
 
   function chooseProperty(id: string) {
@@ -164,27 +161,25 @@ export function DecisionStudio() {
     setMaintenancePct(next.maintenance);
   }
 
-  const metrics = useMemo(() => {
-    const closing = askPrice * closingPct / 100;
-    const totalBasis = askPrice + rehab + closing;
-    const annualRent = monthlyRent * 12;
-    const effectiveRent = annualRent * (1 - vacancyPct / 100);
-    const operatingExpenses = taxes + insurance + hoaMonthly * 12 + annualRent * maintenancePct / 100;
-    const noi = effectiveRent - operatingExpenses;
-    const loan = askPrice * (1 - downPct / 100);
-    const annualDebt = payment(loan, interestRate, termYears) * 12;
-    const cashInvested = askPrice * downPct / 100 + rehab + closing;
-    const capRate = totalBasis > 0 && monthlyRent > 0 ? noi / totalBasis * 100 : null;
-    const dscr = annualDebt > 0 && monthlyRent > 0 ? noi / annualDebt : null;
-    const cashOnCash = cashInvested > 0 && monthlyRent > 0 ? (noi - annualDebt) / cashInvested * 100 : null;
-    const monthlyCashFlow = monthlyRent > 0 ? (noi - annualDebt) / 12 : null;
-    const priceEdge = totalBasis > 0 ? (selected.model.value - totalBasis) / totalBasis * 100 : null;
-    const maxTotalBasis = noi > 0 ? noi / (targetCap / 100) : null;
-    const maxOffer = maxTotalBasis ? Math.max(0, (maxTotalBasis - rehab) / (1 + closingPct / 100)) : null;
-    const askPpsf = livingArea > 0 ? askPrice / livingArea : null;
-    const totalBasisPpsf = livingArea > 0 ? totalBasis / livingArea : null;
-    return { closing, totalBasis, annualRent, operatingExpenses, noi, annualDebt, cashInvested, capRate, dscr, cashOnCash, monthlyCashFlow, priceEdge, maxOffer, askPpsf, totalBasisPpsf };
-  }, [askPrice, closingPct, rehab, livingArea, monthlyRent, vacancyPct, taxes, insurance, hoaMonthly, maintenancePct, downPct, interestRate, termYears, selected.model.value, targetCap]);
+  const closing = askPrice * closingPct / 100;
+  const totalBasis = askPrice + rehab + closing;
+  const annualRent = monthlyRent * 12;
+  const effectiveRent = annualRent * (1 - vacancyPct / 100);
+  const operatingExpenses = taxes + insurance + hoaMonthly * 12 + annualRent * maintenancePct / 100;
+  const noi = effectiveRent - operatingExpenses;
+  const loan = askPrice * (1 - downPct / 100);
+  const annualDebt = payment(loan, interestRate, termYears) * 12;
+  const cashInvested = askPrice * downPct / 100 + rehab + closing;
+  const capRate = totalBasis > 0 && monthlyRent > 0 ? noi / totalBasis * 100 : null;
+  const dscr = annualDebt > 0 && monthlyRent > 0 ? noi / annualDebt : null;
+  const cashOnCash = cashInvested > 0 && monthlyRent > 0 ? (noi - annualDebt) / cashInvested * 100 : null;
+  const monthlyCashFlow = monthlyRent > 0 ? (noi - annualDebt) / 12 : null;
+  const priceEdge = totalBasis > 0 ? (selected.model.value - totalBasis) / totalBasis * 100 : null;
+  const maxTotalBasis = noi > 0 ? noi / (targetCap / 100) : null;
+  const maxOffer = maxTotalBasis ? Math.max(0, (maxTotalBasis - rehab) / (1 + closingPct / 100)) : null;
+  const askPpsf = livingArea > 0 ? askPrice / livingArea : null;
+  const totalBasisPpsf = livingArea > 0 ? totalBasis / livingArea : null;
+  const metrics = { closing, totalBasis, annualRent, operatingExpenses, noi, annualDebt, cashInvested, capRate, dscr, cashOnCash, monthlyCashFlow, priceEdge, maxOffer, askPpsf, totalBasisPpsf };
 
   const requiredComplete = monthlyRent > 0 && taxes > 0 && insurance > 0 && askPrice > 0;
   const gates = [

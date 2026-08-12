@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { BOROCAST_MAP_STYLES, getGoogleMaps, type GoogleInfoWindow, type GoogleMapInstance, type GoogleMarker } from "./googleMapsLoader";
+import type { ListingMarketId } from "./featureAvailability";
 
 type PilotListing = {
   id: string;
@@ -69,8 +70,7 @@ function escapeHtml(value: string) {
   return value.replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[character]!);
 }
 
-export function MarketListingPilot() {
-  const [marketId, setMarketId] = useState<(typeof LISTING_MARKETS)[number]["id"]>("raleigh");
+export function MarketListingPilot({ marketId, onMarketChange }: { marketId: ListingMarketId; onMarketChange: (marketId: ListingMarketId) => void }) {
   const [connected, setConnected] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -144,10 +144,7 @@ export function MarketListingPilot() {
   }, [result, marketConfig]);
 
   function chooseMarket(id: (typeof LISTING_MARKETS)[number]["id"]) {
-    setMarketId(id);
-    setResult(null);
-    setSelectedId(null);
-    setError("");
+    onMarketChange(id);
   }
 
   async function loadPilot() {

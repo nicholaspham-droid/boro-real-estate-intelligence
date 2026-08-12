@@ -23,6 +23,8 @@ const parcelMarketIds = Array.from(new Set(sourceRegistry.sources.flatMap((sourc
 const valuationMarketIds = propertyValuations.markets
   .filter((market) => market.status === "live" && market.propertyCount > 0)
   .map((market) => market.id);
+export const LISTING_MARKET_IDS = ["raleigh", "chicago", "philadelphia"] as const;
+export type ListingMarketId = (typeof LISTING_MARKET_IDS)[number];
 
 export const PRODUCT_FEATURES: ProductFeatureCoverage[] = [
   {
@@ -80,7 +82,7 @@ export const PRODUCT_FEATURES: ProductFeatureCoverage[] = [
     label: "Active listing screen",
     shortLabel: "Listings",
     description: "Active asking price, status, days on market and source identifiers from the connected RentCast feed.",
-    marketIds: ["raleigh", "chicago", "philadelphia"],
+    marketIds: [...LISTING_MARKET_IDS],
     href: "#valuation",
     freshness: "Live lookup · six-hour cache",
     boundary: "Raleigh, Chicago and Philadelphia are enabled with one cached regional request each. Listing evidence is not a valuation or investment recommendation.",

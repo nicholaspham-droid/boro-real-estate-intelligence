@@ -7,7 +7,7 @@ import { DecisionStudio } from "./DecisionStudio";
 import { AttomConnector } from "./AttomConnector";
 import { SafetyEvidence } from "./SafetyEvidence";
 import { FeatureAvailability } from "./AvailabilityPanel";
-import { VALUATION_MARKET_IDS, type ProductFeatureId } from "./featureAvailability";
+import { LISTING_MARKET_IDS, VALUATION_MARKET_IDS, marketLabel, type ListingMarketId, type ProductFeatureId } from "./featureAvailability";
 import { PropertyOpportunityMap } from "./PropertyOpportunityMap";
 import { AttomMarketAudit } from "./AttomMarketAudit";
 import { RentCastEvidence } from "./RentCastEvidence";
@@ -60,6 +60,8 @@ const JOURNEY_STEPS: Array<{ id: "discover" | "evaluate" | "underwrite" | "monit
   { id: "underwrite", label: "Underwrite a deal", short: "Underwrite", view: "underwrite" },
   { id: "monitor", label: "Monitor a portfolio", short: "Monitor", view: "portfolio" },
 ];
+
+const PROPERTY_WORKFLOW_MARKET_IDS = LISTING_MARKET_IDS.filter((marketId) => VALUATION_MARKET_IDS.includes(marketId));
 
 const NEXT_VIEW: Record<ProductView, { view: ProductView; label: string }> = {
   overview: { view: "explore", label: "Start market research" },
@@ -149,6 +151,7 @@ function tractAction(tract: ScoredTract, layer: ExplorerLayer) {
 export default function Home() {
   const [activeView, setActiveView] = useState<ProductView>("overview");
   const [selectedMarketId, setSelectedMarketId] = useState(MARKET_EXPLORERS[0].id);
+  const [workflowMarketId, setWorkflowMarketId] = useState<ListingMarketId>("raleigh");
   const [selectedClusterId, setSelectedClusterId] = useState(MARKET_EXPLORERS[0].neighborhoods[0].id);
   const [layer, setLayer] = useState<ExplorerLayer>("composite");
   const [weights, setWeights] = useState<FactorWeights>(BALANCED_WEIGHTS);
@@ -250,6 +253,13 @@ export default function Home() {
   const activeTab = PRODUCT_TABS.find((item) => item.id === activeView) ?? PRODUCT_TABS[0];
   const activeJourneyStep = journeyStepFor(activeView);
   const nextView = NEXT_VIEW[activeView];
+  const propertyWorkflowActive = activeView === "properties" || activeView === "underwrite";
+  const topbarMarkets = propertyWorkflowActive ? MARKET_EXPLORERS.filter((item) => PROPERTY_WORKFLOW_MARKET_IDS.includes(item.id as ListingMarketId)) : MARKET_EXPLORERS;
+  const topbarMarketId = propertyWorkflowActive ? workflowMarketId : market.id;
+  const contextMarketLabel = propertyWorkflowActive ? marketLabel(workflowMarketId)
+    : activeView === "portfolio" ? "Multi-market portfolio"
+      : activeView === "coverage" ? "Feature-specific markets"
+        : activeView === "feedback" ? "Product-wide" : market.metro.short;
 
   useEffect(() => {
     const syncHash = () => { setActiveView(viewFromHash(window.location.hash)); window.scrollTo({ top: 0 }); };
@@ -259,6 +269,10 @@ export default function Home() {
   }, []);
 
   function selectView(view: ProductView, hash = PRODUCT_TABS.find((item) => item.id === view)?.hash ?? "#overview") {
+    if (view === "properties" || view === "underwrite") {
+      const nextMarket = PROPERTY_WORKFLOW_MARKET_IDS.includes(selectedMarketId as ListingMarketId) ? selectedMarketId : workflowMarketId;
+      chooseWorkflowMarket(nextMarket);
+    }
     setActiveView(view);
     window.history.replaceState(null, "", hash);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -273,6 +287,13 @@ export default function Home() {
     setSelectedTractId(null);
     setShowAllTracts(false);
     setTractScope("cluster");
+  }
+
+  function chooseWorkflowMarket(id: string) {
+    const next = PROPERTY_WORKFLOW_MARKET_IDS.find((marketId) => marketId === id) ?? PROPERTY_WORKFLOW_MARKET_IDS[0];
+    setWorkflowMarketId(next);
+    setValuationMarket(next);
+    setSelectedPropertyId(null);
   }
 
   async function exploreTracts() {
@@ -323,9 +344,8 @@ export default function Home() {
   }
 
   function openAvailableMarket(marketId: string, featureId: ProductFeatureId) {
-    if (featureId === "valuation" || featureId === "safety") {
-      setValuationMarket(marketId);
-      setSelectedPropertyId(null);
+    if (featureId === "valuation" || featureId === "safety" || featureId === "listings") {
+      chooseWorkflowMarket(marketId);
       selectView("properties", "#valuation");
       return;
     }
@@ -344,7 +364,7 @@ export default function Home() {
       <header className="topbar product-topbar">
         <a className="brand" href="#overview" aria-label="BORO home" onClick={() => selectView("overview")}><span>BORO</span></a>
         <span className="product-label">Real Estate Intelligence</span>
-        <label className="global-market-picker"><span>Market</span><select value={market.id} onChange={(event) => chooseMarket(event.target.value)}>{MARKET_EXPLORERS.map((item) => <option key={item.id} value={item.id}>{item.metro.short}</option>)}</select></label>
+        {activeView === "portfolio" || activeView === "coverage" || activeView === "feedback" ? <div className="global-market-picker global-market-status"><span>Scope</span><b>{contextMarketLabel}</b></div> : <label className="global-market-picker"><span>{propertyWorkflowActive ? "Property market" : "Market"}</span><select value={topbarMarketId} onChange={(event) => propertyWorkflowActive ? chooseWorkflowMarket(event.target.value) : chooseMarket(event.target.value)}>{topbarMarkets.map((item) => <option key={item.id} value={item.id}>{item.metro.short}</option>)}</select></label>}
         <nav className="product-tabs" aria-label="Research journey">{JOURNEY_STEPS.map((step, index) => <button key={step.id} aria-current={activeJourneyStep === index ? "page" : undefined} className={activeJourneyStep === index ? "active" : ""} onClick={() => selectView(step.view)}><span>{String(index + 1).padStart(2, "0")}</span>{step.short}</button>)}</nav>
         <details className="product-utility"><summary aria-label="Open supporting tools">More</summary><div><button onClick={() => selectView("coverage")}>Data & methodology</button><button onClick={() => selectView("feedback")}>Give Feedback</button><a href="/profile" aria-label="Open saved research profile">Saved research</a></div></details>
         <a className="profile-entry" href="/profile" aria-label="Open persistent research profile"><span aria-hidden="true">♡</span> Profile</a>
@@ -354,7 +374,7 @@ export default function Home() {
         <nav aria-label="Current workspace views">
           {activeJourneyStep === 0 ? <>{([['overview','Brief'],['explore','Map & clusters'],['areas','Top areas']] as const).map(([id, label]) => <button key={id} aria-current={activeView === id ? "page" : undefined} onClick={() => selectView(id)}>{label}</button>)}</> : <span>{activeJourneyStep >= 0 ? `Step ${activeJourneyStep + 1} of 4` : "Supporting tool"}</span>}
         </nav>
-        <div className="research-selection"><span>Current context</span><b>{activeTab.label} · {market.metro.short}</b><small>{activeTab.purpose}</small></div>
+        <div className="research-selection"><span>Current context</span><b>{activeTab.label} · {contextMarketLabel}</b><small>{activeTab.purpose}</small></div>
         <details className="decision-boundary"><summary>Decision boundary</summary><p>{activeTab.boundary}</p></details>
         <button className="next-action" onClick={() => selectView(nextView.view)}>{nextView.label}<span aria-hidden="true">→</span></button>
       </div>
@@ -422,7 +442,7 @@ export default function Home() {
               <div><span>Map layer</span>{(["composite", "demographic", "economic", "education", "housing", "pricing"] as ExplorerLayer[]).map((item) => <button key={item} className={layer === item ? "selected" : ""} onClick={() => setLayer(item)}>{item}</button>)}</div>
             </div>
             <div className="map-stage">
-              <NationalMarketMap market={market} neighborhoods={visibleClusters} tracts={filteredTracts} tractGeoJson={tractGeometries[market.id]} tractScopeLabel={tractScopeLabel} geographyMode={explorerLevel} focus={explorerLevel === "tracts" ? { center: { lat: selectedCluster.lat, lng: selectedCluster.lng }, zoom: market.id === "new-york" ? 10 : 11 } : undefined} layer={layer} selectedId={explorerLevel === "tracts" ? selectedTract?.id ?? "" : selectedCluster.id} onSelect={explorerLevel === "tracts" ? selectTract : setSelectedClusterId} onPropertySelect={(id) => { const property = propertyValuations.properties.find((item) => item.id === id); if (property) setValuationMarket(property.marketId); setSelectedPropertyId(id); window.location.hash = "valuation"; }} />
+              <NationalMarketMap market={market} neighborhoods={visibleClusters} tracts={filteredTracts} tractGeoJson={tractGeometries[market.id]} tractScopeLabel={tractScopeLabel} geographyMode={explorerLevel} focus={explorerLevel === "tracts" ? { center: { lat: selectedCluster.lat, lng: selectedCluster.lng }, zoom: market.id === "new-york" ? 10 : 11 } : undefined} layer={layer} selectedId={explorerLevel === "tracts" ? selectedTract?.id ?? "" : selectedCluster.id} onSelect={explorerLevel === "tracts" ? selectTract : setSelectedClusterId} onPropertySelect={(id) => { const property = propertyValuations.properties.find((item) => item.id === id); if (property) chooseWorkflowMarket(property.marketId); setSelectedPropertyId(id); window.location.hash = "valuation"; }} />
               {explorerLevel === "tracts" && tractStatus === "loading" && <div className="tract-loading"><i /> Loading official tract evidence…</div>}
               {explorerLevel === "tracts" && tractStatus === "error" && <div className="tract-loading error"><b>Tract data unavailable</b><span>{tractMessage}</span><button onClick={() => void exploreTracts()}>Try again</button></div>}
             </div>
@@ -509,19 +529,19 @@ export default function Home() {
       </div>
 
       <div className={`product-view ${activeView === "underwrite" ? "active" : ""}`} aria-hidden={activeView !== "underwrite"}>
-      <DecisionStudio />
+      <DecisionStudio key={workflowMarketId} marketId={workflowMarketId} onMarketChange={chooseWorkflowMarket} />
       </div>
 
       <div className={`product-view ${activeView === "properties" ? "active" : ""}`} aria-hidden={activeView !== "properties"}>
       <section className="valuation-section" id="valuation">
         <div className="section-title"><div><p className="eyebrow">PROPERTY VALUATION LAB · MODEL V3.1</p><h2>Cross-check the property.<br />Keep the uncertainty.</h2></div><p>Qualified recorded sales, effective-dated assessments, building facts and FHFA tract-cluster history resolve to individual properties in three high-intent corridors. Version 3.1 adds leakage-safe Philadelphia assessment cohorts and more local subtype/ZIP comparable pools while keeping the region fail-closed because out-of-time error remains too high.</p></div>
-        <nav className="property-stage-nav" aria-label="Property evaluation stages">{([['live','Live opportunities','Map and compare connected listings'],['decision','Decision loop','Validate a short list before underwriting'],['models','Public models','Inspect recorded-sale model ranges'],['evidence','Evidence stack','Audit vendors, sources and methodology']] as const).map(([id, label, description], index) => <button key={id} className={propertyStage === id ? "active" : ""} aria-current={propertyStage === id ? "step" : undefined} onClick={() => setPropertyStage(id)}><span>{String(index + 1).padStart(2, '0')}</span><b>{label}</b><small>{description}</small></button>)}</nav>
-        <div className={`property-stage-panel ${propertyStage === "live" ? "active" : ""}`} aria-hidden={propertyStage !== "live"}><MarketListingPilot /></div>
+        <nav className="property-stage-nav" aria-label="Property evaluation stages">{([['live','Live opportunities','Map and compare connected listings'],['decision','Decision loop','Raleigh reference loop'],['models','Public models','Inspect recorded-sale model ranges'],['evidence','Evidence stack','Audit vendors, sources and methodology']] as const).map(([id, label, description], index) => <button key={id} className={propertyStage === id ? "active" : ""} aria-current={propertyStage === id ? "step" : undefined} onClick={() => { setPropertyStage(id); if (id === "decision") chooseWorkflowMarket("raleigh"); if (id === "models") setValuationMarket(workflowMarketId); }}><span>{String(index + 1).padStart(2, '0')}</span><b>{label}</b><small>{description}</small></button>)}</nav>
+        <div className={`property-stage-panel ${propertyStage === "live" ? "active" : ""}`} aria-hidden={propertyStage !== "live"}><MarketListingPilot key={workflowMarketId} marketId={workflowMarketId} onMarketChange={chooseWorkflowMarket} /></div>
         <div className={`property-stage-panel ${propertyStage === "decision" ? "active" : ""}`} aria-hidden={propertyStage !== "decision"}><RaleighDecisionLoop /></div>
         <div className={`property-stage-panel ${propertyStage === "models" ? "active" : ""}`} aria-hidden={propertyStage !== "models"}>
         <div className="valuation-channel-heading"><div><p className="eyebrow">SEPARATE CHANNEL · RECORDED PUBLIC DATA</p><h3>Historical model library</h3></div><p>These controls change the public-record table below. The live-listing screen above now covers Raleigh, Chicago and Philadelphia; the historical library preserves each region’s recorded evidence and out-of-time error separately.</p></div>
         <div className="valuation-readiness">
-          {liveValuationMarkets.map((item) => <button key={item.id} className={valuationMarket === item.id ? "active" : ""} onClick={() => { setValuationMarket(item.id); setSelectedPropertyId(null); }}><span>PUBLIC RECORD MODEL · {"decisionUse" in item ? item.decisionUse : "gap"}</span><b>{item.label}</b><i>{item.competency}% integrated competency</i><small>{"sourceCompetency" in item ? `${item.sourceCompetency}% source · ${item.modelCompetency}% model · ${item.diagnostics?.sampleSize ?? 0} leakage-controlled tests` : ""}</small></button>)}
+          {liveValuationMarkets.map((item) => <button key={item.id} className={valuationMarket === item.id ? "active" : ""} onClick={() => chooseWorkflowMarket(item.id)}><span>PUBLIC RECORD MODEL · {"decisionUse" in item ? item.decisionUse : "gap"}</span><b>{item.label}</b><i>{item.competency}% integrated competency</i><small>{"sourceCompetency" in item ? `${item.sourceCompetency}% source · ${item.modelCompetency}% model · ${item.diagnostics?.sampleSize ?? 0} leakage-controlled tests` : ""}</small></button>)}
         </div>
         <ModelDecisionGate market={valuationMarketMeta} />
         {valuationRows.length > 0 && valuationMarket !== "raleigh" && <PropertyOpportunityMap marketLabel={valuationMarketMeta.label} properties={valuationRows} selectedId={selectedProperty?.id ?? null} onSelect={setSelectedPropertyId} />}
