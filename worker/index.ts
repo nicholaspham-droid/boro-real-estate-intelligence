@@ -958,6 +958,28 @@ async function authToken(scope: string, password: string) {
 function reviewToken(password: string) { return authToken("private-review-v1", password); }
 function feedbackAdminToken(password: string) { return authToken("feedback-admin-v1", password); }
 
+async function ownerWorkspaceAuthorized(request: Request, env: Env) {
+  if (!env.FEEDBACK_ADMIN_PASSWORD) return false;
+  const expected = await feedbackAdminToken(env.FEEDBACK_ADMIN_PASSWORD);
+  return safeEqual(cookieValue(request, FEEDBACK_ADMIN_COOKIE), expected);
+}
+
+function reviewerSurface(pathname: string) {
+  return pathname === "/showcase" || pathname.startsWith("/showcase/")
+    || pathname === "/api/review/feedback" || pathname === "/api/review/logout";
+}
+
+function gatedResponseHeaders(extra: Record<string, string> = {}) {
+  return {
+    "Cache-Control": "private, no-store, max-age=0",
+    "X-Robots-Tag": "noindex, nofollow, noarchive",
+    "Referrer-Policy": "no-referrer",
+    "X-Content-Type-Options": "nosniff",
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+    ...extra,
+  };
+}
+
 function safeEqual(left: string, right: string) {
   const length = Math.max(left.length, right.length);
   let mismatch = left.length ^ right.length;
@@ -968,7 +990,7 @@ function safeEqual(left: string, right: string) {
 function reviewLoginHtml() {
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Private review · BORO</title><style>
   *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#071a38;color:#fff;font-family:Arial,sans-serif}main{width:min(92vw,470px);padding:48px;border:1px solid #304762;background:#0b2244;box-shadow:0 30px 90px #020b1b}i{display:block;width:12px;height:12px;margin-bottom:35px;border-radius:50%;background:#d9ff55;box-shadow:0 0 0 8px rgba(217,255,85,.08)}span{color:#70dfcc;font-size:10px;font-weight:900;letter-spacing:.13em}h1{margin:15px 0 16px;font-size:42px;line-height:.95;letter-spacing:-.055em}p{margin:0 0 28px;color:#a7b6c9;font-size:13px;line-height:1.65}label{display:block;color:#8fa0b6;font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}input{width:100%;height:50px;margin:9px 0 12px;padding:0 14px;border:1px solid #405674;background:#071a38;color:white;font:inherit;outline:0}input:focus{border-color:#d9ff55}button{width:100%;height:50px;border:0;background:#d9ff55;color:#071a38;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}button:disabled{opacity:.6}b{display:block;min-height:16px;margin-top:14px;color:#ff958d;font-size:10px}@media(max-width:520px){main{padding:35px 26px}h1{font-size:36px}}
-  </style></head><body><main><i></i><span>BORO · INVITED REVIEW</span><h1>Private B-school<br>MVP review</h1><p>Enter the shared review password to explore the real estate intelligence workbench and leave structured feedback.</p><form><label for="password">Review password</label><input id="password" name="password" type="password" autocomplete="current-password" autofocus required><button>Enter private MVP →</button><b role="alert"></b></form></main><script>
+  </style></head><body><main><i></i><span>BORO · INVITED REVIEW</span><h1>Private B-school<br>MVP preview</h1><p>Enter the shared review password to see a curated snapshot of BORO’s capabilities and leave structured feedback. Live data connectors and experimental workspaces remain owner-gated.</p><form><label for="password">Review password</label><input id="password" name="password" type="password" autocomplete="current-password" autofocus required><button>Enter private preview →</button><b role="alert"></b></form></main><script>
   const form=document.querySelector('form'),button=document.querySelector('button'),error=document.querySelector('b');form.addEventListener('submit',async(event)=>{event.preventDefault();button.disabled=true;error.textContent='';try{const response=await fetch('/api/review/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:form.password.value})});const result=await response.json();if(!response.ok)throw new Error(result.error||'Could not sign in.');location.reload()}catch(reason){error.textContent=reason.message||'Could not sign in.';button.disabled=false}});
   </script></body></html>`;
 }
@@ -1274,11 +1296,15 @@ const worker = {
       const supplied = limitedText(body.password, 256);
       if (!safeEqual(supplied, env.REVIEW_PASSWORD)) return Response.json({ error: "That password does not match. Check the shared invite and try again." }, { status: 401, headers: { "Cache-Control": "no-store" } });
       const token = await reviewToken(env.REVIEW_PASSWORD);
-      return Response.json({ ok: true }, { headers: { "Cache-Control": "no-store", "Set-Cookie": `${REVIEW_COOKIE}=${encodeURIComponent(token)}; Path=/; Max-Age=1209600; HttpOnly; Secure; SameSite=Lax` } });
+      return Response.json({ ok: true, access: "reviewer", returnTo: "/showcase" }, { headers: gatedResponseHeaders({ "Set-Cookie": `${REVIEW_COOKIE}=${encodeURIComponent(token)}; Path=/; Max-Age=604800; HttpOnly; Secure; SameSite=Lax` }) });
     }
 
     if (url.pathname === "/api/review/logout") {
-      return Response.json({ ok: true }, { headers: { "Cache-Control": "no-store", "Set-Cookie": `${REVIEW_COOKIE}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax` } });
+      const headers = new Headers(gatedResponseHeaders());
+      headers.append("Set-Cookie", `${REVIEW_COOKIE}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax`);
+      headers.append("Set-Cookie", `${FEEDBACK_ADMIN_COOKIE}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax`);
+      if (request.method === "POST" && (request.headers.get("Accept") ?? "").includes("text/html")) return Response.redirect(new URL("/", request.url), 303);
+      return Response.json({ ok: true }, { headers });
     }
 
     if (url.pathname === "/api/review/admin/login") {
@@ -1322,8 +1348,16 @@ const worker = {
       const expected = await reviewToken(env.REVIEW_PASSWORD);
       const authenticated = safeEqual(reviewCookieValue(request), expected);
       if (!authenticated) {
-        if (url.pathname.startsWith("/api/")) return Response.json({ error: "Private review authentication required." }, { status: 401, headers: { "Cache-Control": "no-store" } });
-        return new Response(reviewLoginHtml(), { status: 200, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex, nofollow", "Referrer-Policy": "no-referrer" } });
+        if (url.pathname.startsWith("/api/")) return Response.json({ error: "Private review authentication required." }, { status: 401, headers: gatedResponseHeaders() });
+        return new Response(reviewLoginHtml(), { status: 200, headers: gatedResponseHeaders({ "Content-Type": "text/html; charset=utf-8" }) });
+      }
+
+      const ownerAuthorized = await ownerWorkspaceAuthorized(request, env);
+      if (!ownerAuthorized && !reviewerSurface(url.pathname)) {
+        if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/data/")) {
+          return Response.json({ error: "Owner workspace authorization required.", access: "reviewer", available: "/showcase" }, { status: 403, headers: gatedResponseHeaders() });
+        }
+        return Response.redirect(new URL("/showcase", request.url), 302);
       }
     }
 
@@ -1800,7 +1834,11 @@ const worker = {
       }, allowedWidths);
     }
 
-    return handler.fetch(request, env, ctx);
+    const applicationResponse = await handler.fetch(request, env, ctx);
+    if (!env.REVIEW_PASSWORD || url.pathname.startsWith("/_next/")) return applicationResponse;
+    const headers = new Headers(applicationResponse.headers);
+    for (const [key, value] of Object.entries(gatedResponseHeaders())) headers.set(key, value);
+    return new Response(applicationResponse.body, { status: applicationResponse.status, statusText: applicationResponse.statusText, headers });
   },
   async scheduled(_controller: ScheduledController, env: Env, ctx: ExecutionContext) {
     const marketIds = propertyValuations.markets.filter((market) => market.status === "live").map((market) => market.id);

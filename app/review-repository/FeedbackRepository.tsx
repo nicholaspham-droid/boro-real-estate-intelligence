@@ -83,7 +83,7 @@ export function FeedbackRepository({ ownerEmail }: { ownerEmail: string }) {
     const response = await fetch("/api/review/admin/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: form.get("password") }) });
     const result = await response.json() as { error?: string };
     if (!response.ok) { setMessage(result.error ?? "Access denied."); return; }
-    await load();
+    window.location.href = "/";
   }
 
   async function updateEntry(entry: Entry, field: "triageStatus" | "impactLane", value: string) {
@@ -96,7 +96,7 @@ export function FeedbackRepository({ ownerEmail }: { ownerEmail: string }) {
   const visible = useMemo(() => (repository?.entries ?? []).filter((entry) => (bucket === "all" || entry.failureModes.includes(bucket)) && (statusFilter === "all" || entry.triageStatus === statusFilter) && (featureFilter === "all" || entry.featureArea === featureFilter)), [repository, bucket, statusFilter, featureFilter]);
 
   if (access === "loading") return <main className="repository-lock"><span>BORO · OWNER REPOSITORY</span><h1>Loading feedback…</h1></main>;
-  if (access === "locked") return <main className="repository-lock"><span>BORO · OWNER REPOSITORY</span><h1>Identity verified. Complete step two.</h1><p>Signed in as {ownerEmail}. Enter the reset owner password to view reviewer identities, comments and triage status.</p><form onSubmit={unlock}><label htmlFor="owner-password">Owner password · step 2 of 2</label><input id="owner-password" name="password" type="password" autoComplete="current-password" required /><button>Open repository →</button><b role="alert">{message}</b></form><Link href="/">← Back to BORO</Link></main>;
+  if (access === "locked") return <main className="repository-lock"><span>BORO · OWNER WORKSPACE</span><h1>Identity verified. Complete step two.</h1><p>Signed in as {ownerEmail}. Enter the owner password to unlock live connectors, model workbenches, reports, profiles and feedback triage for this browser session.</p><form onSubmit={unlock}><label htmlFor="owner-password">Owner password · step 2 of 2</label><input id="owner-password" name="password" type="password" autoComplete="current-password" required /><button>Unlock owner workspace →</button><b role="alert">{message}</b></form><Link href="/showcase">← Back to reviewer preview</Link></main>;
   if (access === "error" || !repository) return <main className="repository-lock"><h1>Repository unavailable.</h1><p>{message}</p><button onClick={() => void load()}>Try again</button></main>;
 
   return <main className="feedback-repository">

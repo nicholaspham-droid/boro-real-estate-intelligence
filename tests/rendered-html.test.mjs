@@ -156,8 +156,33 @@ test("private review gate rejects unknown visitors and issues an HttpOnly review
   assert.match(setCookie, /Secure/);
 
   const cookie = setCookie.split(";")[0];
-  const unlocked = await worker.fetch(new Request("http://localhost/api/property-data/health", { headers: { Cookie: cookie } }), protectedEnv, ctx);
-  assert.equal(unlocked.status, 200);
+  const showcase = await worker.fetch(new Request("http://localhost/showcase", { headers: { Cookie: cookie, accept: "text/html" } }), protectedEnv, ctx);
+  assert.equal(showcase.status, 200);
+  assert.match(await showcase.text(), /CAPABILITY PREVIEW/);
+  assert.match(showcase.headers.get("x-robots-tag"), /noindex/);
+
+  const workspaceRedirect = await worker.fetch(new Request("http://localhost/", { headers: { Cookie: cookie }, redirect: "manual" }), protectedEnv, ctx);
+  assert.equal(workspaceRedirect.status, 302);
+  assert.equal(new URL(workspaceRedirect.headers.get("location")).pathname, "/showcase");
+
+  const ownerApiLocked = await worker.fetch(new Request("http://localhost/api/property-data/health", { headers: { Cookie: cookie } }), protectedEnv, ctx);
+  assert.equal(ownerApiLocked.status, 403);
+});
+
+test("owner second factor unlocks the internal workspace and experimental APIs", async () => {
+  const worker = await loadWorker();
+  const protectedEnv = { ...env, REVIEW_PASSWORD: "test-review-password", FEEDBACK_ADMIN_PASSWORD: "owner-password", FEEDBACK_ADMIN_EMAIL: "owner@example.com" };
+  const reviewLogin = await worker.fetch(new Request("http://localhost/api/review/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: "test-review-password" }) }), protectedEnv, ctx);
+  const reviewCookie = reviewLogin.headers.get("set-cookie").split(";")[0];
+  const ownerLogin = await worker.fetch(new Request("http://localhost/api/review/admin/login", { method: "POST", headers: { "Content-Type": "application/json", "oai-authenticated-user-email": "owner@example.com" }, body: JSON.stringify({ password: "owner-password" }) }), protectedEnv, ctx);
+  assert.equal(ownerLogin.status, 200);
+  const ownerCookie = ownerLogin.headers.get("set-cookie").split(";")[0];
+  const cookie = `${reviewCookie}; ${ownerCookie}`;
+  const workspace = await worker.fetch(new Request("http://localhost/", { headers: { Cookie: cookie, accept: "text/html" } }), protectedEnv, ctx);
+  assert.equal(workspace.status, 200);
+  assert.match(await workspace.text(), /NATIONAL PUBLIC-DATA MARKET WORKBENCH/);
+  const api = await worker.fetch(new Request("http://localhost/api/property-data/health", { headers: { Cookie: cookie } }), protectedEnv, ctx);
+  assert.equal(api.status, 200);
 });
 
 test("authenticated reviewers can save structured feedback to D1", async () => {
