@@ -966,7 +966,8 @@ async function ownerWorkspaceAuthorized(request: Request, env: Env) {
 
 function reviewerSurface(pathname: string) {
   return pathname === "/showcase" || pathname.startsWith("/showcase/")
-    || pathname === "/api/review/feedback" || pathname === "/api/review/logout";
+    || pathname === "/api/review/feedback" || pathname === "/api/review/logout"
+    || pathname.startsWith("/_next/") || pathname === "/favicon.svg";
 }
 
 function gatedResponseHeaders(extra: Record<string, string> = {}) {
@@ -1835,7 +1836,7 @@ const worker = {
     }
 
     const applicationResponse = await handler.fetch(request, env, ctx);
-    if (!env.REVIEW_PASSWORD || url.pathname.startsWith("/_next/")) return applicationResponse;
+    if (!env.REVIEW_PASSWORD) return applicationResponse;
     const headers = new Headers(applicationResponse.headers);
     for (const [key, value] of Object.entries(gatedResponseHeaders())) headers.set(key, value);
     return new Response(applicationResponse.body, { status: applicationResponse.status, statusText: applicationResponse.statusText, headers });

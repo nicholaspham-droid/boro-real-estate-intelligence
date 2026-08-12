@@ -185,6 +185,17 @@ test("owner second factor unlocks the internal workspace and experimental APIs",
   assert.equal(api.status, 200);
 });
 
+test("asset routing reaches the Worker first so direct data files cannot bypass reviewer authorization", async () => {
+  const configText = await import("node:fs/promises").then(({ readFile }) => readFile(new URL("../wrangler.cloudflare.jsonc", import.meta.url), "utf8"));
+  assert.match(configText, /"run_worker_first"\s*:\s*true/);
+  const worker = await loadWorker();
+  const protectedEnv = { ...env, REVIEW_PASSWORD: "test-review-password", FEEDBACK_ADMIN_PASSWORD: "owner-password" };
+  const login = await worker.fetch(new Request("http://localhost/api/review/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: "test-review-password" }) }), protectedEnv, ctx);
+  const cookie = login.headers.get("set-cookie").split(";")[0];
+  const directData = await worker.fetch(new Request("http://localhost/data/tract-pilot/new-york.json", { headers: { Cookie: cookie } }), protectedEnv, ctx);
+  assert.equal(directData.status, 403);
+});
+
 test("authenticated reviewers can save structured feedback to D1", async () => {
   const worker = await loadWorker();
   let inserted = null;
