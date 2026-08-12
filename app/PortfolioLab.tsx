@@ -3,8 +3,51 @@
 import { useMemo, useState } from "react";
 import propertyValuations from "../data/property-valuations.json";
 import { MARKET_EXPLORERS } from "./marketNeighborhoods";
+import { listingVerificationDecision, nearestRegionalCluster } from "./portfolioMonitorLogic.mjs";
 
 type PortfolioView = "overview" | "builder" | "risk";
+type ListingMarketId = "raleigh" | "chicago" | "philadelphia";
+type MonitoredProperty = {
+  id: string;
+  marketId: ListingMarketId;
+  clusterId: string;
+  address: string;
+  locality: string;
+  propertyType: string;
+  sqft: number | null;
+  beds: number | null;
+  baths: number | null;
+  salePrice: number;
+  sourceMode: "public-record" | "connected-listing";
+  sourceLabel: string;
+  reportId: string | null;
+  listing: null | { status: string; lastSeenDate: string | null; mlsName: string | null; mlsNumber: string | null; daysOnMarket: number | null };
+  model: { value: number; low: number; high: number; confidence: number; watchScore: number; clusterEdgeScore: number };
+};
+
+type PilotListing = {
+  id: string; address: string; addressLine1: string; city: string; state: string; zipCode: string | null;
+  lat: number; lng: number; propertyType: string; bedrooms: number | null; bathrooms: number | null; squareFootage: number;
+  status: string; price: number; pricePerSqft: number; lastSeenDate: string | null; daysOnMarket: number | null;
+  mlsName: string | null; mlsNumber: string | null; screeningScore: number; evidenceReliability: number;
+};
+type PilotResult = {
+  market: { id: ListingMarketId; label: string };
+  retrievedAt: string;
+  requestCost: number;
+  candidateCount: number;
+  scoredCandidateCount: number;
+  pricePerSqftBand: { p25: number; median: number; p75: number };
+  regionDiagnostics: { status: "pass" | "watch" | "compromised"; listingCompleteness: number; listingFreshnessCoverage: number };
+  listings: PilotListing[];
+};
+type ListingVerification = {
+  checkedAt: string;
+  activeSale: null | { status: string; price: number | null; lastSeenDate: string | null; daysOnMarket: number | null; mlsName: string | null; mlsNumber: string | null };
+  rent: null | { median: number; low: number | null; high: number | null; compCount: number };
+  attom: null | { value: number; low: number | null; high: number | null; confidence: number | null; livingSize: number | null; beds: number | null; baths: number | null; taxAmount: number | null; cacheHit: boolean };
+  errors: string[];
+};
 type Assumption = {
   propertyId: string;
   purchasePrice: number;
@@ -28,6 +71,37 @@ type Scenario = {
 const DEFAULT_PROPERTY_IDS = ["chicago", "philadelphia", "raleigh"]
   .map((marketId) => propertyValuations.properties.find((property) => property.marketId === marketId)?.id)
   .filter((propertyId): propertyId is string => Boolean(propertyId));
+
+const PUBLIC_PROPERTIES: MonitoredProperty[] = propertyValuations.properties.map((property) => ({
+  id: property.id,
+  marketId: property.marketId as ListingMarketId,
+  clusterId: property.clusterId,
+  address: property.address,
+  locality: property.locality,
+  propertyType: property.propertyType,
+  sqft: property.sqft,
+  beds: property.beds,
+  baths: property.baths,
+  salePrice: property.salePrice,
+  sourceMode: "public-record",
+  sourceLabel: property.sourceLabel,
+  reportId: property.id,
+  listing: null,
+  model: {
+    value: property.model.value,
+    low: property.model.low,
+    high: property.model.high,
+    confidence: property.model.confidence,
+    watchScore: property.model.watchScore,
+    clusterEdgeScore: property.model.clusterEdgeScore,
+  },
+}));
+
+const LISTING_MARKETS: Array<{ id: ListingMarketId; label: string }> = [
+  { id: "raleigh", label: "Raleigh" },
+  { id: "chicago", label: "Chicago" },
+  { id: "philadelphia", label: "Philadelphia" },
+];
 
 function clamp(value: number, minimum = 0, maximum = 100) {
   return Math.min(maximum, Math.max(minimum, value));
@@ -54,21 +128,19 @@ function payment(principal: number, annualRate: number, termYears: number) {
   return principal * rate * ((1 + rate) ** periods) / (((1 + rate) ** periods) - 1);
 }
 
-function marketRentProxy(propertyId: string) {
-  const property = propertyValuations.properties.find((item) => item.id === propertyId);
-  const market = MARKET_EXPLORERS.find((item) => item.id === property?.marketId);
-  const cluster = market?.neighborhoods.find((item) => item.id === property?.clusterId);
-  return Math.round(cluster?.medianRent ?? 1800);
+function regionalContext(property: MonitoredProperty) {
+  const market = MARKET_EXPLORERS.find((item) => item.id === property.marketId);
+  return market?.neighborhoods.find((item) => item.id === property.clusterId) ?? market?.neighborhoods[0] ?? null;
 }
 
-function initialAssumption(propertyId: string): Assumption {
-  const property = propertyValuations.properties.find((item) => item.id === propertyId)!;
+function initialAssumption(property: MonitoredProperty, verifiedRent = 0): Assumption {
+  const context = regionalContext(property);
   return {
-    propertyId,
+    propertyId: property.id,
     purchasePrice: property.salePrice,
     closingCostPct: 2,
-    monthlyRent: marketRentProxy(propertyId),
-    vacancyPct: 5,
+    monthlyRent: verifiedRent,
+    vacancyPct: Math.round((context?.vacancyPct ?? 6) * 10) / 10,
     expensePct: 35,
     downPaymentPct: 25,
     interestRate: 7,
@@ -78,12 +150,21 @@ function initialAssumption(propertyId: string): Assumption {
 
 export function PortfolioLab() {
   const [activeView, setActiveView] = useState<PortfolioView>("overview");
-  const [assumptions, setAssumptions] = useState<Assumption[]>(() => DEFAULT_PROPERTY_IDS.map(initialAssumption));
-  const [propertyToAdd, setPropertyToAdd] = useState(propertyValuations.properties[0].id);
+  const [monitoredProperties, setMonitoredProperties] = useState<MonitoredProperty[]>(() => DEFAULT_PROPERTY_IDS.map((id) => PUBLIC_PROPERTIES.find((property) => property.id === id)!));
+  const [assumptions, setAssumptions] = useState<Assumption[]>(() => DEFAULT_PROPERTY_IDS.map((id) => initialAssumption(PUBLIC_PROPERTIES.find((property) => property.id === id)!)));
+  const [propertyToAdd, setPropertyToAdd] = useState(PUBLIC_PROPERTIES.find((property) => !DEFAULT_PROPERTY_IDS.includes(property.id))?.id ?? PUBLIC_PROPERTIES[0].id);
   const [scenario, setScenario] = useState<Scenario>({ valueShock: -10, rentShock: -5, vacancyShock: 4, expenseShock: 5, rateShock: 1.5 });
+  const [listingMarketId, setListingMarketId] = useState<ListingMarketId>("raleigh");
+  const [listingResult, setListingResult] = useState<PilotResult | null>(null);
+  const [selectedListingId, setSelectedListingId] = useState<string | null>(null);
+  const [listingLoading, setListingLoading] = useState(false);
+  const [verificationLoading, setVerificationLoading] = useState(false);
+  const [listingError, setListingError] = useState("");
+  const [listingVerification, setListingVerification] = useState<Record<string, ListingVerification>>({});
+  const [candidateSearch, setCandidateSearch] = useState("");
 
   const items = useMemo(() => assumptions.map((assumption) => {
-    const property = propertyValuations.properties.find((candidate) => candidate.id === assumption.propertyId)!;
+    const property = monitoredProperties.find((candidate) => candidate.id === assumption.propertyId)!;
     const market = propertyValuations.markets.find((candidate) => candidate.id === property.marketId)!;
     const closingCosts = assumption.purchasePrice * assumption.closingCostPct / 100;
     const acquisitionCost = assumption.purchasePrice + closingCosts;
@@ -103,7 +184,7 @@ export function PortfolioLab() {
     const reliability = .60 + property.model.confidence / 100 * .40;
     const itemEdge = Math.round(50 + (rawOpportunity - 50) * reliability);
     return { assumption, property, market, closingCosts, acquisitionCost, debt, investedEquity, annualRent, noi, annualDebtService, cashFlow, dscr, cashOnCash, capRate, priceDelta, returnScore, priceScore, rawOpportunity, reliability, itemEdge };
-  }), [assumptions]);
+  }), [assumptions, monitoredProperties]);
 
   const totals = useMemo(() => {
     const acquisitionCost = items.reduce((sum, item) => sum + item.acquisitionCost, 0);
@@ -159,7 +240,13 @@ export function PortfolioLab() {
     return { ...item, status: "watch", action: "Keep on watchlist", reason: `The ${item.itemEdge}/100 item edge is mixed under current assumptions.` };
   }).sort((a, b) => (a.status === "fail" ? -1 : a.status === "watch" && b.status === "pass" ? -1 : 1)), [items, totals.marketExposure]);
 
-  const availableProperties = propertyValuations.properties.filter((property) => !assumptions.some((assumption) => assumption.propertyId === property.id));
+  const availableProperties = PUBLIC_PROPERTIES.filter((property) => !assumptions.some((assumption) => assumption.propertyId === property.id));
+  const selectedListing = listingResult?.listings.find((listing) => listing.id === selectedListingId) ?? listingResult?.listings[0] ?? null;
+  const verification = selectedListing ? listingVerification[selectedListing.id] : null;
+  const verificationDecision = listingVerificationDecision(selectedListing, verification);
+  const filteredListings = (listingResult?.listings ?? []).filter((listing) => `${listing.address} ${listing.propertyType} ${listing.mlsName ?? ""}`.toLowerCase().includes(candidateSearch.toLowerCase()));
+  const selectedMarket = MARKET_EXPLORERS.find((market) => market.id === listingMarketId);
+  const selectedCluster = selectedListing && selectedMarket ? nearestRegionalCluster(selectedListing, selectedMarket.neighborhoods) : null;
 
   function updateAssumption(propertyId: string, key: keyof Omit<Assumption, "propertyId">, value: number) {
     setAssumptions((current) => current.map((assumption) => assumption.propertyId === propertyId ? { ...assumption, [key]: value } : assumption));
@@ -167,9 +254,89 @@ export function PortfolioLab() {
 
   function addProperty() {
     if (!availableProperties.some((property) => property.id === propertyToAdd)) return;
-    setAssumptions((current) => [...current, initialAssumption(propertyToAdd)]);
+    const property = PUBLIC_PROPERTIES.find((candidate) => candidate.id === propertyToAdd)!;
+    setMonitoredProperties((current) => current.some((item) => item.id === property.id) ? current : [...current, property]);
+    setAssumptions((current) => [...current, initialAssumption(property)]);
     const next = availableProperties.find((property) => property.id !== propertyToAdd);
     if (next) setPropertyToAdd(next.id);
+  }
+
+  async function loadLiveCandidates() {
+    setListingLoading(true);
+    setListingError("");
+    setListingResult(null);
+    setSelectedListingId(null);
+    try {
+      const response = await fetch(`/api/listings/${listingMarketId}`, { headers: { Accept: "application/json" }, cache: "no-store" });
+      const payload = await response.json() as PilotResult & { error?: string };
+      if (!response.ok || !Array.isArray(payload.listings)) throw new Error(payload.error || "Connected listings are unavailable.");
+      setListingResult(payload);
+      setSelectedListingId(payload.listings[0]?.id ?? null);
+    } catch (error) {
+      setListingError(error instanceof Error ? error.message : "Connected listings are unavailable.");
+    } finally {
+      setListingLoading(false);
+    }
+  }
+
+  async function verifyListing() {
+    if (!selectedListing || listingVerification[selectedListing.id]) return;
+    setVerificationLoading(true);
+    setListingError("");
+    const address2 = `${selectedListing.city}, ${selectedListing.state}${selectedListing.zipCode ? ` ${selectedListing.zipCode}` : ""}`;
+    try {
+      const [propertyResponse, attomResponse] = await Promise.allSettled([
+        fetch(`/api/integrations/rentcast/property?address=${encodeURIComponent(selectedListing.address)}`, { cache: "no-store" }),
+        fetch(`/api/integrations/attom/property?address1=${encodeURIComponent(selectedListing.addressLine1)}&address2=${encodeURIComponent(address2)}&market=${selectedListing.state.toLowerCase()}&depth=core`, { cache: "no-store" }),
+      ]);
+      const errors: string[] = [];
+      let activeSale: ListingVerification["activeSale"] = null;
+      let rent: ListingVerification["rent"] = null;
+      let attom: ListingVerification["attom"] = null;
+      if (propertyResponse.status === "fulfilled") {
+        const payload = await propertyResponse.value.json() as { activeSale?: ListingVerification["activeSale"]; rentEstimate?: { rent?: number | null; low?: number | null; high?: number | null; compCount?: number }; error?: string };
+        if (propertyResponse.value.ok) {
+          activeSale = payload.activeSale ?? null;
+          if (payload.rentEstimate?.rent) rent = { median: payload.rentEstimate.rent, low: payload.rentEstimate.low ?? null, high: payload.rentEstimate.high ?? null, compCount: payload.rentEstimate.compCount ?? 0 };
+        } else errors.push(payload.error || "Exact-address listing recheck failed.");
+      } else errors.push("Exact-address listing recheck failed.");
+      if (attomResponse.status === "fulfilled") {
+        const payload = await attomResponse.value.json() as { cacheHit?: boolean; property?: { avm?: { value?: number | null; low?: number | null; high?: number | null; confidence?: number | null }; livingSize?: number | null; beds?: number | null; baths?: number | null; assessment?: { taxAmount?: number | null } }; error?: string };
+        if (attomResponse.value.ok && payload.property?.avm?.value) attom = { value: payload.property.avm.value, low: payload.property.avm.low ?? null, high: payload.property.avm.high ?? null, confidence: payload.property.avm.confidence ?? null, livingSize: payload.property.livingSize ?? null, beds: payload.property.beds ?? null, baths: payload.property.baths ?? null, taxAmount: payload.property.assessment?.taxAmount ?? null, cacheHit: Boolean(payload.cacheHit) };
+        else errors.push(payload.error || "Independent property match was unavailable.");
+      } else errors.push("Independent property match was unavailable.");
+      setListingVerification((current) => ({ ...current, [selectedListing.id]: { checkedAt: new Date().toISOString(), activeSale, rent, attom, errors } }));
+    } catch (error) {
+      setListingError(error instanceof Error ? error.message : "Property verification could not complete.");
+    } finally {
+      setVerificationLoading(false);
+    }
+  }
+
+  function addVerifiedListing() {
+    if (!selectedListing || !verification || !verificationDecision.addable || monitoredProperties.some((property) => property.id === `listing-${selectedListing.id}`)) return;
+    const listingPrice = verification.activeSale?.price ?? selectedListing.price;
+    const vendorValue = verification.attom?.value ?? listingPrice;
+    const confidence = Math.min(90, Math.round(selectedListing.evidenceReliability * .65 + verificationDecision.confidence * .35));
+    const property: MonitoredProperty = {
+      id: `listing-${selectedListing.id}`,
+      marketId: listingMarketId,
+      clusterId: selectedCluster?.id ?? `${listingMarketId}-unknown`,
+      address: selectedListing.addressLine1,
+      locality: `${selectedListing.city}, ${selectedListing.state}${selectedListing.zipCode ? ` ${selectedListing.zipCode}` : ""}`,
+      propertyType: selectedListing.propertyType,
+      sqft: verification.attom?.livingSize ?? selectedListing.squareFootage,
+      beds: verification.attom?.beds ?? selectedListing.bedrooms,
+      baths: verification.attom?.baths ?? selectedListing.bathrooms,
+      salePrice: listingPrice ?? selectedListing.price,
+      sourceMode: "connected-listing",
+      sourceLabel: verification.activeSale?.mlsName ?? selectedListing.mlsName ?? "RentCast connected listing",
+      reportId: null,
+      listing: { status: verification.activeSale?.status ?? selectedListing.status, lastSeenDate: verification.activeSale?.lastSeenDate ?? selectedListing.lastSeenDate, mlsName: verification.activeSale?.mlsName ?? selectedListing.mlsName, mlsNumber: verification.activeSale?.mlsNumber ?? selectedListing.mlsNumber, daysOnMarket: verification.activeSale?.daysOnMarket ?? selectedListing.daysOnMarket },
+      model: { value: vendorValue, low: verification.attom?.low ?? Math.round(vendorValue * .85), high: verification.attom?.high ?? Math.round(vendorValue * 1.15), confidence, watchScore: selectedListing.screeningScore, clusterEdgeScore: selectedCluster?.composite ?? 50 },
+    };
+    setMonitoredProperties((current) => [...current, property]);
+    setAssumptions((current) => [...current, initialAssumption(property, verification.rent?.median ?? 0)]);
   }
 
   const gates = [
@@ -195,8 +362,30 @@ export function PortfolioLab() {
     </div>}
 
     {activeView === "builder" && <div className="portfolio-panel">
-      <div className="portfolio-builder-toolbar"><div><p className="eyebrow">ADD FROM QUALIFIED PUBLIC RECORDS</p><h3>{propertyValuations.properties.length - assumptions.length} available properties</h3></div><label><span>Property</span><select value={propertyToAdd} onChange={(event) => setPropertyToAdd(event.target.value)} disabled={!availableProperties.length}>{availableProperties.map((property) => <option key={property.id} value={property.id}>{property.address} · {property.locality}</option>)}</select></label><button onClick={addProperty} disabled={!availableProperties.length}>Add position</button></div>
-      <div className="builder-table"><table><thead><tr><th>Position + evidence</th><th>Acquisition basis</th><th>Monthly rent</th><th>Vacancy</th><th>Operating expense</th><th>Down payment</th><th>Interest rate</th><th>Remove</th></tr></thead><tbody>{items.map((item) => <tr key={item.property.id}><td><b>{item.property.address}</b><small>{item.market.label} · value {currency(item.property.model.value)} · {item.property.model.confidence}% evidence</small><a href={`/report?type=property&id=${encodeURIComponent(item.property.id)}`} target="_blank" rel="noreferrer">Open property report →</a></td><td><label><span>Price</span><input aria-label={`${item.property.address} acquisition basis`} type="number" min="0" step="1000" value={item.assumption.purchasePrice} onChange={(event) => updateAssumption(item.property.id, "purchasePrice", Number(event.target.value))} /></label><small>Default: recorded sale</small></td><td><label><span>Rent</span><input aria-label={`${item.property.address} monthly rent`} type="number" min="0" step="50" value={item.assumption.monthlyRent} onChange={(event) => updateAssumption(item.property.id, "monthlyRent", Number(event.target.value))} /></label><small>Default: ACS cluster median</small></td><td><label><span>Vacancy</span><input aria-label={`${item.property.address} vacancy`} type="number" min="0" max="95" step=".5" value={item.assumption.vacancyPct} onChange={(event) => updateAssumption(item.property.id, "vacancyPct", Number(event.target.value))} /></label><small>% of gross rent</small></td><td><label><span>Expenses</span><input aria-label={`${item.property.address} operating expenses`} type="number" min="0" max="95" step="1" value={item.assumption.expensePct} onChange={(event) => updateAssumption(item.property.id, "expensePct", Number(event.target.value))} /></label><small>% after vacancy</small></td><td><label><span>Equity</span><input aria-label={`${item.property.address} down payment`} type="number" min="0" max="100" step="1" value={item.assumption.downPaymentPct} onChange={(event) => updateAssumption(item.property.id, "downPaymentPct", Number(event.target.value))} /></label><small>% of basis</small></td><td><label><span>Rate</span><input aria-label={`${item.property.address} interest rate`} type="number" min="0" max="30" step=".1" value={item.assumption.interestRate} onChange={(event) => updateAssumption(item.property.id, "interestRate", Number(event.target.value))} /></label><small>30-year amortization</small></td><td><button aria-label={`Remove ${item.property.address}`} onClick={() => setAssumptions((current) => current.filter((assumption) => assumption.propertyId !== item.property.id))} disabled={assumptions.length <= 1}>×</button></td></tr>)}</tbody></table></div>
+      <section className="monitor-intake" aria-labelledby="monitor-intake-title">
+        <div className="monitor-intake-head"><div><p className="eyebrow">CONNECTED CANDIDATE INTAKE</p><h3 id="monitor-intake-title">Source → verify → add.</h3><p>Load one regional listing response, select a candidate, and recheck the exact address before it enters the model portfolio. Existing fields populate automatically; regional statistics stay visibly separate from property facts.</p></div><div className="monitor-market-load"><label><span>Market</span><select value={listingMarketId} onChange={(event) => { setListingMarketId(event.target.value as ListingMarketId); setListingResult(null); setSelectedListingId(null); setListingError(""); }}>{LISTING_MARKETS.map((market) => <option key={market.id} value={market.id}>{market.label}</option>)}</select></label><button type="button" onClick={() => void loadLiveCandidates()} disabled={listingLoading}>{listingLoading ? "Loading candidates…" : listingResult ? "Refresh · 1 regional call" : "Load candidates · 1 regional call"}</button></div></div>
+        {listingError && <p className="monitor-intake-error" role="alert"><b>Candidate evidence unavailable.</b> {listingError}</p>}
+        <div className="monitor-intake-grid">
+          <aside className="monitor-candidates">
+            <div className="monitor-candidate-tools"><div><b>{listingResult ? `${listingResult.scoredCandidateCount} screened` : "Candidate queue"}</b><small>{listingResult ? `${listingResult.candidateCount.toLocaleString()} reported · ${listingResult.listings.length} comparison records shown` : "Connected active listings only"}</small></div><input aria-label="Search listing candidates" type="search" placeholder="Search address or type" value={candidateSearch} onChange={(event) => setCandidateSearch(event.target.value)} disabled={!listingResult} /></div>
+            <div className="monitor-candidate-list">{listingResult ? filteredListings.map((listing) => <button type="button" key={listing.id} className={selectedListing?.id === listing.id ? "active" : ""} onClick={() => setSelectedListingId(listing.id)}><div><b>{listing.addressLine1}</b><small>{listing.propertyType} · {listing.bedrooms ?? "—"} bd / {listing.bathrooms ?? "—"} ba · {listing.squareFootage.toLocaleString()} sf</small></div><strong>{currency(listing.price)}<small>{currency(listing.pricePerSqft)}/sf · {listing.daysOnMarket ?? "—"} DOM</small></strong></button>) : <div className="monitor-candidate-empty"><b>No listing feed loaded</b><span>Choose a market and make one regional request. Public-record samples remain available below.</span></div>}</div>
+          </aside>
+          <article className="monitor-verify-card">
+            <div className="monitor-property-head"><div><span>SELECTED CANDIDATE</span><h4>{selectedListing?.addressLine1 ?? "Choose a connected listing"}</h4><p>{selectedListing ? `${selectedListing.city}, ${selectedListing.state} ${selectedListing.zipCode ?? ""} · ${selectedListing.propertyType}` : "A verification file appears after the regional feed loads."}</p></div><strong>{selectedListing ? currency(selectedListing.price) : "—"}<small>reported asking price</small></strong></div>
+            {selectedListing && <>
+              <div className="monitor-autofill-grid"><div><span>Living area</span><b>{selectedListing.squareFootage.toLocaleString()} sf</b><small>Listing feed</small></div><div><span>Bed / bath</span><b>{selectedListing.bedrooms ?? "—"} / {selectedListing.bathrooms ?? "—"}</b><small>Listing feed</small></div><div><span>Regional price / sf</span><b>{listingResult ? currency(listingResult.pricePerSqftBand.median) : "—"}</b><small>{listingResult ? `${currency(listingResult.pricePerSqftBand.p25)}–${currency(listingResult.pricePerSqftBand.p75)} listing IQR` : "—"}</small></div><div><span>Regional vacancy</span><b>{selectedCluster?.vacancyPct == null ? "—" : percent(selectedCluster.vacancyPct)}</b><small>{selectedCluster?.name ?? "Nearest ACS cluster"}</small></div><div><span>Regional rent context</span><b>{selectedCluster?.medianRent ? currency(selectedCluster.medianRent) : "—"}</b><small>{selectedCluster?.rentP25 && selectedCluster.rentP75 ? `${currency(selectedCluster.rentP25)}–${currency(selectedCluster.rentP75)} · not property rent` : "Context only"}</small></div><div><span>Listing source</span><b>{selectedListing.mlsName ?? "Unnamed"}</b><small>{selectedListing.mlsNumber ?? "No listing identifier"}</small></div></div>
+              {!verification ? <div className="monitor-verify-action"><div><b>Cross-verify before adding</b><p>Rechecks the exact address for an active sale and property rent, then requests one cached-or-live ATTOM core match. This can use up to four provider calls.</p></div><button type="button" onClick={() => void verifyListing()} disabled={verificationLoading}>{verificationLoading ? "Verifying exact address…" : "Verify property"}</button></div> : <>
+                <div className={`monitor-verification-status ${verificationDecision.status}`}><div><span>ADD GATE</span><b>{verificationDecision.status === "verified" ? "Verified to monitor" : verificationDecision.status === "watch" ? "Add with watch flags" : "Blocked from Monitor"}</b><small>{verificationDecision.confidence}% of evidence checks passed · checked {new Date(verification.checkedAt).toLocaleString()}</small></div><button type="button" onClick={addVerifiedListing} disabled={!verificationDecision.addable || monitoredProperties.some((property) => property.id === `listing-${selectedListing.id}`)}>{monitoredProperties.some((property) => property.id === `listing-${selectedListing.id}`) ? "Already monitored" : verificationDecision.addable ? "Add populated position" : "Resolve required checks"}</button></div>
+                <div className="monitor-checks">{verificationDecision.checks.map((check) => <div key={check.id} className={check.pass ? "pass" : "fail"}><i>{check.pass ? "✓" : "!"}</i><span><b>{check.label}</b><small>{check.detail}</small></span></div>)}</div>
+                <div className="monitor-crossfills"><span><b>Verified asking price</b>{verification.activeSale?.price ? currency(verification.activeSale.price) : "Unavailable"}</span><span><b>Property rent estimate</b>{verification.rent?.median ? `${currency(verification.rent.median)}/mo` : "Unavailable"}</span><span><b>ATTOM value</b>{verification.attom?.value ? currency(verification.attom.value) : "Unavailable"}</span><span><b>ATTOM facts</b>{verification.attom ? `${verification.attom.livingSize?.toLocaleString() ?? "—"} sf · ${verification.attom.beds ?? "—"} bd / ${verification.attom.baths ?? "—"} ba` : "Unavailable"}</span></div>
+              </>}
+            </>}
+          </article>
+        </div>
+        <p className="monitor-intake-boundary"><b>Add boundary.</b> An exact active-listing match and a named source are required. ATTOM and property-rent matches strengthen the evidence file but cannot turn an incomplete listing into an investable deal. Regional rent is context only and is never auto-filled as achievable property rent.</p>
+      </section>
+      <div className="portfolio-builder-toolbar"><div><p className="eyebrow">ADD FROM QUALIFIED PUBLIC RECORDS</p><h3>{availableProperties.length} available properties</h3></div><label><span>Property</span><select value={propertyToAdd} onChange={(event) => setPropertyToAdd(event.target.value)} disabled={!availableProperties.length}>{availableProperties.map((property) => <option key={property.id} value={property.id}>{property.address} · {property.locality}</option>)}</select></label><button onClick={addProperty} disabled={!availableProperties.length}>Add position</button></div>
+      <div className="builder-table"><table><thead><tr><th>Position + evidence</th><th>Acquisition basis</th><th>Monthly rent</th><th>Vacancy</th><th>Operating expense</th><th>Down payment</th><th>Interest rate</th><th>Remove</th></tr></thead><tbody>{items.map((item) => { const context = regionalContext(item.property); return <tr key={item.property.id}><td><b>{item.property.address}</b><small>{item.market.label} · value {currency(item.property.model.value)} · {item.property.model.confidence}% evidence</small><span className={`builder-source ${item.property.sourceMode}`}>{item.property.sourceMode === "connected-listing" ? `Connected · ${item.property.sourceLabel}` : `Public record · ${item.property.sourceLabel}`}</span>{item.property.reportId && <a href={`/report?type=property&id=${encodeURIComponent(item.property.reportId)}`} target="_blank" rel="noreferrer">Open property report →</a>}</td><td><label><span>Price</span><input aria-label={`${item.property.address} acquisition basis`} type="number" min="0" step="1000" value={item.assumption.purchasePrice} onChange={(event) => updateAssumption(item.property.id, "purchasePrice", Number(event.target.value))} /></label><small>{item.property.sourceMode === "connected-listing" ? "Verified active asking price" : "Recorded sale default"}</small></td><td><label><span>Rent</span><input aria-label={`${item.property.address} monthly rent`} type="number" min="0" step="50" value={item.assumption.monthlyRent || ""} placeholder="Required" onChange={(event) => updateAssumption(item.property.id, "monthlyRent", Number(event.target.value))} /></label><small>{item.property.sourceMode === "connected-listing" && item.assumption.monthlyRent ? "Property estimate; replace with rent comps" : `${context?.rentP25 && context?.rentP75 ? `${currency(context.rentP25)}–${currency(context.rentP75)} regional context` : "Property evidence required"}`}</small></td><td><label><span>Vacancy</span><input aria-label={`${item.property.address} vacancy`} type="number" min="0" max="95" step=".5" value={item.assumption.vacancyPct} onChange={(event) => updateAssumption(item.property.id, "vacancyPct", Number(event.target.value))} /></label><small>{context?.vacancyPct == null ? "% of gross rent" : `${percent(context.vacancyPct)} nearest-cluster standard`}</small></td><td><label><span>Expenses</span><input aria-label={`${item.property.address} operating expenses`} type="number" min="0" max="95" step="1" value={item.assumption.expensePct} onChange={(event) => updateAssumption(item.property.id, "expensePct", Number(event.target.value))} /></label><small>35% screening default · verify line items</small></td><td><label><span>Equity</span><input aria-label={`${item.property.address} down payment`} type="number" min="0" max="100" step="1" value={item.assumption.downPaymentPct} onChange={(event) => updateAssumption(item.property.id, "downPaymentPct", Number(event.target.value))} /></label><small>25% portfolio policy default</small></td><td><label><span>Rate</span><input aria-label={`${item.property.address} interest rate`} type="number" min="0" max="30" step=".1" value={item.assumption.interestRate} onChange={(event) => updateAssumption(item.property.id, "interestRate", Number(event.target.value))} /></label><small>7% scenario default · 30 years</small></td><td><button aria-label={`Remove ${item.property.address}`} onClick={() => { setAssumptions((current) => current.filter((assumption) => assumption.propertyId !== item.property.id)); if (item.property.sourceMode === "connected-listing") setMonitoredProperties((current) => current.filter((property) => property.id !== item.property.id)); }} disabled={assumptions.length <= 1}>×</button></td></tr>; })}</tbody></table></div>
       <div className="portfolio-data-legend"><b>ACQUISITION-COST ASSUMPTIONS</b>{items.map((item) => <label key={item.property.id}><span>{item.property.address} closing costs</span><input aria-label={`${item.property.address} closing costs`} type="number" min="0" max="20" step=".5" value={item.assumption.closingCostPct} onChange={(event) => updateAssumption(item.property.id, "closingCostPct", Number(event.target.value))} />%</label>)}<p>Closing costs are included in all-in basis, invested cash, cash-on-cash return and price-to-model margin. The 2% default is an editable placeholder—not a market fact.</p></div>
       <div className="portfolio-data-legend"><b>INPUT PROVENANCE</b><span><i className="public" /> Public record: identity, recorded sale, assessment and building facts</span><span><i className="model" /> BORO model: value range, comps, cluster edge and confidence</span><span><i className="assumption" /> Editable assumption: rent, vacancy, expenses, reserves and financing</span><p>Operating expense is a combined screening ratio after vacancy. Replace it with taxes, insurance, management, utilities, repairs and replacement reserves before diligence. Refinance-rate stress is an indicative refinance case; it does not reprice existing fixed-rate debt.</p></div>
     </div>}
