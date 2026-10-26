@@ -1,4 +1,5 @@
 import { readFile, writeFile } from "node:fs/promises";
+import { productionValidationFor, confidenceForEvidence, heuristicMargin } from "./valuation-validation.mjs";
 
 const ROOT = new URL("../../", import.meta.url);
 const OUTPUT = new URL("../../data/property-valuations.json", import.meta.url);
@@ -397,9 +398,7 @@ function modelMarket(records, clusterId) {
   const meta = clusterMeta(clusterId);
   const usable = records.filter((row) => row.salePrice && row.assessedValue && row.sqft && row.sqft > 0);
   const calibration = calibrationFor(usable);
-  const diagnostics = backtestMarket(usable, meta.price);
-  const modelQuality = clamp(100 - diagnostics.medianAbsoluteErrorPct * 2.2 - Math.abs(diagnostics.biasPct) * 1.2 - Math.max(0, 18 - diagnostics.sampleSize) * 0.5, 35, 92);
-  diagnostics.modelCompetency = Math.round(modelQuality);
+  const diagnostics = productionValidationFor(backtestMarket(usable, meta.price));
   const modeled = usable.map((record) => {
     const comps = comparableEvidence(record, usable, meta.price, TODAY);
     if (!comps.ppsf || comps.count < 2) return null;
@@ -418,10 +417,8 @@ function modelMarket(records, clusterId) {
     const completeness = [record.sqft, record.yearBuilt, record.assessedValue, record.lat, record.lng, record.zip].filter(Boolean).length / 6;
     const compQuality = clamp(comps.count / 8 * 50 + comps.sameTypePct * 0.3 + (20 - (comps.medianMiles ?? 20)) * 1.0, 0, 100);
     const agreement = clamp(100 - spread / estimate * 120, 0, 100);
-    const rawConfidence = Math.round(modelQuality * 0.35 + recency * 0.15 + completeness * 100 * 0.15 + compQuality * 0.20 + agreement * 0.10 + meta.price.pricingCompetency * 0.05);
-    const confidence = clamp(Math.round(Math.min(rawConfidence, modelQuality + 10)), 25, 94);
-    const empiricalMargin = diagnostics.sampleSize >= 8 ? diagnostics.p80AbsoluteErrorPct / 100 : 0.22;
-    const margin = clamp(Math.max(empiricalMargin, spread / estimate * 0.28, (100 - confidence) / 300), 0.08, 0.60);
+    const confidence = confidenceForEvidence({ recency, completeness, compQuality, agreement }, diagnostics);
+    const margin = heuristicMargin({ spread, estimate, confidence }, diagnostics);
     const valuationGapPct = (estimate / record.assessedValue - 1) * 100;
     const watchScore = Math.round(50 + (meta.score - 50) * confidence / 100);
     return {
@@ -436,7 +433,7 @@ function modelMarket(records, clusterId) {
         pricePerSqft: { recordedSale: round(record.salePrice / record.sqft, 0), hpiAdjustedSale: round(saleAnchor / record.sqft, 0), assessmentCalibrated: round(assessmentAnchor / record.sqft, 0), comparableP25: round(comps.ppsfP25, 0), comparableMedian: round(comps.ppsf, 0), comparableP75: round(comps.ppsfP75, 0), modelCenter: round(estimate / record.sqft, 0) },
         recency: { saleAgeMonths: round(ageMonths, 1), score: round(recency, 0), band: recencyBand },
         comparableQuality: { nearestMiles: round(comps.nearestMiles ?? 0, 1), medianMiles: round(comps.medianMiles ?? 0, 1), medianAgeMonths: round(comps.medianAgeMonths ?? 0, 1), newestSaleDate: comps.newestSaleDate, oldestSaleDate: comps.oldestSaleDate, sameTypePct: round(comps.sameTypePct, 0), recordIds: comps.ids },
-        diagnostics: { modelVersion: "3.1", decisionUse: diagnostics.decisionUse, marketBacktestSample: diagnostics.sampleSize, marketMedianAbsoluteErrorPct: diagnostics.medianAbsoluteErrorPct, marketP80AbsoluteErrorPct: diagnostics.p80AbsoluteErrorPct },
+        diagnostics: { modelVersion: "3.1", decisionUse: diagnostics.decisionUse, productionValidation: diagnostics.productionValidation, rangeMethod: diagnostics.rangeMethod, marketBacktestSample: diagnostics.sampleSize, marketMedianAbsoluteErrorPct: diagnostics.medianAbsoluteErrorPct, marketP80AbsoluteErrorPct: diagnostics.p80AbsoluteErrorPct },
       },
       listing: null,
       vendorEstimates: [],
@@ -463,9 +460,9 @@ const output = {
   methodology: {
     label: "Public-record valuation watch model v3.1",
     value: "Recency-weighted prior sale + 20% locally calibrated assessment + 45–65% geographically, physically and price-per-square-foot matched comparable sales",
-    range: "The larger of the market's out-of-time 80th-percentile error, anchor disagreement, or evidence-quality penalty",
+    range: "Heuristic range: at least 30% (60% in compromised regions), widened for anchor disagreement and evidence quality; coverage is not calibrated",
     watchScore: "Cluster screening signal shrunk toward neutral in proportion to property evidence confidence; evidence quality and assessment gaps do not earn edge points",
-    validation: "Rolling-origin backtesting uses only earlier comparable sales; assessments enter only when their source effective date precedes the sale, with calibration learned from earlier eligible sales",
+    validation: "Reference-estimator rolling-origin tests use earlier comparable sales and eligible dated assessments. They do not validate the production three-anchor blend; release gates remain watch or compromised.",
     boundary: "The assessment gap is not acquisition edge. A true price edge requires an asking price or licensed live listing joined to the record.",
   },
   markets: [

@@ -394,7 +394,7 @@ async function fetchMarketListingPilot(apiKey: string, marketId: ListingMarketId
       publicRecordMedianErrorPct: diagnostics?.medianAbsoluteErrorPct ?? null,
       publicRecordP80ErrorPct: diagnostics?.p80AbsoluteErrorPct ?? null,
       modelCompetency: modelMarket && "modelCompetency" in modelMarket ? modelMarket.modelCompetency : null,
-      interpretation: regionalStatus === "pass" ? "Listing breadth, field completeness and public-record backtesting support regional use with visible uncertainty." : regionalStatus === "watch" ? "The regional model remains usable for screening, but reliability is capped at 80% because sample depth or validation error requires higher diligence." : "Regional evidence does not clear the minimum transferability gate; reliability is capped at 55% and scores must not be compared as if equally calibrated.",
+      interpretation: regionalStatus === "pass" ? "Listing breadth and field completeness pass; production valuation accuracy and range coverage require matching-estimator validation." : regionalStatus === "watch" ? "The production valuation blend is unvalidated. Reference-estimator errors are diagnostic only; regional reliability is capped and property decisions require higher diligence." : "Regional evidence does not clear the minimum transferability gate; reliability is capped at 55% and scores must not be compared as if equally calibrated.",
     },
   };
 }

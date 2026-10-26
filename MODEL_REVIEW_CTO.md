@@ -1,5 +1,14 @@
 # BORO model and data-quality review
 
+## Validation correction — October 26, 2026
+
+The historical metrics in this document evaluate a reference estimator (85% eligible assessment / 15% comparable sales, or comparable-only), not the production prior-sale / 20% assessment / comparable blend. They must not be interpreted as production error rates or calibrated range coverage.
+
+The production formula and value centers are unchanged. All production release gates are now capped at watch, with compromised regions retaining their restriction. Confidence is based on evidence completeness, recency, comparable quality and anchor agreement, capped at 50 (35 in compromised regions). Ranges use explicitly heuristic minimum widths of 30% or 60% for compromised regions, widened for disagreement and evidence quality. These floors are conservative screening policies, not statistical coverage claims.
+
+Raleigh remains the strongest reference baseline; it is not a validated production release. A matching-estimator out-of-time evaluation and interval-coverage study are required before promotion. Earlier readiness and empirical-uncertainty language below is superseded by this correction.
+
+
 **Audience:** CTO and product/model-risk leadership  
 **Review date:** 2026-08-11  
 **Reviewed release:** Public-record valuation model v3.1 plus live ATTOM and RentCast adapters

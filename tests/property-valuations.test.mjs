@@ -7,6 +7,10 @@ test("property valuation snapshot is internally consistent", () => {
   assert.equal(valuations.properties.length, 54);
   assert.deepEqual([...new Set(valuations.properties.map((record) => record.marketId))].sort(), ["chicago", "philadelphia", "raleigh"]);
   for (const record of valuations.properties) {
+    assert.equal(record.model.diagnostics.rangeMethod, "heuristic");
+    assert.equal(record.model.diagnostics.productionValidation, "not-validated");
+    assert.ok(record.model.confidence <= 50);
+    assert.ok(record.model.high >= record.model.value * 1.29);
     const anchors = record.model.anchors;
     const weights = record.model.weights;
     const expected = anchors.hpiAdjustedSale * weights.hpiAdjustedSale + anchors.assessmentCalibrated * weights.assessmentCalibrated + anchors.comparablePpsf * weights.comparableSales;
@@ -48,7 +52,12 @@ test("market competency separates source coverage from observed model performanc
   assert.ok(philadelphia.diagnostics.validationSegments.datedAssessment.medianAbsoluteErrorPct < philadelphia.diagnostics.validationSegments.comparableOnly.medianAbsoluteErrorPct);
   assert.ok(philadelphia.diagnostics.priceRelatedDifferential < 1.263);
   assert.ok(raleigh.diagnostics.medianAbsoluteErrorPct <= 15);
-  assert.equal(raleigh.decisionUse, "pass");
+  assert.equal(raleigh.diagnostics.referenceDecisionUse, "pass");
+  assert.equal(raleigh.decisionUse, "watch");
+  for (const market of live) {
+    assert.equal(market.diagnostics.productionValidation, "not-validated");
+    assert.notEqual(market.decisionUse, "pass");
+  }
   assert.equal(live.find((market) => market.id === "chicago").decisionUse, "watch");
 });
 

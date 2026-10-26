@@ -43,7 +43,7 @@ test("cluster-only rent can never produce an advance state", () => {
 
 test("complete corroborating evidence advances only to underwriting", () => {
   const publicRange = buildPublicRecordRange(listing, selectComparableControls(listing, controls, 3));
-  const memo = buildDecisionMemo({ listing, sourceMode: "connected", publicRange, cluster: null, rentEvidence: { source: "rentcast_property", median: 2300, low: 2100, high: 2500, compCount: 5 }, attomEvidence: { status: "available", deltaPct: 4 }, now });
+  const memo = buildDecisionMemo({ listing, sourceMode: "connected", publicRange, cluster: null, rentEvidence: { source: "rentcast_property", median: 2300, low: 2100, high: 2500, compCount: 5 }, attomEvidence: { status: "available", deltaPct: 4 }, modelValidated: true, now });
   assert.equal(memo.decision, "advance");
   assert.match(memo.headline, /underwriting/i);
   assert.match(memo.rationale, /not a purchase recommendation/i);
@@ -54,4 +54,18 @@ test("material vendor disagreement stops the current thesis", () => {
   const memo = buildDecisionMemo({ listing, sourceMode: "connected", publicRange, cluster: null, rentEvidence: { source: "rentcast_property", median: 2300, compCount: 5 }, attomEvidence: { status: "available", deltaPct: 31 }, now });
   assert.equal(memo.decision, "stop");
   assert.equal(memo.gates.find((gate) => gate.id === "vendor").status, "fail");
+});
+
+test("failed comparable quality blocks advance even with all other gates passing", () => {
+  const publicRange = { center: 420000, high: 480000, quality: "weak", controlCount: 5, medianDistance: 19, typeMatchPct: 0 };
+  const memo = buildDecisionMemo({ listing, sourceMode: "connected", publicRange, cluster: null, rentEvidence: { source: "rentcast_property", median: 2300, compCount: 5 }, attomEvidence: { status: "available", deltaPct: 4 }, modelValidated: true, now });
+  assert.equal(memo.decision, "stop");
+  assert.equal(memo.gates.find(gate => gate.id === "controls").status, "fail");
+});
+
+test("unvalidated production model cannot advance despite strong reference controls", () => {
+  const publicRange = buildPublicRecordRange(listing, selectComparableControls(listing, controls, 3));
+  const memo = buildDecisionMemo({ listing, sourceMode: "connected", publicRange, cluster: null, rentEvidence: { source: "rentcast_property", median: 2300, compCount: 5 }, attomEvidence: { status: "available", deltaPct: 4 }, now });
+  assert.equal(memo.decision, "watch");
+  assert.equal(memo.gates.find(gate => gate.id === "valuation").status, "watch");
 });

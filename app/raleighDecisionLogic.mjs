@@ -96,7 +96,7 @@ function gate(id, label, status, detail) {
   return { id, label, status, detail };
 }
 
-export function buildDecisionMemo({ listing, sourceMode, publicRange, cluster, rentEvidence, attomEvidence, now = new Date() }) {
+export function buildDecisionMemo({ listing, sourceMode, publicRange, cluster, rentEvidence, attomEvidence, modelValidated = false, now = new Date() }) {
   const truth = listingTruth(listing, sourceMode, now);
   if (!listing) {
     return {
@@ -142,10 +142,13 @@ export function buildDecisionMemo({ listing, sourceMode, publicRange, cluster, r
         ? gate("vendor", "Independent cross-check", "watch", `ATTOM differs by ${Math.abs(attomEvidence.deltaPct ?? 0).toFixed(1)}%; widen diligence.`)
         : gate("vendor", "Independent cross-check", "fail", `ATTOM differs by ${Math.abs(attomEvidence.deltaPct ?? 0).toFixed(1)}%; the valuation thesis is not stable.`);
 
+  if (valuationGate.status !== "fail" && !modelValidated) {
+    valuationGate = gate("valuation", "Public-record range", "watch", "The production anchor blend has not been validated out of time. This heuristic range cannot clear the underwriting gate.");
+  }
   const gates = [listingGate, valuationGate, compGate, rentGate, attomGate];
   const passCount = gates.filter((item) => item.status === "pass").length;
-  const hardStop = listingGate.status === "fail" || valuationGate.status === "fail" || rentGate.status === "fail" || attomGate.status === "fail";
-  const decision = hardStop ? "stop" : propertyRent && passCount >= 4 ? "advance" : "watch";
+  const hardStop = compGate.status === "fail" || listingGate.status === "fail" || valuationGate.status === "fail" || rentGate.status === "fail" || attomGate.status === "fail";
+  const decision = hardStop ? "stop" : modelValidated && propertyRent && passCount >= 4 ? "advance" : "watch";
   const headline = decision === "advance" ? "Advance to full underwriting"
     : decision === "watch" ? "Watch · complete missing diligence" : "Stop the current thesis";
   const rationale = decision === "advance"

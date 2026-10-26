@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { BOROCAST_MAP_STYLES, getGoogleMaps, type GoogleCircle, type GoogleDataFeature, type GoogleInfoWindow, type GoogleMapInstance, type GoogleMapsNamespace, type GoogleMarker } from "./googleMapsLoader";
+import { BOROCAST_MAP_STYLES, getGoogleMaps, type GoogleCircle, type GoogleDataFeature, type GoogleInfoWindow, type GoogleMapInstance, type GoogleMapStyle, type GoogleMapsNamespace, type GoogleMarker } from "./googleMapsLoader";
 import { type ExplorerLayer, type MarketExplorer, type NeighborhoodSignal } from "./marketNeighborhoods";
 import type { ScoredTract } from "./tractPilot";
 import propertyValuations from "../data/property-valuations.json";
@@ -138,7 +138,7 @@ export function NationalMarketMap({ market, neighborhoods, layer, selectedId, on
       const maximum = values.length ? Math.max(...values) : 100;
       const spread = Math.max(8, maximum - minimum);
       const lookup = new Map(tracts.map((tract) => [tract.id, tract]));
-      map.data.setStyle((feature) => {
+      map.data.setStyle((feature): GoogleMapStyle => {
         const geoid = String(feature.getProperty("geoid") ?? "");
         const tract = lookup.get(geoid);
         if (!tract) return { visible: false };

@@ -48,6 +48,7 @@ export function RaleighDecisionLoop() {
     cluster,
     rentEvidence: validation?.rent ?? null,
     attomEvidence: validation?.attom ?? null,
+    modelValidated: valuations.markets.find((market) => market.id === "raleigh")?.diagnostics?.productionValidation === "validated",
   }), [selected, result, publicRange, cluster, validation]);
 
   async function loadCandidates() {
@@ -100,13 +101,13 @@ export function RaleighDecisionLoop() {
 
   return <section className={styles.shell} aria-labelledby="raleigh-loop-title">
     <header className={styles.head}>
-      <div><p className={styles.eyebrow}>RALEIGH REFERENCE LOOP · SIGNAL TO DECISION MEMO</p><h3 id="raleigh-loop-title">One candidate. Five evidence gates. One next action.</h3><p>The loop turns a tract signal into a property research decision. It will not produce an “advance” state without a fresh, source-traceable active listing and property-level rent evidence.</p></div>
+      <div><p className={styles.eyebrow}>RALEIGH REFERENCE LOOP · SIGNAL TO DECISION MEMO</p><h3 id="raleigh-loop-title">One candidate. Five evidence gates. One next action.</h3><p>The loop turns a tract signal into a property research decision. It will not produce an “advance” state without a fresh, source-traceable active listing, property-level rent evidence and a validated production model.</p></div>
       <div className={styles.budget}><span>Provider budget</span><b>1 call to screen</b><small>The market request returns up to 500 candidates. Property rent and ATTOM validation remain opt-in and run once per selected address.</small><button type="button" onClick={loadCandidates} disabled={loading}>{loading ? "Loading Raleigh…" : result ? "Refresh Raleigh · 1 call" : "Load Raleigh · 1 call"}</button></div>
     </header>
     {error && <p className={styles.error} role="alert"><b>Evidence unavailable.</b> {error} The decision loop has failed closed.</p>}
     <div className={styles.sourceStrip}>
       <div><span>Listing truth</span><b>{result ? "Connected feed" : "Not loaded"}</b><small>{result ? "Live provider response · up to 6h response cache" : "No conclusion permitted"}</small></div>
-      <div><span>Public records</span><b>Wake County model v3</b><small>{valuations.asOf} snapshot · 1,210 backtests</small></div>
+      <div><span>Public records</span><b>Wake County model v3</b><small>{valuations.asOf} snapshot · reference backtest only</small></div>
       <div><span>Cluster context</span><b>ACS 2020–2024</b><small>{raleighMarket.coverage}% field coverage · contextual rent only</small></div>
       <div><span>Property validation</span><b>{validation ? "Completed once" : "Opt-in"}</b><small>{validation ? `${validation.rent ? "Rent matched" : "Rent missing"} · ${validation.attom.status === "available" ? "ATTOM matched" : "ATTOM missing"}` : "Up to 4 provider calls"}</small></div>
     </div>
@@ -123,7 +124,7 @@ export function RaleighDecisionLoop() {
           <article><span>2 · Public range</span><b>{publicRange ? money(publicRange.center) : "—"}</b><small>{publicRange ? `${money(publicRange.low)}–${money(publicRange.high)} · ${publicRange.controlCount} controls · ${publicRange.medianDistance} mi median distance` : "A range appears only with at least three usable controls."}</small><em>OFFICIAL SNAPSHOT</em></article>
           <article><span>3 · Rent evidence</span><b>{validation?.rent ? money(validation.rent.median) : cluster ? money(cluster.medianRent) : "—"}</b><small>{validation?.rent ? `${money(validation.rent.low)}–${money(validation.rent.high)} · ${validation.rent.compCount} property comps` : cluster ? `${money(cluster.rentP25)}–${money(cluster.rentP75)} · ${cluster.name} context, not achievable rent` : "No rent context."}</small><em>{validation?.rent ? "PROPERTY ESTIMATE" : "CLUSTER CONTEXT"}</em></article>
         </div>
-        <div className={styles.controls}><div><b>Public-control quality</b><span>{publicRange?.quality ?? "unavailable"}</span></div><p>{publicRange ? `${publicRange.typeMatchPct}% same property type. Raleigh has a passing market backtest, but this candidate range is still constrained by the local control distance.` : "The system will not extrapolate a property value without comparable controls."}</p></div>
+        <div className={styles.controls}><div><b>Public-control quality</b><span>{publicRange?.quality ?? "unavailable"}</span></div><p>{publicRange ? `${publicRange.typeMatchPct}% same property type. The reference backtest does not validate the production blend; this candidate range is heuristic and constrained by local control distance.` : "The system will not extrapolate a property value without comparable controls."}</p></div>
         <button type="button" className={styles.validate} onClick={validateSelected} disabled={!selected || validating || Boolean(validation)}>{validating ? "Validating property…" : validation ? "Property validation cached" : "Add rent + ATTOM evidence"}</button>
         <small className={styles.cost}>Explicit action only · RentCast property endpoint can use 3 calls · ATTOM core uses up to 1 call · results are reused during this session.</small>
       </main>
